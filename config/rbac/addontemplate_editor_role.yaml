@@ -1,0 +1,24 @@
+# permissions for end users to edit addontemplates.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: addontemplate-editor-role
+rules:
+- apiGroups:
+  - addons.managed.openshift.io
+  resources:
+  - addontemplates
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - addons.managed.openshift.io
+  resources:
+  - addontemplates/status
+  verbs:
+  - get

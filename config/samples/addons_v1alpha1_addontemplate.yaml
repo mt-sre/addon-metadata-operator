@@ -1,0 +1,7 @@
+apiVersion: addons.managed.openshift.io/v1alpha1
+kind: AddonTemplate
+metadata:
+  name: addontemplate-sample
+spec:
+  # Add fields here
+  foo: bar
