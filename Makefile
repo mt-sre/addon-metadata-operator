@@ -42,17 +42,17 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-fmt: ## Run go fmt against code.
-	go fmt ./...
-
-vet: ## Run go vet against code.
-	go vet ./...
-
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test: manifests generate fmt vet ## Run tests.
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
 	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out
+
+fmt: ## Run go fmt against code.
+	@go fmt ./...
+
+vet: ## Run go vet against code.
+	@go vet ./...
 
 clean: ## Clean this directory
 	@if [ -f "$(KIND)" ]; then $(KIND) delete cluster --name $(KIND_CLUSTER_NAME); fi
@@ -90,7 +90,7 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 ##@ Kind
 KIND_CLUSTER_NAME := addon-flow
 
-kind-create: init kind ## Create a plain kind cluster /w secret to allow pulling from Quay.io
+kind-create: kind ## Create a plain kind cluster /w secret to allow pulling from Quay.io
 	@$(KIND) create cluster --name $(KIND_CLUSTER_NAME) --kubeconfig $(KUBECONFIG) || true
 	@echo -e "Ignoring existing cluster error...\n"
 
@@ -102,19 +102,31 @@ deploy-olm: kind-create
 deploy-console: kind-create
 	@./hack/deploy-console.sh
 
+deploy-hive: kind-create
+	@./hack/deploy-hive.sh
 
-##@ Dependencies
-CONTROLLER_GEN = $(GOBIN)/controller-gen
-controller-gen: ## Download controller-gen locally if necessary.
-	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.4.1)
 
-KUSTOMIZE = $(GOBIN)/kustomize
-kustomize: ## Download kustomize locally if necessary.
-	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
+## Dependencies
 
-KIND = $(GOBIN)/kind
-kind: ## Download kind locally if necessary.
-	$(call go-get-tool,$(KIND),sigs.k8s.io/kind)
+CONTROLLER_GEN := $(GOBIN)/controller-gen
+controller-gen:
+	@$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.4.1)
+
+KUSTOMIZE := $(GOBIN)/kustomize
+kustomize:
+	@$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
+
+KIND := $(GOBIN)/kind
+kind:
+	@$(call go-get-tool,$(KIND),sigs.k8s.io/kind)
+
+GOIMPORTS := $(GOBIN)/goimports
+goimports:
+	@$(call go-get-tool,$(GOIMPORTS),golang.org/x/tools/cmd/goimports)
+
+GOLANGCI_LINT := $(GOBIN)/golangci-lint
+golangci-lint:
+	@$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 define go-get-tool

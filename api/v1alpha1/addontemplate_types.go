@@ -20,16 +20,35 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // AddonTemplateSpec defines the desired state of AddonTemplate
+// View markers: $ controller-gen -www crd
+// TODO add missing fields from schema, simplified type for POC
 type AddonTemplateSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$`
+	ID string `json:"id"`
 
-	// Foo is an example field of AddonTemplate. Edit addontemplate_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^[0-9A-Z][A-Za-z0-9-_ ()]+$`
+	Name string `json:"name"`
+
+	// +kubebuilder:validation:Required
+	Description string `json:"description"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$`
+	Link string `json:"link"`
+
+	// +kubebuilder:validation:Required
+	// TODO base64
+	Icon string `json:"icon"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^api\.openshift\.com/addon-[0-9a-z][0-9a-z-]{0,30}[0-9a-z]$`
+	Label string `json:"label"`
+
+	// +kubebuilder:validation:Required
+	Enabled bool `json:"enabled"`
 }
 
 // AddonTemplateStatus defines the observed state of AddonTemplate
