@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	addonsv1alpha1 "github.com/mt-sre/addon-flow-operator/api/v1alpha1"
+	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 )
 
 // AddonMetadataReconciler reconciles a AddonMetadata object
@@ -33,9 +33,9 @@ type AddonMetadataReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=addons.managed.openshift.io,resources=AddonMetadatas,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=addons.managed.openshift.io,resources=AddonMetadatas/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=addons.managed.openshift.io,resources=AddonMetadatas/finalizers,verbs=update
+//+kubebuilder:rbac:groups=addons.managed.openshift.io,resources=AddonMetadata,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=addons.managed.openshift.io,resources=AddonMetadata/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=addons.managed.openshift.io,resources=AddonMetadata/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

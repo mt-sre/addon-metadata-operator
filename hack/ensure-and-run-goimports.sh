@@ -5,4 +5,4 @@ set -euo pipefail
 # and then executes goimport passing all arguments forward
 
 make -s goimports
-.cache/bin/goimports -local github.com/mt-sre/addon-flow-operator -w -l "$@"
+.cache/bin/goimports -local github.com/mt-sre/addon-metadata-operator -w -l "$@"

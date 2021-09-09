@@ -9,7 +9,7 @@ rules:
 - apiGroups:
   - addons.managed.openshift.io
   resources:
-  - AddonMetadatas
+  - AddonMetadata
   verbs:
   - create
   - delete
@@ -21,13 +21,13 @@ rules:
 - apiGroups:
   - addons.managed.openshift.io
   resources:
-  - AddonMetadatas/finalizers
+  - AddonMetadata/finalizers
   verbs:
   - update
 - apiGroups:
   - addons.managed.openshift.io
   resources:
-  - AddonMetadatas/status
+  - AddonMetadata/status
   verbs:
   - get
   - patch

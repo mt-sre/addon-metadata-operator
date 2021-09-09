@@ -102,7 +102,7 @@ deploy-olm: kind-create
 deploy-console: kind-create
 	@./hack/deploy-console.sh
 
-deploy-hive: kind-create
+deploy-hive: kind-create deploy-olm
 	@./hack/deploy-hive.sh
 
 

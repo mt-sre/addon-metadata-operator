@@ -126,7 +126,7 @@ type AddonMetadataStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// AddonMetadata is the Schema for the AddonMetadatas API
+// AddonMetadata is the Schema for the AddonMetadata API
 type AddonMetadata struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
