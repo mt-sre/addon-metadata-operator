@@ -1,8 +1,8 @@
 domain: managed.openshift.io
 layout:
 - go.kubebuilder.io/v3
-projectName: addon-flow-operator
-repo: github.com/mt-sre/addon-flow-operator
+projectName: addon-metadata-operator
+repo: github.com/mt-sre/addon-metadata-operator
 resources:
 - api:
     crdVersion: v1
@@ -10,7 +10,7 @@ resources:
   controller: true
   domain: managed.openshift.io
   group: addons
-  kind: AddonTemplate
-  path: github.com/mt-sre/addon-flow-operator/api/v1alpha1
+  kind: AddonMetadata
+  path: github.com/mt-sre/addon-metadata-operator/api/v1alpha1
   version: v1alpha1
 version: "3"

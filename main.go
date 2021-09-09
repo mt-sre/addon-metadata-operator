@@ -78,11 +78,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.AddonTemplateReconciler{
+	if err = (&controllers.AddonMetadataReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AddonTemplate")
+		setupLog.Error(err, "unable to create controller", "controller", "AddonMetadata")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
