@@ -94,7 +94,7 @@ kind-create: kind ## Create a plain kind cluster /w secret to allow pulling from
 	@$(KIND) create cluster --name $(KIND_CLUSTER_NAME) --kubeconfig $(KUBECONFIG) || true
 	@echo -e "Ignoring existing cluster error...\n"
 
-kind-create-all: deploy-olm deploy-hive deploy-console ## Create kind cluster /w OLM + OKD console
+kind-create-all: deploy-olm deploy-hive deploy-console ## Create kind cluster /w OLM + Hive + OKD console
 
 deploy-olm: kind-create
 	@./hack/deploy-olm.sh
