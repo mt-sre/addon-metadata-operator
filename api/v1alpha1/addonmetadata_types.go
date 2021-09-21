@@ -73,7 +73,7 @@ type AddonMetadataSpec struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum={AllNamespaces,SingleNamespace,OwnNamespace}
-	// OLM InstallMode for the addon operator.
+	// OLM InstallMode for the addon operator. One of: AllNamespaces, SingleNamespace or OwnNamespace.
 	InstallMode string `json:"installMode"`
 
 	// +kubebuilder:validation:Required
@@ -88,12 +88,12 @@ type AddonMetadataSpec struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-_]{0,35}[A-Za-z0-9]$`
-	// TODO: what exactly is this?
+	// Refers to the SKU name for the addon.
 	OcmQuotaName string `json:"ocmQuotaName"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=0
-	// TODO: what exactly is this?
+	// TODO: what is this?
 	OcmQuotaCost int `json:"ocmQuotaCost"`
 
 	// +kubebuilder:validation:Required
@@ -103,8 +103,13 @@ type AddonMetadataSpec struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum={alpha,beta,stable,edge,rc}
-	// OLM channel from which to install the addon-operator.
+	// OLM channel from which to install the addon-operator. One of: alpha, beta, stable, edge or rc.
 	DefaultChannel string `json:"defaultChannel"`
+
+	// +optional
+	// +kubebuilder:default:[]
+	// List of channels where the addon operator is available.
+	Channels []Channel `json:"channels"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:default:{}
@@ -115,6 +120,10 @@ type AddonMetadataSpec struct {
 	// +kubebuilder:default:{}
 	// Annotations to be applied on all listed namespaces.
 	NamespaceAnnotations map[string]string `json:"namespaceAnnotations"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^quay\.io/osd-addons/[a-z-]+`
+	IndexImage string `json:"indexImage"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata
