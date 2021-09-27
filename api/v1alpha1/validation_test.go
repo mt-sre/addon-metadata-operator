@@ -1,10 +1,8 @@
 package v1alpha1
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/go-playground/validator"
 	"github.com/stretchr/testify/require"
 )
 
@@ -41,7 +39,7 @@ func newReferenceAddon() *AddonMetadata {
 
 func TestMetadataValidatorIsSingleton(t *testing.T) {
 	t.Parallel()
-	require.Same(t, GetMetadataValidator(), GetMetadataValidator())
+	require.Same(t, getMetadataValidator(), getMetadataValidator())
 }
 
 // TODO - implement newReferenceAddon, make sure failing tests report useful errors
@@ -49,16 +47,8 @@ func TestMetadataValidatorIsSingleton(t *testing.T) {
 func TestReferenceAddonBase(t *testing.T) {
 	t.Parallel()
 	refAddon := newReferenceAddon()
-	metadataValidator := GetMetadataValidator()
-	if err := metadataValidator.Struct(refAddon); err != nil {
-		handleValidationErrors(t, err)
+	if err := refAddon.Validate(); err != nil {
+		PrintValidationErrors(err)
+		t.Fail()
 	}
-}
-
-// handleValidationErrors - helper to pretty print validationErrors and fail
-func handleValidationErrors(t *testing.T, err error) {
-	for _, err := range err.(validator.ValidationErrors) {
-		fmt.Println(err)
-	}
-	t.Fail()
 }
