@@ -23,7 +23,7 @@ $ direnv allow .
 
 ### `.envrc`
 
-Here is my `.envrc` to be used with [direnv](https://github.com/direnv/direnv). This is to make sure my environment is set properly to work with this repo:
+Use `.envrc` with [direnv](https://github.com/direnv/direnv) to make sure your environment is set properly:
 
 ```bash
 export GOROOT=$(go1.16.7 env GOROOT)
@@ -32,8 +32,42 @@ export PATH=${GOROOT}/bin:${GOBIN}:${PATH}
 export KUBECONFIG=${PWD}/.cache/kubeconfig
 ```
 
+## Develop
+
 ### Useful make commands
 
-**`$ make manifests`**
+Install `pre-commit` hooks:
 
-Use this to regenerate the underlying CRD located here: `./config/crd/bases/addons.managed.openshift.io_addonmetadata.yaml` whenever you modify the `AddonMetadata` type.
+```bash
+$ pre-commit install
+```
+
+Run code checks:
+
+```bash
+$ make check
+```
+
+Run tests:
+
+```bash
+$ make test
+```
+
+Regenerate manifests and CRDs (`./config/crd/bases/addons.managed.openshift.io_addonmetadata.yaml` whenever you modify the `AddonMetadata` type:
+
+```bash
+$ make manifest
+```
+
+You can also use the `Dockerfile.test` for a more stable environment:
+
+```bash
+$ ./pr_check.sh
+```
+
+## Release
+
+## License
+
+Apache License 2.0, see [LICENSE](LICENSE).

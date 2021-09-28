@@ -1,0 +1,25 @@
+# vi:set ft=dockerfile:
+# --- stage 1 ---
+FROM golang:1.16 as builder
+
+WORKDIR /build
+
+RUN echo "noroot:x:10001:10001:noroot:/:/sbin/nologin" | tee -a /etc/passwd
+
+# Cache optimization
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . ./
+RUN make build
+
+# --- stage 2 ---
+FROM scratch
+
+WORKDIR /
+COPY --from=builder /build/bin/addon-metadata-operator /
+COPY --from=builder /etc/passwd /etc/passwd
+
+USER "noroot"
+
+ENTRYPOINT ["/addon-metadata-operator"]

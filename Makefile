@@ -1,76 +1,63 @@
+.PHONY: all test fmt vet clean build vendor docker-build docker-push
 
-# TODO: Image URL to use all building/pushing image targets
-IMG ?= controoler:latest
+REPO := quay.io/app-sre/addon-metadata-operator
+TAG := $(shell git rev-parse --short HEAD)
+
+# Set the GOBIN environment variable so that dependencies will be installed
+# always in the same place, regardless of the value of GOPATH
+CACHE := $(PWD)/.cache
+export GOBIN := $(CACHE)/bin
+export PATH := $(GOBIN):$(PATH)
+export KUBECONFIG := $(CACHE)/kubeconfig
+PKGS := $(shell go list ./... | grep -v -E '/vendor')
+
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
-
-CACHE := $(PWD)/.cache
-export GOBIN := $(CACHE)/bin
-export KUBECONFIG := $(CACHE)/kubeconfig
-
-
-# Setting SHELL to bash allows bash commands to be executed by recipes.
-# This is a requirement for 'setup-envtest.sh' in the test target.
-# Options are set to exit when a recipe line exits non-zero or a piped command fails.
-SHELL = /usr/bin/env bash -o pipefail
-.SHELLFLAGS = -ec
-
 all: build
-
-##@ General
-
-# The help target prints out all targets with their descriptions organized
-# beneath their categories. The categories are represented by '##@' and the
-# target descriptions by '##'. The awk commands is responsible for reading the
-# entire set of makefiles included in this invocation, looking for lines of the
-# file as xyz: ## something, and then pretty-format the target and help. Then,
-# if there's a line with ##@ something, that gets pretty-printed as a category.
-# More info on the usage of ANSI control characters for terminal formatting:
-# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
-# More info on the awk command:
-# http://linuxcommand.org/lc3_adv_awk.php
-
-help: ## Display this help.
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Development
 
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-
-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
-
 test: ## Run tests.
-	@go clean -testcache && go test ./...
+	@go test -count=1 $(PKGS)
 
-fmt: ## Run go fmt against code.
-	@go fmt ./...
-
-vet: ## Run go vet against code.
-	@go vet ./...
+check: golangci-lint goimports ## Runs all checks.
+	@go fmt $(PKGS)
+	@go vet $(PKGS)
 
 clean: ## Clean this directory
 	@if [ -f "$(KIND)" ]; then $(KIND) delete cluster --name $(KIND_CLUSTER_NAME); fi
-	@rm -fr $(CACHE) $(GOBIN)
+	@rm -fr $(CACHE) $(GOBIN) bin/* || true
 	@go mod tidy
 
 ##@ Build
 
-build: generate fmt vet ## Build manager binary.
-	go build -o bin/manager main.go
+build: vendor generate ## Build binaries
+	# Disable cgo for for cross-compilation: https://pkg.go.dev/cmd/cgo
+	@CGO_ENABLED=0 go build -mod=vendor -a -o bin/mtcli cmd/mtcli/main.go
+	@CGO_ENABLED=0 go build -mod=vendor -a -o bin/addon-metadata-operator cmd/addon-metadata-operator/main.go
 
-run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./main.go
+vendor:
+	@go mod tidy
+	@go mod vendor
+	@go mod verify
 
-docker-build: test ## Build docker image with the manager.
-	docker build -t ${IMG} .
+docker-build: ## Build docker image with the operator.
+	@docker build -t $(REPO):$(TAG) -f Dockerfile.build .
 
-docker-push: ## Push docker image with the manager.
-	docker push ${IMG}
+docker-push: ## Push docker image with the operator.
+	@if [ -z "$(DOCKER_CONF)" ]; then echo "Please set DOCKER_CONF. Exiting." && exit 1; fi
+	@docker tag $(REPO):$(TAG) $(REPO):latest
+	@docker --config=$(DOCKER_CONF) push $(REPO):$(TAG)
+	@docker --config=$(DOCKER_CONF) push $(REPO):latest
 
-##@ Deployment
+##@ CRD and K8S
+
+manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+
+generate: controller-gen manifests ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/crd | kubectl apply -f -
@@ -85,8 +72,10 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
+
 ##@ Kind
-KIND_CLUSTER_NAME := addon-flow
+
+KIND_CLUSTER_NAME := addon-metadata
 
 kind-create: kind ## Create a plain kind cluster /w secret to allow pulling from Quay.io
 	@$(KIND) create cluster --name $(KIND_CLUSTER_NAME) --kubeconfig $(KUBECONFIG) || true
@@ -112,7 +101,7 @@ controller-gen:
 
 KUSTOMIZE := $(GOBIN)/kustomize
 kustomize:
-	@$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
+	@$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v4)
 
 KIND := $(GOBIN)/kind
 kind:
@@ -121,10 +110,12 @@ kind:
 GOIMPORTS := $(GOBIN)/goimports
 goimports:
 	@$(call go-get-tool,$(GOIMPORTS),golang.org/x/tools/cmd/goimports)
+	@$(GOIMPORTS) -w -l .
 
 GOLANGCI_LINT := $(GOBIN)/golangci-lint
 golangci-lint:
-	@$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint)
+	@$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.42.1)
+	@$(GOLANGCI_LINT) run -E unused,gosimple,staticcheck
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 define go-get-tool
@@ -138,3 +129,6 @@ go get $(2) ;\
 rm -rf $$TMP_DIR ;\
 }
 endef
+
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
