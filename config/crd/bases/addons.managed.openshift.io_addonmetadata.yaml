@@ -43,8 +43,23 @@ spec:
                   to match: ''some name <some-email@redhat.com>''.'
                 pattern: ^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$
                 type: string
+              channels:
+                description: List of channels where the addon operator is available.
+                items:
+                  description: Channel - list all channels for a given operator
+                  properties:
+                    currentCSV:
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - currentCSV
+                  - name
+                  type: object
+                type: array
               defaultChannel:
-                description: OLM channel from which to install the addon-operator.
+                description: 'OLM channel from which to install the addon-operator.
+                  One of: alpha, beta, stable, edge or rc.'
                 enum:
                 - alpha
                 - beta
@@ -66,8 +81,12 @@ spec:
                 description: Unique ID of the addon
                 pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$
                 type: string
+              indexImage:
+                pattern: ^quay\.io/osd-addons/[a-z-]+
+                type: string
               installMode:
-                description: OLM InstallMode for the addon operator.
+                description: 'OLM InstallMode for the addon operator. One of: AllNamespaces,
+                  SingleNamespace or OwnNamespace.'
                 enum:
                 - AllNamespaces
                 - SingleNamespace
@@ -103,11 +122,11 @@ spec:
                 type: array
                 uniqueItems: true
               ocmQuotaCost:
-                description: 'TODO: what exactly is this?'
+                description: 'TODO: what is this?'
                 minimum: 0
                 type: integer
               ocmQuotaName:
-                description: 'TODO: what exactly is this?'
+                description: Refers to the SKU name for the addon.
                 pattern: ^[A-Za-z0-9][A-Za-z0-9-_]{0,35}[A-Za-z0-9]$
                 type: string
               operatorName:
@@ -130,6 +149,7 @@ spec:
                 type: string
             required:
             - addonOwner
+            - channels
             - defaultChannel
             - description
             - enabled

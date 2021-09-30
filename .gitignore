@@ -2,6 +2,7 @@
 .cache
 .envrc
 vendor/
+dist/
 
 # --- Kubebuilder generated .gitignore ---
 # Binaries for programs and plugins

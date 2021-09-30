@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	"testing"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,7 +49,7 @@ func TestReferenceAddonBase(t *testing.T) {
 	t.Parallel()
 	refAddon := newReferenceAddon()
 	if err := refAddon.Validate(); err != nil {
-		PrintValidationErrors(err)
+		utils.PrintValidationErrors(err)
 		t.Fail()
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
@@ -25,9 +26,14 @@ var (
 		"  # Validate an addon.yaml file loaded form an URL.",
 		"  mtcli validate https://<url/to/addon.yaml>",
 	}
+	validateLong = `
+Validate an addon metadata against custom validators and the managed-tenants-cli JSON schema:
+    https://github.com/mt-sre/managed-tenants-cli/blob/main/docs/tenants/zz_schema_generated.md.
+	`
 	validateCmd = &cobra.Command{
 		Use:     "validate",
-		Short:   "Validate an addon metadata against custom validators and the managed-tenants-cli JSON schema: https://github.com/mt-sre/managed-tenants-cli/blob/main/docs/tenants/zz_schema_generated.md.",
+		Short:   "Validate addon metadata, bundles and imagesets.",
+		Long:    validateLong,
 		Example: strings.Join(validateExamples, "\n"),
 		Args:    cobra.ExactArgs(1),
 		Run:     validateMain,
@@ -50,7 +56,7 @@ func validateMain(cmd *cobra.Command, args []string) {
 	}
 
 	if err := addonMetadata.Validate(); err != nil {
-		addonsv1alpha1.PrintValidationErrors(err)
+		utils.PrintValidationErrors(err)
 		log.Fatalln("Addon Metadata validation failed.")
 	}
 }

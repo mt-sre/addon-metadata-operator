@@ -155,3 +155,13 @@ type AddonMetadataList struct {
 func init() {
 	SchemeBuilder.Register(&AddonMetadata{}, &AddonMetadataList{})
 }
+
+// *****
+// Helper types
+// *****
+
+// Channel - list all channels for a given operator
+type Channel struct {
+	Name       string `json:"name"`
+	CurrentCSV string `json:"currentCSV"`
+}

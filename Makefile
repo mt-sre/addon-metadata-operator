@@ -27,8 +27,7 @@ check: golangci-lint goimports ## Runs all checks.
 
 clean: ## Clean this directory
 	@if [ -f "$(KIND)" ]; then $(KIND) delete cluster --name $(KIND_CLUSTER_NAME); fi
-	@rm -fr $(CACHE) $(GOBIN) bin/* || true
-	@go mod tidy
+	@rm -fr $(CACHE) $(GOBIN) bin/* dist/ || true
 
 ##@ Build
 

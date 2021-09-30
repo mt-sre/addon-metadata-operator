@@ -1,8 +1,6 @@
 package v1alpha1
 
 import (
-	"fmt"
-
 	"github.com/go-playground/validator"
 )
 
@@ -41,11 +39,4 @@ func (a *AddonMetadata) Validate() *[]validator.FieldError {
 
 	// no errors
 	return nil
-}
-
-// PrintValidationErrors - helper to pretty print validationErrors and fail
-func PrintValidationErrors(fieldErrors *[]validator.FieldError) {
-	for _, err := range *fieldErrors {
-		fmt.Println(err)
-	}
 }
