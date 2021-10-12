@@ -1,5 +1,26 @@
-# More info: https://docs.docker.com/engine/reference/builder/#dockerignore-file
-# Ignore all files which are not go type
-!**/*.go
-!**/*.mod
-!**/*.sum
+# Custom paths
+.cache
+.envrc
+vendor
+
+# --- Kubebuilder generated .gitignore ---
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+testbin/*
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# editor and IDE paraphernalia
+.idea
+*.swp
+*.swo
+*~
+.vscode

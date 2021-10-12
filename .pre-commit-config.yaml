@@ -1,0 +1,45 @@
+# Supported hooks: https://pre-commit.com/hooks.html
+#
+# Install hooks:
+#   $ pre-commit install
+# Update hooks:
+#   $ pre-commit autoupdate
+---
+exclude: |
+  (?x)(
+    (^vendor/)|
+    (.deepcopy.go$)
+  )
+repos:
+  # vendor
+  - repo: local
+    hooks:
+      - id: govendor
+        name: govendor
+        language: system
+        entry: make vendor
+        pass_filenames: false
+
+  # vet + fmt + golangci-lint + goimports
+  - repo: local
+    hooks:
+      - id: check
+        name: check
+        language: system
+        entry: make check
+        pass_filenames: false
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: pretty-format-json
+        args:
+          - --autofix
+      - id: trailing-whitespace

@@ -1,0 +1,42 @@
+---
+# GoReleaser docs: https://goreleaser.com/intro/
+# This is used to build the mtcli binary upon pushing a tag.
+# Tag needs to respect Semver: https://semver.org/
+# Validate config with: $ goreleaser check
+project_name: mtcli
+before:
+  hooks:
+    - make vendor
+    - make check
+builds:
+  - env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+    goos:
+      - linux
+      - windows
+      - darwin
+    main: ./cmd/mtcli
+    ldflags:
+      - -s -w
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.version={{.Version}}'
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.commit={{.Commit}}'
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.date={{.Date}}'
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.builtBy=goreleaser'
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

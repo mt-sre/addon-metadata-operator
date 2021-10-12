@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	addonsv1alpha1 "github.com/mt-sre/addon-flow-operator/api/v1alpha1"
-	"github.com/mt-sre/addon-flow-operator/controllers"
+	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -78,11 +78,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.AddonTemplateReconciler{
+	if err = (&controllers.AddonMetadataReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AddonTemplate")
+		setupLog.Error(err, "unable to create controller", "controller", "AddonMetadata")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
