@@ -4,13 +4,6 @@ import (
 	"fmt"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
-)
-
-var (
-	success = utils.Green("Success")
-	failed  = utils.Red("Failed")
-	running = utils.Bold("Running")
 )
 
 type Validator struct {
@@ -37,16 +30,18 @@ func (mb *MetaBundle) Validate(runMeta bool) []error {
 
 	if runMeta {
 		validators := GetAllMetaValidators()
-		fmt.Printf("%s\n", utils.Bold("Running metadata validators"))
-		fmt.Println()
+
+		printMetaHeading()
+
 		for _, validator := range validators {
-			fmt.Printf("\r%s\t\t%s", validator.Description, running)
+			fmt.Printf("\r%s\t\t", validator.Description)
 			err := validator.Runner(mb)
 			if err != nil {
 				errs = append(errs, err)
-				fmt.Printf("\r%s\t\t%s", validator.Description, failed)
+				printFailureMessage(validator.Description)
+			} else {
+				printSuccessMessage(validator.Description)
 			}
-			fmt.Printf("\r%s\t\t%s", validator.Description, success)
 			fmt.Println()
 		}
 	}

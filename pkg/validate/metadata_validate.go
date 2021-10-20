@@ -13,7 +13,7 @@ func ValidateDefaultChannel(metabundle *MetaBundle) error {
 	}
 
 	if !valid {
-		fmt.Errorf("could not find defaultChannel in channels")
+		return fmt.Errorf("could not find defaultChannel in channels")
 	}
 	return nil
 }
