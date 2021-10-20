@@ -1,30 +1,21 @@
 package validate
 
-import "github.com/go-playground/validator"
+import "fmt"
 
-type Validator struct {
-	Description string
-	Runner      validator.StructLevelFunc
-}
-
-func ValidateDefaultChannel(sl validator.StructLevel) {
+func ValidateDefaultChannel(metabundle *MetaBundle) error {
 	valid := false
-	metaBundle := sl.Current().Interface().(MetaBundle)
 
-	defaultChannel := metaBundle.AddonMeta.DefaultChannel
-	for _, channel := range metaBundle.AddonMeta.Channels {
+	defaultChannel := metabundle.AddonMeta.DefaultChannel
+	for _, channel := range metabundle.AddonMeta.Channels {
 		if channel.Name == defaultChannel {
 			valid = true
 		}
 	}
 
 	if !valid {
-		sl.ReportError(metaBundle.AddonMeta.DefaultChannel,
-			"defaultChannel",
-			"DefaultChannel",
-			"DefaultChannelPresentInChannels",
-			"")
+		fmt.Errorf("could not find defaultChannel in channels")
 	}
+	return nil
 }
 
 func GetAllMetaValidators() []Validator {

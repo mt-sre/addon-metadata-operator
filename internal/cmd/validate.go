@@ -66,10 +66,12 @@ func validateMain(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonURI, err)
 	}
+
 	metaBundle := validate.NewMetaBundle(addonMetadata)
-	if err := metaBundle.Validate(flags.runMeta); err != nil {
-		utils.PrintValidationErrors(err)
-		log.Fatalln("Failed to validate metadata")
+
+	errs := metaBundle.Validate(flags.runMeta)
+	if len(errs) > 0 {
+		utils.PrintValidationErrors(errs)
 	}
 }
 

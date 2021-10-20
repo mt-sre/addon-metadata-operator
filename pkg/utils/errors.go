@@ -2,13 +2,12 @@ package utils
 
 import (
 	"fmt"
-
-	"github.com/go-playground/validator"
 )
 
 // PrintValidationErrors - helper to pretty print validationErrors
-func PrintValidationErrors(fieldErrors *[]validator.FieldError) {
-	for _, err := range *fieldErrors {
-		fmt.Println(err)
+func PrintValidationErrors(errs []error) {
+	fmt.Printf("%s\n", Red("Failed with the following errors:"))
+	for _, err := range errs {
+		fmt.Printf("%s\n", err.Error())
 	}
 }
