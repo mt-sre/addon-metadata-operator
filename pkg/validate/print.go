@@ -12,6 +12,7 @@ var (
 
 	success = utils.Green("Success")
 	failed  = utils.Red("Failed")
+	err     = utils.IntenselyBoldRed("Error")
 )
 
 func printMetaHeading() {
@@ -24,4 +25,8 @@ func printSuccessMessage(msg string) {
 
 func printFailureMessage(msg string) {
 	fmt.Printf("\r%s\t\t%s", msg, failed)
+}
+
+func printErrorMessage(msg string) {
+	fmt.Printf("\r%s\t\t%s", msg, err)
 }

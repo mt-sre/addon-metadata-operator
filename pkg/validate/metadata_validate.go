@@ -1,21 +1,13 @@
 package validate
 
-import "fmt"
-
-func ValidateDefaultChannel(metabundle *MetaBundle) error {
-	valid := false
-
+func ValidateDefaultChannel(metabundle *MetaBundle) (bool, error) {
 	defaultChannel := metabundle.AddonMeta.DefaultChannel
 	for _, channel := range metabundle.AddonMeta.Channels {
 		if channel.Name == defaultChannel {
-			valid = true
+			return true, nil
 		}
 	}
-
-	if !valid {
-		return fmt.Errorf("could not find defaultChannel in channels")
-	}
-	return nil
+	return false, nil
 }
 
 func GetAllMetaValidators() []Validator {

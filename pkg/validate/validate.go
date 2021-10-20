@@ -11,7 +11,7 @@ type Validator struct {
 	Runner      ValidateFunc
 }
 
-type ValidateFunc func(mb *MetaBundle) error
+type ValidateFunc func(mb *MetaBundle) (bool, error)
 
 type MetaBundle struct {
 	AddonMeta *v1alpha1.AddonMetadataSpec
@@ -35,9 +35,11 @@ func (mb *MetaBundle) Validate(runMeta bool) []error {
 
 		for _, validator := range validators {
 			fmt.Printf("\r%s\t\t", validator.Description)
-			err := validator.Runner(mb)
+			success, err := validator.Runner(mb)
 			if err != nil {
 				errs = append(errs, err)
+				printErrorMessage(validator.Description)
+			} else if !success {
 				printFailureMessage(validator.Description)
 			} else {
 				printSuccessMessage(validator.Description)
