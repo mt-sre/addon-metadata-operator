@@ -1,20 +1,26 @@
 package validate
 
-func ValidateDefaultChannel(metabundle *MetaBundle) (bool, error) {
-	defaultChannel := metabundle.AddonMeta.DefaultChannel
-	for _, channel := range metabundle.AddonMeta.Channels {
-		if channel.Name == defaultChannel {
-			return true, nil
-		}
-	}
-	return false, nil
-}
+import (
+	"github.com/mt-sre/addon-metadata-operator/pkg/validators/meta"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validators/cross"
+	
+	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 
-func GetAllMetaValidators() []Validator {
-	return []Validator{
+)
+
+func GetAllMetaValidators() []utils.Validator {
+	return []utils.Validator{
 		{
 			Description: "Ensure defaultChannel is present in list of channels",
-			Runner:      ValidateDefaultChannel,
+			Runner:      meta.ValidateDefaultChannel,
+		},
+		{
+			Description: "Ensure `label` to follow the format api.openshift.com/addon-<operator-name>",
+			Runner:      meta.ValidateAddonLabel,
+		},
+		{
+			Description: "Some description about some cross validator",
+			Runner:      cross.ValidateSomethingCrossBetweenImageSetAndMetadata, // cross validators can be separated into a different function as well like GetAllCrossValidators() []utils.Validator
 		},
 	}
 }

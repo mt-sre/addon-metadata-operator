@@ -3,29 +3,10 @@ package validate
 import (
 	"fmt"
 
-	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-type Validator struct {
-	Description string
-	Runner      ValidateFunc
-}
-
-type ValidateFunc func(mb *MetaBundle) (bool, error)
-
-type MetaBundle struct {
-	AddonMeta *v1alpha1.AddonMetadataSpec
-	// TODO: add field for corresponding bundle
-}
-
-// TODO: This will return a MetaBundle with corresponding bundle
-func NewMetaBundle(addonMeta *v1alpha1.AddonMetadataSpec) *MetaBundle {
-	return &MetaBundle{
-		AddonMeta: addonMeta,
-	}
-}
-
-func (mb *MetaBundle) Validate(runMeta bool) []error {
+func Validate(mb *utils.MetaBundle, runMeta bool) []error {
 	errs := []error{}
 
 	if runMeta {
