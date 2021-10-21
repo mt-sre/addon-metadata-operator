@@ -1,4 +1,4 @@
-package cross
+package validators
 
 import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"

@@ -1,4 +1,4 @@
-package meta
+package validators
 
 import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
@@ -12,10 +12,6 @@ func ValidateAddonLabel(metabundle *utils.MetaBundle) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func someUtilFunction() {
-
 }
 
 func someOtherUtilFunction() {
