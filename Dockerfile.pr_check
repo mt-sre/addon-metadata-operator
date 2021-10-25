@@ -1,4 +1,4 @@
-FROM golang:1.16
+FROM registry.access.redhat.com/ubi8/go-toolset
 
 USER root
 
