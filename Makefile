@@ -14,6 +14,8 @@ PKGS := $(shell go list ./... | grep -v -E '/vendor')
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
+# Debug Jenkins
+$(info [DEBUG] Go version used is $(shell go version))
 all: build
 
 ##@ Development
@@ -109,7 +111,7 @@ kind:
 GOIMPORTS := $(GOBIN)/goimports
 goimports:
 	@$(call go-get-tool,$(GOIMPORTS),golang.org/x/tools/cmd/goimports)
-	@$(GOIMPORTS) -w -l .
+	@$(GOIMPORTS) -w -l $(shell find . -type f -name "*.go" -not -path "./vendor/*")
 
 GOLANGCI_LINT := $(GOBIN)/golangci-lint
 golangci-lint:

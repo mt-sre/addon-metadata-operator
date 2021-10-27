@@ -1,3 +1,4 @@
+# vi: set ft=dockerfile:
 FROM registry.ci.openshift.org/openshift/release:golang-1.16
 
 USER root
@@ -10,7 +11,7 @@ RUN go mod download
 
 COPY . ./
 
-RUN go mod vendor
+RUN make vendor
 ENTRYPOINT ["make"]
 
 CMD ["check", "test", "build"]

@@ -1,7 +1,6 @@
 # Custom paths
 .cache
 .envrc
-vendor/
 dist/
 
 # --- Kubebuilder generated .gitignore ---
