@@ -5,7 +5,7 @@ set -exvo pipefail -o nounset
 # Need to install proper go version because Jenkins runs go < 1.16
 echo "[DEBUG] System go version is: $(go version)"
 export GO111MODULE=on
-export PATH="${GOBIN}:${PATH}"
+export PATH="${GOPATH}/bin:${PATH}"
 export GOVERSION="1.16.8"
 
 function downloadGo() {
