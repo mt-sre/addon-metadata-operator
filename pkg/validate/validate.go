@@ -8,13 +8,16 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-func Validate(mb *utils.MetaBundle) []error {
+func Validate(mb *utils.MetaBundle, validateBundles bool) []error {
 	errs := []error{}
 	validators := GetAllValidators()
 
 	printMetaHeading()
 
 	for _, validator := range validators {
+		if validator.IsBundleValidation && !validateBundles {
+			continue
+		}
 		fmt.Printf("\r%s\t\t", validator.Description)
 		success, err := validator.Runner(mb)
 		if err != nil {

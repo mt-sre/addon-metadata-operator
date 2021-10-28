@@ -12,7 +12,6 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
 	log "github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
 )
 
@@ -57,8 +56,14 @@ func validateMain(cmd *cobra.Command, args []string) {
 	}
 
 	metaBundle := utils.NewMetaBundle(addonMetadata)
-
-	errs := validate.Validate(metaBundle)
+	if flags.runBundle {
+		bundles, err := utils.ExtractAndParse(metaBundle.AddonMeta.IndexImage, metaBundle.AddonMeta.OperatorName)
+		if err != nil {
+			log.Fatalln("Failed to extract bundles from the given index image")
+		}
+		metaBundle.AddBundles(bundles)
+	}
+	errs := validate.Validate(metaBundle, flags.runBundle)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
 	}

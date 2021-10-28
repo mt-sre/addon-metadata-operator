@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"errors"
+
 	"github.com/operator-framework/operator-registry/pkg/registry"
 	log "github.com/sirupsen/logrus"
 )
@@ -18,6 +20,9 @@ func init() {
 }
 
 func ExtractAndParse(indexImage, addonName string) ([]registry.Bundle, error) {
+	if indexImage == "" {
+		return []registry.Bundle{}, errors.New("Missing index image!")
+	}
 	key := indexImageExtractor.CacheKey(indexImage, addonName)
 	if !indexImageExtractor.CacheHit(key) {
 		if err := indexImageExtractor.ExtractBundlesFromImage(indexImage, indexImageExtractor.ExtractionPath()); err != nil {

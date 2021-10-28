@@ -14,8 +14,6 @@ import (
 
 type DefaultBundleParser struct{}
 
-
-
 func (obj DefaultBundleParser) ParseBundles(addonName, manifestsDir string) ([]registry.Bundle, error) {
 	var bundles []registry.Bundle
 	bundlesDir, err := os.ReadDir(manifestsDir)
