@@ -10,7 +10,3 @@ func ValidateSomethingCrossBetweenImageSetAndMetadata(metabundle *utils.MetaBund
 	}
 	return true, nil
 }
-
-func someUtilFunction() {
-
-}

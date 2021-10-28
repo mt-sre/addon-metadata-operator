@@ -13,7 +13,3 @@ func ValidateAddonLabel(metabundle *utils.MetaBundle) (bool, error) {
 
 	return true, nil
 }
-
-func someOtherUtilFunction() {
-
-}
