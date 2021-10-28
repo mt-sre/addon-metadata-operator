@@ -1,7 +1,6 @@
 # Custom paths
 .cache
 .envrc
-vendor
 
 # --- Kubebuilder generated .gitignore ---
 # Binaries for programs and plugins
