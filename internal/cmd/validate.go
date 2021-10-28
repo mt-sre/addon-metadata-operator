@@ -10,16 +10,28 @@ import (
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 )
 
+type validateOptions struct {
+	runMeta   bool
+	runBundle bool
+}
+
 func init() {
+	validateCmd.Flags().BoolVar(&flags.runBundle, "bundle", true,
+		"Runs bundle validations when set to true")
+	validateCmd.Flags().BoolVar(&flags.runMeta, "meta", true,
+		"Runs metadata validations when set to true")
+
 	mtcli.AddCommand(validateCmd)
 }
 
 var (
+	flags            = &validateOptions{}
 	validateExamples = []string{
 		"  # Validate an addon.yaml file on local filesystem.",
 		"  mtcli validate <path/to/addon.yaml>",
@@ -42,7 +54,6 @@ Validate an addon metadata against custom validators and the managed-tenants-cli
 
 func validateMain(cmd *cobra.Command, args []string) {
 	addonURI := args[0]
-	addonMetadata := &addonsv1alpha1.AddonMetadata{}
 
 	data, err := readAddonMetadata(addonURI)
 	log.Debugf("Raw data read from addonURI %v: \n%v\n", addonURI, string(data))
@@ -51,14 +62,25 @@ func validateMain(cmd *cobra.Command, args []string) {
 		log.Fatalf("Could not read addon metadata from URI %v, got %v.\n", addonURI, err)
 	}
 
-	if err := addonMetadata.FromYAML(data); err != nil {
+	addonMetadata, err := getAddonMetaObject(data)
+	if err != nil {
 		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonURI, err)
 	}
 
-	if err := addonMetadata.Validate(); err != nil {
-		utils.PrintValidationErrors(err)
-		log.Fatalln("Addon Metadata validation failed.")
+	metaBundle := utils.NewMetaBundle(addonMetadata)
+
+	errs := validate.Validate(metaBundle)
+	if len(errs) > 0 {
+		utils.PrintValidationErrors(errs)
 	}
+}
+
+func getAddonMetaObject(data []byte) (*addonsv1alpha1.AddonMetadataSpec, error) {
+	addonMetadata := &addonsv1alpha1.AddonMetadataSpec{}
+	if err := addonMetadata.FromYAML(data); err != nil {
+		return nil, err
+	}
+	return addonMetadata, nil
 }
 
 func readAddonMetadata(addonURI string) ([]byte, error) {
