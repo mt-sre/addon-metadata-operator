@@ -3,11 +3,22 @@
 set -exvo pipefail -o nounset
 
 # Need to install proper go version because Jenkins runs go < 1.16
-# and I could not get goreleaser to work inside a container
-go install golang.org/dl/go1.16.7@latest
-go1.16.7 download
-export GOROOT=$(go1.16.7 env GOROOT)
-export PATH=${GOROOT}/bin:${PATH}
+echo "[DEBUG] System go version is: $(go version)"
+export GO111MODULE=on
+export GOVERSION="1.16.8"
+
+function downloadGo() {
+    go get golang.org/dl/go${GOVERSION}@latest
+    go${GOVERSION} download
+}
+
+function setupEnv() {
+    export GOROOT=$(go${GOVERSION} env GOROOT)
+    export PATH=${GOROOT}/bin:${PATH}
+}
+
+downloadGo
+setupEnv
 
 # Simple script to download and run goreleaser
 # uses config from .goreleaser.yml
