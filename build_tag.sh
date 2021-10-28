@@ -4,17 +4,18 @@ set -exvo pipefail -o nounset
 
 # Need to install proper go version because Jenkins runs go < 1.16
 echo "[DEBUG] System go version is: $(go version)"
-# Set GO111MODULE=off to avoid modifying go.mod or go.sum
-export GO111MODULE=off
 export PATH="$(go env GOPATH)/bin:${PATH}"
 export GOVERSION="1.16.8"
 
 function downloadGo() {
+    # Set GO111MODULE=off to avoid modifying go.mod or go.sum
+    export GO111MODULE=off
     go get golang.org/dl/go${GOVERSION}
     go${GOVERSION} download
 }
 
 function setupEnv() {
+    export GO111MODULE=on
     export GOROOT=$(go${GOVERSION} env GOROOT)
     export PATH="${GOROOT}/bin:${PATH}"
 }
