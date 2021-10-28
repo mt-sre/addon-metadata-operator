@@ -37,12 +37,8 @@ func GetAllValidators() []utils.Validator {
 			Runner:      validators.ValidateDefaultChannel,
 		},
 		{
-			Description: "Ensure `label` to follow the format api.openshift.com/addon-<operator-name>",
+			Description: "Ensure `label` to follow the format api.openshift.com/addon-<operator-id>",
 			Runner:      validators.ValidateAddonLabel,
-		},
-		{
-			Description: "Some description about some cross validator",
-			Runner:      validators.ValidateSomethingCrossBetweenImageSetAndMetadata, // cross validators can be separated into a different function as well like GetAllCrossValidators() []utils.Validator
 		},
 	}
 }

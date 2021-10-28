@@ -16,22 +16,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type validateOptions struct {
-	runMeta   bool
-	runBundle bool
-}
-
 func init() {
-	validateCmd.Flags().BoolVar(&flags.runBundle, "bundle", true,
-		"Runs bundle validations when set to true")
-	validateCmd.Flags().BoolVar(&flags.runMeta, "meta", true,
-		"Runs metadata validations when set to true")
-
 	mtcli.AddCommand(validateCmd)
 }
 
 var (
-	flags            = &validateOptions{}
 	validateExamples = []string{
 		"  # Validate an addon.yaml file on local filesystem.",
 		"  mtcli validate <path/to/addon.yaml>",
