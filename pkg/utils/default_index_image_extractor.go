@@ -10,8 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const DefaultDownloadPath = "/tmp/mtcli"
-const DefaultCacheLocation = "/tmp/mtcli/.cache"
+const (
+	defaultDownloadPath  = "/tmp/mtcli"
+	defaultCacheLocation = "/tmp/mtcli/.cache"
+)
 
 type DefaultIndexImageExtractor struct {
 	downloadPath  string
@@ -70,9 +72,5 @@ func (obj DefaultIndexImageExtractor) WriteToCache(value string) error {
 
 func checkFileExists(path string) bool {
 	_, err := os.Stat(path)
-	if err != nil {
-		return false
-	} else {
-		return true
-	}
+	return err == nil
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
-// ValidateAddonLabel validates whether the 'label' field under an addon.yaml follows the format 'api.openshift.com/addon-<id>'
 func ValidateCSVPresent(metabundle *utils.MetaBundle) (bool, error) {
 	if len(metabundle.Bundles) == 0 {
 		return false, fmt.Errorf("No bundles present!")

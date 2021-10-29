@@ -8,16 +8,13 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-func Validate(mb *utils.MetaBundle, validateBundles bool) []error {
+func Validate(mb *utils.MetaBundle) []error {
 	errs := []error{}
 	validators := GetAllValidators()
 
 	printMetaHeading()
 
 	for _, validator := range validators {
-		if validator.IsBundleValidation && !validateBundles {
-			continue
-		}
 		fmt.Printf("\r%s\t\t", validator.Description)
 		success, err := validator.Runner(mb)
 		if err != nil {
@@ -42,6 +39,10 @@ func GetAllValidators() []utils.Validator {
 		{
 			Description: "Ensure `label` to follow the format api.openshift.com/addon-<operator-id>",
 			Runner:      validators.ValidateAddonLabel,
+		},
+		{
+			Description: "Ensure current csv is present in the index image",
+			Runner:      validators.ValidateCSVPresent,
 		},
 	}
 }

@@ -55,15 +55,13 @@ func validateMain(cmd *cobra.Command, args []string) {
 		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonURI, err)
 	}
 
-	metaBundle := utils.NewMetaBundle(addonMetadata)
-	if flags.runBundle {
-		bundles, err := utils.ExtractAndParse(metaBundle.AddonMeta.IndexImage, metaBundle.AddonMeta.OperatorName)
-		if err != nil {
-			log.Fatalln("Failed to extract bundles from the given index image")
-		}
-		metaBundle.AddBundles(bundles)
+	bundles, err := utils.ExtractAndParse(addonMetadata.IndexImage, addonMetadata.OperatorName)
+	if err != nil {
+		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
 	}
-	errs := validate.Validate(metaBundle, flags.runBundle)
+
+	metaBundle := utils.NewMetaBundle(addonMetadata, bundles)
+	errs := validate.Validate(metaBundle)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
 	}

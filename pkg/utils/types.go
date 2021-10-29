@@ -6,9 +6,8 @@ import (
 )
 
 type Validator struct {
-	Description        string
-	Runner             ValidateFunc
-	IsBundleValidation bool
+	Description string
+	Runner      ValidateFunc
 }
 
 type IndexImageExtractor interface {
@@ -30,16 +29,12 @@ type ValidateFunc func(mb *MetaBundle) (bool, error)
 type MetaBundle struct {
 	AddonMeta *v1alpha1.AddonMetadataSpec
 	Bundles   []registry.Bundle
-	// TODO: add field for corresponding bundle
 }
 
 // TODO: This will return a MetaBundle with corresponding bundle
-func NewMetaBundle(addonMeta *v1alpha1.AddonMetadataSpec) *MetaBundle {
+func NewMetaBundle(addonMeta *v1alpha1.AddonMetadataSpec, bundles []registry.Bundle) *MetaBundle {
 	return &MetaBundle{
 		AddonMeta: addonMeta,
+		Bundles:   bundles,
 	}
-}
-
-func (mb *MetaBundle) AddBundles(bundles []registry.Bundle) {
-	mb.Bundles = bundles
 }
