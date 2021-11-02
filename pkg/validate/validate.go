@@ -40,5 +40,9 @@ func GetAllValidators() []utils.Validator {
 			Description: "Ensure `label` to follow the format api.openshift.com/addon-<operator-id>",
 			Runner:      validators.ValidateAddonLabel,
 		},
+		{
+			Description: "Ensure current csv is present in the index image",
+			Runner:      validators.ValidateCSVPresent,
+		},
 	}
 }

@@ -12,7 +12,6 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
 	log "github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
 )
 
@@ -56,8 +55,12 @@ func validateMain(cmd *cobra.Command, args []string) {
 		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonURI, err)
 	}
 
-	metaBundle := utils.NewMetaBundle(addonMetadata)
+	bundles, err := utils.ExtractAndParse(addonMetadata.IndexImage, addonMetadata.OperatorName)
+	if err != nil {
+		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
+	}
 
+	metaBundle := utils.NewMetaBundle(addonMetadata, bundles)
 	errs := validate.Validate(metaBundle)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
