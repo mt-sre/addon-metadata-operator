@@ -1,5 +1,16 @@
 # addon-metadata-operator
 
+- [addon-metadata-operator](#addon-metadata-operator)
+  - [Developer Guide](#developer-guide)
+    - [Getting Started](#getting-started)
+    - [`.envrc`](#envrc)
+  - [Develop](#develop)
+    - [Useful make commands](#useful-make-commands)
+  - [Release](#release)
+    - [mtcli](#mtcli)
+    - [addon-metadata-operator image](#addon-metadata-operator-image)
+  - [License](#license)
+
 Operator responsible for managing AddOn resources in OSD
 
 ## Developer Guide
@@ -67,6 +78,21 @@ $ ./pr_check.sh
 ```
 
 ## Release
+
+### mtcli
+
+The external Jenkins integration will run the `build_tag.sh` script after you push a tag. The script runs `goreleaser`, which is responsible for building the binaries and publishing them as a Github Release.
+
+```bash
+$ git tag vX.X.X
+$ git push upstream --tags
+```
+
+**A tag can't be built twice, you will need to add a new commit and a new tag referencing the latest commit.**
+
+### addon-metadata-operator image
+
+The container image is built on every merge to the `master` branch. The external Jenkins integration will run the `build_deploy.sh` script, effectively building and pushing to: `https://quay.io/repository/app-sre/addon-metadata-operator`.
 
 ## License
 
