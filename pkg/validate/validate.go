@@ -8,7 +8,7 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-func Validate(mb *utils.MetaBundle) []error {
+func Validate(mb utils.MetaBundle) []error {
 	errs := []error{}
 	validators := GetAllValidators()
 

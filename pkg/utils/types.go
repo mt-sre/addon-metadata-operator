@@ -24,7 +24,7 @@ type BundleParser interface {
 	ParseBundles(addonName string, manifestsPath string) ([]registry.Bundle, error)
 }
 
-type ValidateFunc func(mb *MetaBundle) (bool, error)
+type ValidateFunc func(mb MetaBundle) (bool, error)
 
 type MetaBundle struct {
 	AddonMeta *v1alpha1.AddonMetadataSpec
