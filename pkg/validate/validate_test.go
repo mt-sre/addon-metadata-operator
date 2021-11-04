@@ -1,9 +1,10 @@
-package testutil
+package validate
 
 import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,12 +17,10 @@ type Validator interface {
 }
 
 // register the validators to test here by appending them to the following slice
-var (
-	validatorsToTest []Validator = []Validator{
-		ValidatorAddonLabelTestBundle{},
-		ValidatorDefaultChannelTestBundle{},
-	}
-)
+var validatorsToTest []Validator = []Validator{
+	validators.ValidatorAddonLabelTestBundle{},
+	validators.ValidatorDefaultChannelTestBundle{},
+}
 
 func Test_AllValidators(t *testing.T) {
 	for _, validator := range validatorsToTest {

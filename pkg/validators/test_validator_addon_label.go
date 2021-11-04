@@ -1,9 +1,8 @@
-package testutil
+package validators
 
 import (
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
-	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
 )
 
 type ValidatorAddonLabelTestBundle struct{}
@@ -13,7 +12,7 @@ func (val ValidatorAddonLabelTestBundle) Name() string {
 }
 
 func (val ValidatorAddonLabelTestBundle) Run(mb utils.MetaBundle) (bool, error) {
-	return validators.ValidateAddonLabel(&mb)
+	return ValidateAddonLabel(&mb)
 }
 
 func (val ValidatorAddonLabelTestBundle) SucceedingCandidates() []utils.MetaBundle {
