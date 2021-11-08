@@ -7,7 +7,7 @@ import (
 	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
-func ValidateCSVPresent(metabundle *utils.MetaBundle) (bool, error) {
+func ValidateCSVPresent(metabundle utils.MetaBundle) (bool, error) {
 	if len(metabundle.Bundles) == 0 {
 		return false, fmt.Errorf("No bundles present!")
 	}
