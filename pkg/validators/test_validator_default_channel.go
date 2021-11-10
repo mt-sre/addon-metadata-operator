@@ -12,7 +12,7 @@ func (val ValidatorDefaultChannelTestBundle) Name() string {
 }
 
 func (val ValidatorDefaultChannelTestBundle) Run(mb utils.MetaBundle) (bool, error) {
-	return ValidateDefaultChannel(&mb)
+	return ValidateDefaultChannel(mb)
 }
 
 func (val ValidatorDefaultChannelTestBundle) SucceedingCandidates() []utils.MetaBundle {

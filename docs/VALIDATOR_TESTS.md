@@ -48,9 +48,11 @@ var validatorsToTest []Validator = []Validator{
 ...
 ```
 * That's it! Rest will be taken care of assuming that the methods you defined for the struct are aptly coded.
-* Go ahead and run the tests by entering `make test-validators` and it will run:
+* Go ahead and run the all the tests (including the validator tests) by entering `make test` and it will run:
+
+Passing Tests
 ```sh
-╰─ make test-validators
+╰─ make test
 
 [DEBUG] Go version used is go version go1.17.1 darwin/amd64
 === RUN   Test_AllValidators
@@ -65,6 +67,42 @@ var validatorsToTest []Validator = []Validator{
     --- PASS: Test_AllValidators/Addon_Default_Channel_Validator (0.00s)
 PASS
 ok      github.com/mt-sre/addon-metadata-operator/internal/testutil     0.641s
+```
+Failing tests
+```sh
+╰─ make test
+[DEBUG] Go version used is go version go1.17.1 darwin/amd64
+ok      github.com/mt-sre/addon-metadata-operator/api/v1alpha1  0.511s
+?       github.com/mt-sre/addon-metadata-operator/cmd/addon-metadata-operator   [no test files]
+?       github.com/mt-sre/addon-metadata-operator/cmd/mtcli     [no test files]
+?       github.com/mt-sre/addon-metadata-operator/controllers   [no test files]
+?       github.com/mt-sre/addon-metadata-operator/internal/cmd  [no test files]
+?       github.com/mt-sre/addon-metadata-operator/internal/testutils    [no test files]
+?       github.com/mt-sre/addon-metadata-operator/pkg/utils     [no test files]
+--- FAIL: Test_AllValidators (0.00s)
+    --- FAIL: Test_AllValidators/Addon_Label_Validator (0.00s)
+        validate_test.go:42:
+                Error Trace:    validate_test.go:42
+                Error:          Should be true
+                Test:           Test_AllValidators/Addon_Label_Validator
+        validate_test.go:42:
+                Error Trace:    validate_test.go:42
+                Error:          Should be true
+                Test:           Test_AllValidators/Addon_Label_Validator
+    --- FAIL: Test_AllValidators/Addon_Default_Channel_Validator (0.00s)
+        validate_test.go:42:
+                Error Trace:    validate_test.go:42
+                Error:          Should be true
+                Test:           Test_AllValidators/Addon_Default_Channel_Validator
+        validate_test.go:42:
+                Error Trace:    validate_test.go:42
+                Error:          Should be true
+                Test:           Test_AllValidators/Addon_Default_Channel_Validator
+FAIL
+FAIL    github.com/mt-sre/addon-metadata-operator/pkg/validate  0.748s
+?       github.com/mt-sre/addon-metadata-operator/pkg/validators        [no test files]
+FAIL
+make: *** [test] Error 1
 ```
 
 **Checkout an [Example](#example)**
@@ -173,10 +211,10 @@ var validatorsToTest []Validator = []Validator{
 ...
 ```
 
-* That's it! Run `make test-validators` to see it in action :)
+* That's it! Run `make test` to see it in action :)
 
 ```sh
-╰─ make test-validators
+╰─ make test
 
 [DEBUG] Go version used is go version go1.17.1 darwin/amd64
 === RUN   Test_AllValidators

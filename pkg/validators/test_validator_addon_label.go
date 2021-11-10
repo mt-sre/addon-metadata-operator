@@ -12,7 +12,7 @@ func (val ValidatorAddonLabelTestBundle) Name() string {
 }
 
 func (val ValidatorAddonLabelTestBundle) Run(mb utils.MetaBundle) (bool, error) {
-	return ValidateAddonLabel(&mb)
+	return ValidateAddonLabel(mb)
 }
 
 func (val ValidatorAddonLabelTestBundle) SucceedingCandidates() []utils.MetaBundle {
