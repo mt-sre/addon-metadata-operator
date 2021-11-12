@@ -61,9 +61,13 @@ func validateMain(cmd *cobra.Command, args []string) {
 	}
 
 	metaBundle := utils.NewMetaBundle(addonMetadata, bundles)
-	errs := validate.Validate(*metaBundle)
+	success, errs := validate.Validate(*metaBundle)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
+		os.Exit(1)
+	}
+	if !success {
+		os.Exit(1)
 	}
 }
 

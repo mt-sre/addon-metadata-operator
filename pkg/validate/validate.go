@@ -8,8 +8,9 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-func Validate(mb utils.MetaBundle) []error {
+func Validate(mb utils.MetaBundle) (bool, []error) {
 	errs := []error{}
+	allSuccess := true
 	validators := GetAllValidators()
 
 	printMetaHeading()
@@ -22,12 +23,13 @@ func Validate(mb utils.MetaBundle) []error {
 			printErrorMessage(validator.Description)
 		} else if !success {
 			printFailureMessage(validator.Description)
+			allSuccess = false
 		} else {
 			printSuccessMessage(validator.Description)
 		}
 		fmt.Println()
 	}
-	return errs
+	return allSuccess, errs
 }
 
 func GetAllValidators() []utils.Validator {

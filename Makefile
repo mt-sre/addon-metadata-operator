@@ -35,7 +35,7 @@ clean: ## Clean this directory
 
 build: vendor generate ## Build binaries
 	# Disable cgo for for cross-compilation: https://pkg.go.dev/cmd/cgo
-	@CGO_ENABLED=0 go build -mod=vendor -a -o bin/mtcli cmd/mtcli/main.go
+	@CGO_ENABLED=1 go build -mod=vendor -a -o bin/mtcli cmd/mtcli/main.go
 	@CGO_ENABLED=0 go build -mod=vendor -a -o bin/addon-metadata-operator cmd/addon-metadata-operator/main.go
 
 vendor:
