@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	defaultDownloadPath  = "/tmp/mtcli"
-	defaultCacheLocation = "/tmp/mtcli/.cache"
+	// (sblaisdo) sretoolbox also uses /tmp/mtcli to extract binary archive
+	defaultDownloadPath  = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3"
+	defaultCacheLocation = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3/.cache"
 )
 
 type DefaultIndexImageExtractor struct {
