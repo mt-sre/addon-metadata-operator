@@ -14,8 +14,6 @@ PKGS := $(shell go list ./... | grep -v -E '/vendor')
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
-# Debug Jenkins
-$(info [DEBUG] Go version used is $(shell go version))
 all: build
 
 ##@ Development

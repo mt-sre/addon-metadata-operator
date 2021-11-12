@@ -15,6 +15,8 @@ builds:
       - GO111MODULE=on
     goos:
       - linux
+    goarch:
+      - amd64
     main: ./cmd/mtcli
     ldflags:
       - -s -w
