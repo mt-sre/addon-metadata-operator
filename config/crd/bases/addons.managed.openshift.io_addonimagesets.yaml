@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: addonmetadata.addons.managed.openshift.io
+  name: addonimagesets.addons.managed.openshift.io
 spec:
   group: addons.managed.openshift.io
   names:
-    kind: AddonMetadata
-    listKind: AddonMetadataList
-    plural: addonmetadata
-    singular: addonmetadata
+    kind: AddonImageSet
+    listKind: AddonImageSetList
+    plural: addonimagesets
+    singular: addonimageset
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: AddonMetadata is the Schema for the AddonMetadata API
+        description: AddonImageSet is the Schema for the addonimagesets API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,19 +34,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: 'AddonMetadataSpec defines the desired state of AddonMetadata
-              View markers: $ controller-gen -www crd TODO add missing fields from
-              schema, only required fields from jsonschema are present'
+            description: AddonImageSetSpec defines the desired state of AddonImageSet
             properties:
-              addonImageSetVersion:
-                description: A string which specifies the imageset to use. Can either
-                  be 'latest' or a version string
-                type: string
-              addonOwner:
-                description: 'Team or individual responsible for this addon. Needs
-                  to match: ''some name <some-email@redhat.com>''.'
-                pattern: ^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$
-                type: string
               addonParameters:
                 description: OCM representation of an add-on parameter
                 properties:
@@ -206,101 +195,18 @@ spec:
                 required:
                 - items
                 type: object
-              channels:
-                description: List of channels where the addon operator is available.
-                items:
-                  description: Channel - list all channels for a given operator
-                  properties:
-                    currentCSV:
-                      type: string
-                    name:
-                      type: string
-                  required:
-                  - currentCSV
-                  - name
-                  type: object
-                type: array
-              defaultChannel:
-                description: 'OLM channel from which to install the addon-operator.
-                  One of: alpha, beta, stable, edge or rc.'
-                enum:
-                - alpha
-                - beta
-                - stable
-                - edge
-                - rc
-                type: string
-              description:
-                description: Short description for the addon
-                type: string
-              enabled:
-                description: Set to true to allow installation of the addon.
-                type: boolean
-              icon:
-                description: Icon to be shown in UI. Should be around 200px and base64
-                  encoded.
-                type: string
-              id:
-                description: Unique ID of the addon
-                pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$
-                type: string
               indexImage:
+                description: The url for the index image
                 pattern: ^quay\.io/osd-addons/[a-z-]+
                 type: string
-              installMode:
-                description: 'OLM InstallMode for the addon operator. One of: AllNamespaces,
-                  SingleNamespace or OwnNamespace.'
-                enum:
-                - AllNamespaces
-                - SingleNamespace
-                - OwnNamespace
-                type: string
-              label:
-                description: 'Kubernetes label for the addon. Needs to match: ''api.openshift.com/<addon-id>''.'
-                pattern: ^api\.openshift\.com/addon-[0-9a-z][0-9a-z-]{0,30}[0-9a-z]$
-                type: string
-              link:
-                description: Link to the addon documentation
-                pattern: ^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$
-                type: string
               name:
-                description: Friendly name for the addon, displayed in the UI
-                pattern: ^[0-9A-Z][A-Za-z0-9-_ ()]+$
+                description: The name of the imageset along with the version.
                 type: string
-              namespaceAnnotations:
-                additionalProperties:
-                  type: string
-                description: Annotations to be applied on all listed namespaces.
-                type: object
-              namespaceLabels:
-                additionalProperties:
-                  type: string
-                description: Labels to be applied on all listed namespaces.
-                type: object
-              namespaces:
-                description: Namespaces managed by the addon-operator. Need to include
-                  the TargetNamespace.
+              relatedImages:
+                description: A list of image urls of related operators
                 items:
                   type: string
                 type: array
-                uniqueItems: true
-              ocmQuotaCost:
-                description: 'TODO: what is this?'
-                minimum: 0
-                type: integer
-              ocmQuotaName:
-                description: Refers to the SKU name for the addon.
-                pattern: ^[A-Za-z0-9][A-Za-z0-9-_]{0,35}[A-Za-z0-9]$
-                type: string
-              operatorName:
-                description: Name of the addon operator.
-                pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$
-                type: string
-              quayRepo:
-                description: 'Quay repository for the addon operator. Needs to match:
-                  ''quay.io/osd-addons/<my-addon-repo>''.'
-                pattern: ^quay\.io/osd-addons/[a-z-]+$
-                type: string
               subOperators:
                 description: OCM representation of an add-on sub operator. A sub operator
                   is an operator who's life cycle is controlled by the add-on umbrella
@@ -324,38 +230,13 @@ spec:
                 required:
                 - items
                 type: object
-              targetNamespace:
-                description: Namespace where the addon operator should be installed.
-                pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$
-                type: string
-              testHarness:
-                description: 'Quay repository for the testHarness image. Needs to
-                  match: ''quay.io/<my-repo>/<my-test-harness>:<my-tag>''.'
-                pattern: ^quay\.io/[0-9A-Za-z._-]+/[0-9A-Za-z._-]+(:[A-Za-z0-9._-]+)?$
-                type: string
             required:
-            - addonOwner
-            - channels
-            - defaultChannel
-            - description
-            - enabled
-            - icon
-            - id
-            - installMode
-            - label
+            - indexImage
             - name
-            - namespaceAnnotations
-            - namespaceLabels
-            - namespaces
-            - ocmQuotaCost
-            - ocmQuotaName
-            - operatorName
-            - quayRepo
-            - targetNamespace
-            - testHarness
+            - relatedImages
             type: object
           status:
-            description: AddonMetadataStatus defines the observed state of AddonMetadata
+            description: AddonImageSetStatus defines the observed state of AddonImageSet
             type: object
         type: object
     served: true

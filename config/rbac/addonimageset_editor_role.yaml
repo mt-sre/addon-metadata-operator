@@ -1,0 +1,24 @@
+# permissions for end users to edit addonimagesets.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: addonimageset-editor-role
+rules:
+- apiGroups:
+  - addons.managed.openshift.io
+  resources:
+  - addonimagesets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - addons.managed.openshift.io
+  resources:
+  - addonimagesets/status
+  verbs:
+  - get
