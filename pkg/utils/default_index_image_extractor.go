@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,18 +14,23 @@ import (
 const (
 	// (sblaisdo) sretoolbox also uses /tmp/mtcli to extract binary archive
 	defaultDownloadPath  = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3"
-	defaultCacheLocation = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3/.cache"
+	defaultCacheDir      = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3"
+	defaultCacheFileName = ".cache"
 )
 
 type DefaultIndexImageExtractor struct {
-	downloadPath  string
-	cacheLocation string
+	downloadPath string
+	cacheDir     string
+	indexImage   string
 }
 
 func (obj DefaultIndexImageExtractor) ExtractBundlesFromImage(indexImage, extractTo string) error {
+	// Write all index image extaction logs to /dev/null
+	logger := log.StandardLogger()
+	logger.Out = ioutil.Discard
 	indexExporter := indexer.NewIndexExporter(
 		containertools.NewContainerTool("", containertools.NoneTool),
-		log.NewEntry(log.StandardLogger()),
+		log.NewEntry(logger),
 	)
 	request := indexer.ExportFromIndexRequest{
 		Index:         indexImage,
@@ -37,16 +43,17 @@ func (obj DefaultIndexImageExtractor) ExtractBundlesFromImage(indexImage, extrac
 }
 
 func (obj DefaultIndexImageExtractor) ManifestsPath(addonName string) string {
-	return filepath.Join(obj.downloadPath, addonName)
+	return filepath.Join(obj.downloadPath, obj.indexImage, addonName)
 }
 
 func (obj DefaultIndexImageExtractor) ExtractionPath() string {
-	return obj.downloadPath
+	return filepath.Join(obj.downloadPath, obj.indexImage)
 }
 
 func (obj DefaultIndexImageExtractor) CacheLocation() string {
-	return obj.cacheLocation
+	return filepath.Join(obj.cacheDir, obj.indexImage, defaultCacheFileName)
 }
+
 func (obj DefaultIndexImageExtractor) CacheKey(indexImage, addonName string) string {
 	return strings.Join(
 		[]string{indexImage, addonName},

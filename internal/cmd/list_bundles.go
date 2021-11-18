@@ -22,7 +22,7 @@ var (
 	listBundlesCmd = &cobra.Command{
 		Use:     "list-bundles",
 		Short:   "List all the bundles present in an index image.",
-		Example: strings.Join(validateExamples, "\n"),
+		Example: strings.Join(listBundlesExamples, "\n"),
 		Args:    cobra.ExactArgs(1),
 		Run:     listBundlesMain,
 	}
