@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const allAddonsKey = "all"
+const AllAddonsIdentifier = "all"
 
 var (
 	bundleParser BundleParser
@@ -18,7 +18,7 @@ func init() {
 	bundleParser = DefaultBundleParser{}
 }
 
-func ExtractAndParseAddon(indexImage, addonName string) ([]registry.Bundle, error) {
+func ExtractAndParseAddons(indexImage, addonIdentifier string) ([]registry.Bundle, error) {
 	if indexImage == "" {
 		return []registry.Bundle{}, errors.New("Missing index image!")
 	}
@@ -29,39 +29,33 @@ func ExtractAndParseAddon(indexImage, addonName string) ([]registry.Bundle, erro
 		indexImage:   indexImage,
 	}
 
-	key := indexImageExtractor.CacheKey(indexImage, addonName)
-	if !indexImageExtractor.CacheHit(key) {
-		if err := indexImageExtractor.ExtractBundlesFromImage(indexImage, indexImageExtractor.ExtractionPath()); err != nil {
-			return []registry.Bundle{}, err
-		}
-		if err := indexImageExtractor.WriteToCache(key); err != nil {
-			log.Warnln("Failed to cache the index image bundles")
-		}
+	key := indexImageExtractor.CacheKey(indexImage, addonIdentifier)
+	if err := extractAddons(indexImageExtractor, key, indexImage); err != nil {
+		return []registry.Bundle{}, err
 	}
-	manifestsDir := indexImageExtractor.ManifestsPath(addonName)
-	return bundleParser.ParseBundles(addonName, manifestsDir)
+	if addonIdentifier == AllAddonsIdentifier {
+		// Parse all adddons in the extraction path
+		return parseAllAddons(indexImageExtractor, indexImageExtractor.ExtractionPath())
+	}
+	// Parse only a specific addon in the extraction path
+	manifestsDir := indexImageExtractor.ManifestsPath(addonIdentifier)
+	return bundleParser.ParseBundles(addonIdentifier, manifestsDir)
 }
 
-func ExtractAndParseAllAddons(indexImage string) ([]registry.Bundle, error) {
-	if indexImage == "" {
-		return []registry.Bundle{}, errors.New("Missing index image!")
-	}
-	indexImageExtractor := DefaultIndexImageExtractor{
-		downloadPath: defaultDownloadPath,
-		cacheDir:     defaultCacheDir,
-		indexImage:   indexImage,
-	}
-	key := indexImageExtractor.CacheKey(indexImage, allAddonsKey)
-
-	if !indexImageExtractor.CacheHit(key) {
+func extractAddons(indexImageExtractor DefaultIndexImageExtractor, cacheKey, indexImage string) error {
+	if !indexImageExtractor.CacheHit(cacheKey) {
 		if err := indexImageExtractor.ExtractBundlesFromImage(indexImage, indexImageExtractor.ExtractionPath()); err != nil {
-			return []registry.Bundle{}, err
+			return err
 		}
-		if err := indexImageExtractor.WriteToCache(key); err != nil {
+		if err := indexImageExtractor.WriteToCache(cacheKey); err != nil {
 			log.Warnln("Failed to cache the index image bundles")
 		}
 	}
-	operatorsFound, err := allOperatorsFound(indexImageExtractor.ExtractionPath())
+	return nil
+}
+
+func parseAllAddons(indexImageExtractor DefaultIndexImageExtractor, addonsDir string) ([]registry.Bundle, error) {
+	operatorsFound, err := allOperatorsFound(addonsDir)
 	if err != nil {
 		return []registry.Bundle{}, err
 	}

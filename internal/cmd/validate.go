@@ -55,7 +55,7 @@ func validateMain(cmd *cobra.Command, args []string) {
 		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonURI, err)
 	}
 
-	bundles, err := utils.ExtractAndParseAddon(addonMetadata.IndexImage, addonMetadata.OperatorName)
+	bundles, err := utils.ExtractAndParseAddons(addonMetadata.IndexImage, addonMetadata.OperatorName)
 	if err != nil {
 		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
 	}

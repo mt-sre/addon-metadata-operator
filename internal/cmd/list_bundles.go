@@ -30,16 +30,18 @@ var (
 
 func listBundlesMain(cmd *cobra.Command, args []string) {
 	indexImageUrl := args[0]
-	allBundles, err := utils.ExtractAndParseAllAddons(indexImageUrl)
+	allBundles, err := utils.ExtractAndParseAddons(indexImageUrl, utils.AllAddonsIdentifier)
 	if err != nil {
 		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
 	}
-
+	var operatorVersionedNames []string
 	for _, bundle := range allBundles {
 		version, err := bundle.Version()
 		if err != nil {
-			log.Fatalf("Failed to parse bundle: %s. Error: %s", bundle.Name, err.Error())
+			log.Fatalf("Failed to extract version info for bundle: %s. Error: %s", bundle.Name, err.Error())
 		}
-		fmt.Printf("%s.v%s\n", bundle.Name, version)
+		currentVersionedName := fmt.Sprintf("%s.v%s", bundle.Name, version)
+		operatorVersionedNames = append(operatorVersionedNames, currentVersionedName)
 	}
+	fmt.Println(strings.Join(operatorVersionedNames, "\n"))
 }
