@@ -24,8 +24,8 @@ func ExtractAndParseAddons(indexImage, addonIdentifier string) ([]registry.Bundl
 	}
 
 	indexImageExtractor := DefaultIndexImageExtractor{
-		downloadPath: defaultDownloadPath,
-		cacheDir:     defaultCacheDir,
+		downloadPath: DefaultDownloadPath,
+		cacheDir:     DefaultCacheDir,
 		indexImage:   indexImage,
 	}
 
