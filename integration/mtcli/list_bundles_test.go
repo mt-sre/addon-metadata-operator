@@ -37,12 +37,10 @@ func (s *e2eTestSuite) SetupSuite() {
 }
 
 func (s *e2eTestSuite) TestMtcliListBundlesE2E() {
-	type testCaseArg struct {
+	testCases := []struct {
 		indexImageUrl  string
 		expectedOutput []string
-	}
-
-	testCases := []testCaseArg{
+	}{
 		{
 			indexImageUrl: "quay.io/osd-addons/reference-addon-index@sha256:b9e87a598e7fd6afb4bfedb31e4098435c2105cc8ebe33231c341e515ba9054d",
 			expectedOutput: []string{
@@ -101,6 +99,6 @@ func readCacheFile(indexImageUrl string) (string, error) {
 	return string(fileBytes), nil
 }
 
-func prepareListBundlesCmd(cli_path string, arg string) *exec.Cmd {
-	return exec.Command(cli_path, "list-bundles", arg)
+func prepareListBundlesCmd(cliPath string, arg string) *exec.Cmd {
+	return exec.Command(cliPath, "list-bundles", arg)
 }

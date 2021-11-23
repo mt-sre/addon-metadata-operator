@@ -28,8 +28,8 @@ test-e2e: ## Run e2e integration tests
 	@E2E_MTCLI_PATH=$(E2E_MTCLI_PATH) go test $(INTEGRATION_TESTS)
 
 check: golangci-lint goimports ## Runs all checks.
-	@go fmt $(PKGS)
-	@go vet $(PKGS)
+	@go fmt $(PKGS) $(INTEGRATION_TESTS)
+	@go vet $(PKGS) $(INTEGRATION_TESTS)
 
 clean: ## Clean this directory
 	@if [ -f "$(KIND)" ]; then $(KIND) delete cluster --name $(KIND_CLUSTER_NAME); fi
