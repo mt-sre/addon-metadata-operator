@@ -23,3 +23,6 @@ testbin/*
 *.swo
 *~
 .vscode
+
+# Ignore pre-commit hooks for CI builds
+.git/hooks/

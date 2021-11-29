@@ -2,27 +2,18 @@
 
 set -exvo pipefail -o nounset
 
-# Need to install proper go version because Jenkins runs go < 1.16
-echo "[DEBUG] System go version is: $(go version)"
-export PATH="$(go env GOPATH)/bin:${PATH}"
-export GOVERSION="1.16.8"
-
-function downloadGo() {
-    # Set GO111MODULE=off to avoid modifying go.mod or go.sum
-    export GO111MODULE=off
-    go get golang.org/dl/go${GOVERSION}
-    go${GOVERSION} download
-}
-
-function setupEnv() {
-    export GO111MODULE=on
-    export GOROOT=$(go${GOVERSION} env GOROOT)
-    export PATH="${GOROOT}/bin:${PATH}"
-}
-
-downloadGo
-setupEnv
-
-# Simple script to download and run goreleaser
-# uses config from .goreleaser.yml
-curl -sL https://git.io/goreleaser | bash
+# Run build_tag.sh in a sandbox to enforce golang & gcc bindings (CGO_ENABLED=1):
+# - sync secrets from app-interface:
+#   -> secrets: /resources/jenkins/global/secrets.yaml
+#   -> for job `gh-build-tag`: /resources/jenkins/global/templates.yaml
+IMAGE_TEST=addon-metadata-operator
+docker build -t ${IMAGE_TEST} -f Dockerfile.ci .
+docker_run_args=(
+    --rm
+    # goreleaser version
+    -e "VERSION=v0.184.0"
+    # github API token to post release
+    -e "GITHUB_TOKEN=${GITHUB_TOKEN}"
+    --entrypoint=/bin/sh
+)
+docker run "${docker_run_args[@]}" "${IMAGE_TEST}" -c /tmp/goreleaser.sh
