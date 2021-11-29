@@ -1,6 +1,8 @@
 # vi:set ft=dockerfile:
 # --- stage 1 ---
-FROM registry.ci.openshift.org/openshift/release:golang-1.16 as builder
+FROM registry.redhat.io/rhel8/go-toolset:1.16 as builder
+
+USER root
 
 WORKDIR /build
 

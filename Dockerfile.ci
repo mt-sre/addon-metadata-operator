@@ -1,15 +1,9 @@
 # vi: set ft=dockerfile:
-FROM registry.ci.openshift.org/openshift/release:golang-1.16
+FROM registry.redhat.io/rhel8/go-toolset:1.16
 
 USER root
 
 WORKDIR /addon-metadata-operator
-
-# Need latest version of git for goreleaser
-# https://packages.endpoint.com/
-RUN yum -y remove git \
-    && yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.9-1.x86_64.rpm \
-    && yum -y install git
 
 # setup goreleaser
 RUN curl -sL https://git.io/goreleaser -o /tmp/goreleaser.sh \
