@@ -38,16 +38,7 @@ spec:
               View markers: $ controller-gen -www crd TODO add missing fields from
               schema, only required fields from jsonschema are present'
             properties:
-              addonImageSetVersion:
-                description: A string which specifies the imageset to use. Can either
-                  be 'latest' or a version string
-                type: string
-              addonOwner:
-                description: 'Team or individual responsible for this addon. Needs
-                  to match: ''some name <some-email@redhat.com>''.'
-                pattern: ^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$
-                type: string
-              addonParameters:
+              addOnParameters:
                 description: OCM representation of an add-on parameter
                 properties:
                   items:
@@ -133,7 +124,7 @@ spec:
                 required:
                 - items
                 type: object
-              addonRequirements:
+              addOnRequirements:
                 description: OCM representation of an addon-requirement
                 properties:
                   items:
@@ -206,6 +197,15 @@ spec:
                 required:
                 - items
                 type: object
+              addonImageSetVersion:
+                description: A string which specifies the imageset to use. Can either
+                  be 'latest' or a version string MAJOR.MINOR.PATCH
+                type: string
+              addonOwner:
+                description: 'Team or individual responsible for this addon. Needs
+                  to match: ''some name <some-email@redhat.com>''.'
+                pattern: ^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$
+                type: string
               channels:
                 description: List of channels where the addon operator is available.
                 items:

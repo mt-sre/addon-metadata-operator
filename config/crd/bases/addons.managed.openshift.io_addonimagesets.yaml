@@ -36,7 +36,7 @@ spec:
           spec:
             description: AddonImageSetSpec defines the desired state of AddonImageSet
             properties:
-              addonParameters:
+              addOnParameters:
                 description: OCM representation of an add-on parameter
                 properties:
                   items:
@@ -122,7 +122,7 @@ spec:
                 required:
                 - items
                 type: object
-              addonRequirements:
+              addOnRequirements:
                 description: OCM representation of an addon-requirement
                 properties:
                   items:
