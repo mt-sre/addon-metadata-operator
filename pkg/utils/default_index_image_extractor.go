@@ -13,9 +13,9 @@ import (
 
 const (
 	// (sblaisdo) sretoolbox also uses /tmp/mtcli to extract binary archive
-	defaultDownloadPath  = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3"
-	defaultCacheDir      = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3"
-	defaultCacheFileName = ".cache"
+	DefaultDownloadPath  = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3"
+	DefaultCacheDir      = "/tmp/mtcli-07b10894-0673-4d95-b6ef-0cbd9701c9c3"
+	DefaultCacheFileName = ".cache"
 )
 
 type DefaultIndexImageExtractor struct {
@@ -51,7 +51,7 @@ func (obj DefaultIndexImageExtractor) ExtractionPath() string {
 }
 
 func (obj DefaultIndexImageExtractor) CacheLocation() string {
-	return filepath.Join(obj.cacheDir, obj.indexImage, defaultCacheFileName)
+	return filepath.Join(obj.cacheDir, obj.indexImage, DefaultCacheFileName)
 }
 
 func (obj DefaultIndexImageExtractor) CacheKey(indexImage, addonName string) string {

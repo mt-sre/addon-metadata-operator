@@ -1,4 +1,4 @@
-.PHONY: all test fmt vet clean build vendor docker-build docker-push
+.PHONY: all test fmt vet clean build vendor docker-build docker-push test-e2e
 
 REPO := quay.io/app-sre/addon-metadata-operator
 TAG := $(shell git rev-parse --short HEAD)
@@ -9,8 +9,9 @@ CACHE := $(PWD)/.cache
 export GOBIN := $(CACHE)/bin
 export PATH := $(GOBIN):$(PATH)
 export KUBECONFIG := $(CACHE)/kubeconfig
-PKGS := $(shell go list ./... | grep -v -E '/vendor')
-
+PKGS := $(shell go list ./... | grep -v -E '/vendor|/integration')
+INTEGRATION_TESTS := $(shell go list ./integration...)
+E2E_MTCLI_PATH := $(CACHE)/mtcli
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
@@ -21,9 +22,14 @@ all: build
 test: ## Run tests.
 	@go test -count=1 $(PKGS)
 
+
+test-e2e: ## Run e2e integration tests
+	@CGO_ENABLED=1 go build -mod=vendor -a -o $(E2E_MTCLI_PATH) cmd/mtcli/main.go
+	@E2E_MTCLI_PATH=$(E2E_MTCLI_PATH) go test $(INTEGRATION_TESTS)
+
 check: golangci-lint goimports ## Runs all checks.
-	@go fmt $(PKGS)
-	@go vet $(PKGS)
+	@go fmt $(PKGS) $(INTEGRATION_TESTS)
+	@go vet $(PKGS) $(INTEGRATION_TESTS)
 
 clean: ## Clean this directory
 	@if [ -f "$(KIND)" ]; then $(KIND) delete cluster --name $(KIND_CLUSTER_NAME); fi
