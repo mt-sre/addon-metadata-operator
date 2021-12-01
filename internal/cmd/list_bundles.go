@@ -36,12 +36,11 @@ func listBundlesMain(cmd *cobra.Command, args []string) {
 	}
 	var operatorVersionedNames []string
 	for _, bundle := range allBundles {
-		version, err := bundle.Version()
+		csv, err := bundle.ClusterServiceVersion()
 		if err != nil {
 			log.Fatalf("Failed to extract version info for bundle: %s. Error: %s", bundle.Name, err.Error())
 		}
-		currentVersionedName := fmt.Sprintf("%s.v%s", bundle.Name, version)
-		operatorVersionedNames = append(operatorVersionedNames, currentVersionedName)
+		operatorVersionedNames = append(operatorVersionedNames, csv.GetName())
 	}
 	fmt.Println(strings.Join(operatorVersionedNames, "\n"))
 }
