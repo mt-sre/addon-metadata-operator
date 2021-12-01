@@ -2,29 +2,35 @@ package cmd
 
 import (
 	"errors"
-	"io/ioutil"
-	"net/http"
-	"net/url"
+	"fmt"
 	"os"
+	"path"
+	"path/filepath"
 	"strings"
 
-	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"golang.org/x/mod/semver"
 )
 
 func init() {
+	validateCmd.Flags().StringVar(&validateEnv, "env", validateEnv, "integration, stage or production")
+	validateCmd.Flags().StringVar(&validateVersion, "version", validateVersion, "addon imageset version")
 	mtcli.AddCommand(validateCmd)
 }
 
 var (
+	validateEnv      = "stage"
+	validateVersion  = ""
 	validateExamples = []string{
-		"  # Validate an addon.yaml file on local filesystem.",
-		"  mtcli validate <path/to/addon.yaml>",
-		"  # Validate an addon.yaml file loaded form an URL.",
-		"  mtcli validate https://<url/to/addon.yaml>",
+		"  # Validate an addon in staging. Uses the latest version if it supports imageset.",
+		"  mtcli validate --env stage --version latest internal/testdata/addons-imageset/reference-addon",
+		"  # Validate a version 1.0.0 of a production addon using imageset.",
+		"  mtcli validate --env production --version 1.0.0 <path/to/addon_dir>",
+		"  # Validate a staging addon that is not using imageset, but a static indexImage.",
+		"  mtcli validate --env stage <path/to/addon_dir>",
 	}
 	validateLong = `
 Validate an addon metadata against custom validators and the managed-tenants-cli JSON schema:
@@ -41,26 +47,29 @@ Validate an addon metadata against custom validators and the managed-tenants-cli
 )
 
 func validateMain(cmd *cobra.Command, args []string) {
-	addonURI := args[0]
-
-	data, err := readAddonMetadata(addonURI)
-	log.Debugf("Raw data read from addonURI %v: \n%v\n", addonURI, string(data))
-
+	addonDir, err := parseAddonDir(args[0])
 	if err != nil {
-		log.Fatalf("Could not read addon metadata from URI %v, got %v.\n", addonURI, err)
+		log.Fatalf("Could not parse addonDir, got %v.\n", err)
 	}
 
-	addonMetadata, err := getAddonMetaObject(data)
+	if err := verifyArgsAndFlags(addonDir); err != nil {
+		log.Fatalf("Could not validate CLI flags, got %v.\n", err)
+	}
+	loader := utils.NewMetaLoader(addonDir, validateEnv, validateVersion)
 	if err != nil {
-		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonURI, err)
+		log.Fatalf("Could not load the addonDir, got %v.", err)
+	}
+	meta, err := loader.Load()
+	if err != nil {
+		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonDir, err)
 	}
 
-	bundles, err := utils.ExtractAndParseAddons(addonMetadata.IndexImage, addonMetadata.OperatorName)
+	bundles, err := utils.ExtractAndParseAddons(*meta.IndexImage, meta.OperatorName)
 	if err != nil {
 		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
 	}
 
-	metaBundle := utils.NewMetaBundle(addonMetadata, bundles)
+	metaBundle := utils.NewMetaBundle(meta, bundles)
 	success, errs := validate.Validate(*metaBundle)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
@@ -71,35 +80,51 @@ func validateMain(cmd *cobra.Command, args []string) {
 	}
 }
 
-func getAddonMetaObject(data []byte) (*addonsv1alpha1.AddonMetadataSpec, error) {
-	addonMetadata := &addonsv1alpha1.AddonMetadataSpec{}
-	if err := addonMetadata.FromYAML(data); err != nil {
-		return nil, err
+func parseAddonDir(dir string) (string, error) {
+	if !path.IsAbs(dir) {
+		return filepath.Abs(dir)
 	}
-	return addonMetadata, nil
+	return dir, nil
 }
 
-func readAddonMetadata(addonURI string) ([]byte, error) {
-	if isLocalPath(addonURI) {
-		return ioutil.ReadFile(addonURI)
+func verifyArgsAndFlags(addonDir string) error {
+	if err := verifyAddonDir(addonDir); err != nil {
+		return err
 	}
-	if isValidURL(addonURI) {
-		response, err := http.Get(addonURI)
-		if err != nil {
-			log.Fatalf("Could not read from URL %v, got %v.\n", addonURI, err)
-		}
-		defer response.Body.Close()
-		return ioutil.ReadAll(response.Body)
+	if err := verifyEnv(validateEnv); err != nil {
+		return err
 	}
-	return nil, errors.New("Invalid addon metadata URI provided.")
+	return verifyVersion(validateVersion)
 }
 
-func isLocalPath(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
+// addonDir is an absolute path at this point
+func verifyAddonDir(addonDir string) error {
+	dir, err := os.Stat(addonDir)
+	if err != nil {
+		return fmt.Errorf("Error while reading directory, got %v.\n", err)
+	}
+	if !dir.IsDir() {
+		return errors.New("The provided path is not a directory. \n")
+	}
+	return nil
 }
 
-func isValidURL(rawURL string) bool {
-	_, err := url.ParseRequestURI(rawURL)
-	return err == nil
+func verifyEnv(env string) error {
+	if env != "integration" && env != "stage" && env != "production" {
+		return fmt.Errorf("Invalid environment provided: %v. Needs to be one of 'integration', 'stage' or 'production'.\n", env)
+	}
+	return nil
+}
+
+func verifyVersion(version string) error {
+	// unset version is OK, will fallback to meta.addonImageSetVersion
+	if version == "" {
+		return nil
+	}
+	// semver.IsValid(...) requires the following format vMAJOR.MINOR.PATCH
+	// so we temporarily prefix the 'v' character
+	if version != "latest" && !semver.IsValid(fmt.Sprintf("v%v", version)) {
+		return fmt.Errorf("Invalid addon version provided: %v. Needs to be either 'latest' or match 'MAJOR.MINOR.PATCH'.", version)
+	}
+	return nil
 }

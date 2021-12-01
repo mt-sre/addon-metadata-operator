@@ -9,8 +9,10 @@ import (
 )
 
 var (
-	RootDir     string = getAndValidateRootDir()
-	TestdataDir string = path.Join(RootDir, "internal", "testdata")
+	RootDir             string = getAndValidateRootDir()
+	TestdataDir         string = path.Join(RootDir, "internal", "testdata")
+	AddonsImagesetDir   string = path.Join(TestdataDir, "addons-imageset")
+	AddonsIndexImageDir string = path.Join(TestdataDir, "addons-indeximage")
 )
 
 func getAndValidateRootDir() string {

@@ -11,7 +11,12 @@ func init() {
 }
 
 // Injected by goreleaser through ldflags (see .goreleaser.yml)
-var version, commit, builtBy, date string
+var (
+	version = "0.0.0"
+	commit  = "local"
+	builtBy = "local"
+	date    = "local"
+)
 
 var (
 	versionCmd = &cobra.Command{

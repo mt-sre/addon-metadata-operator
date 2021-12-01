@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -122,7 +123,25 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// +kubebuilder:validation:Pattern=`^quay\.io/osd-addons/[a-z-]+`
-	IndexImage string `json:"indexImage"`
+	IndexImage *string `json:"indexImage"`
+
+	// +optional
+	// OCM representation of an add-on parameter
+	AddOnParameters *ocmv1.AddOnParameterList `json:"addOnParameters"`
+
+	// +optional
+	// OCM representation of an addon-requirement
+	AddOnRequirements *ocmv1.AddOnRequirementList `json:"addOnRequirements"`
+
+	// +optional
+	// OCM representation of an add-on sub operator. A sub operator is an
+	// operator who's life cycle is controlled by the add-on umbrella operator.
+	SubOperators *ocmv1.AddOnSubOperatorList `json:"subOperators"`
+
+	// +optional
+	// A string which specifies the imageset to use. Can either be 'latest' or a version string
+	// MAJOR.MINOR.PATCH
+	ImageSetVersion *string `json:"addonImageSetVersion"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata
@@ -133,7 +152,6 @@ type AddonMetadataStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-
 // AddonMetadata is the Schema for the AddonMetadata API
 type AddonMetadata struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -144,7 +162,6 @@ type AddonMetadata struct {
 }
 
 //+kubebuilder:object:root=true
-
 // AddonMetadataList contains a list of AddonMetadata
 type AddonMetadataList struct {
 	metav1.TypeMeta `json:",inline"`
