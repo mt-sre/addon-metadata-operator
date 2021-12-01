@@ -60,7 +60,7 @@ func (s *e2eTestSuite) TestMtcliListBundlesE2E() {
 				"ocs-osd-deployer.v1.0.2",
 				"ocs-osd-deployer.v1.1.0",
 				"ocs-osd-deployer.v1.1.1",
-				"ose-prometheus-operator.v4.8.0",
+				"ose-prometheus-operator.4.8.0",
 			},
 		},
 	}
