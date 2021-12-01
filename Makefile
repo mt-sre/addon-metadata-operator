@@ -119,8 +119,9 @@ goimports:
 
 GOLANGCI_LINT := $(GOBIN)/golangci-lint
 golangci-lint:
-	@$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.42.1)
-	@$(GOLANGCI_LINT) run --timeout=5m -E unused,gosimple,staticcheck
+	@$(call go-get-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@v1.43.0)
+	@echo "Running golangci-lint..."
+	@$(GOLANGCI_LINT) run --timeout=10m -E unused,gosimple,staticcheck --skip-dirs-use-default --verbose
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 define go-get-tool
