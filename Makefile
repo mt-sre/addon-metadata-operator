@@ -20,12 +20,12 @@ all: build
 ##@ Development
 
 test: ## Run tests.
-	@go test -count=1 $(PKGS)
+	@go test -count=1 -race $(PKGS)
 
 
 test-e2e: ## Run e2e integration tests
 	@CGO_ENABLED=1 go build -mod=vendor -a -o $(E2E_MTCLI_PATH) cmd/mtcli/main.go
-	@E2E_MTCLI_PATH=$(E2E_MTCLI_PATH) go test $(INTEGRATION_TESTS)
+	@E2E_MTCLI_PATH=$(E2E_MTCLI_PATH) go test -count=1 -race $(INTEGRATION_TESTS)
 
 check: golangci-lint goimports ## Runs all checks.
 	@go fmt $(PKGS) $(INTEGRATION_TESTS)

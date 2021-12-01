@@ -18,12 +18,16 @@ import (
 func init() {
 	validateCmd.Flags().StringVar(&validateEnv, "env", validateEnv, "integration, stage or production")
 	validateCmd.Flags().StringVar(&validateVersion, "version", validateVersion, "addon imageset version")
+	validateCmd.Flags().StringVar(&validateDisabled, "disabled", validateDisabled, "Disable specific validators, separated by ','. Can't be combined with --enabled.")
+	validateCmd.Flags().StringVar(&validateEnabled, "enabled", validateEnabled, "Enable specific validators, separated by ','. Can't be combined with --disabled.")
 	mtcli.AddCommand(validateCmd)
 }
 
 var (
 	validateEnv      = "stage"
 	validateVersion  = ""
+	validateDisabled = ""
+	validateEnabled  = ""
 	validateExamples = []string{
 		"  # Validate an addon in staging. Uses the latest version if it supports imageset.",
 		"  mtcli validate --env stage --version latest internal/testdata/addons-imageset/reference-addon",
@@ -31,12 +35,13 @@ var (
 		"  mtcli validate --env production --version 1.0.0 <path/to/addon_dir>",
 		"  # Validate a staging addon that is not using imageset, but a static indexImage.",
 		"  mtcli validate --env stage <path/to/addon_dir>",
+		"  # Validate an integration addon using imageset, disabling validators 001_foo and 002_bar.",
+		"  mtcli validate --env integration --disabled 001_foo,002_bar <path/to/addon_dir>",
+		"  # Validate an integration addon using imageset, enabled only 001_foo.",
+		"  mtcli validate --env integration --enabled 001_foo <path/to/addon_dir>",
 	}
-	validateLong = `
-Validate an addon metadata against custom validators and the managed-tenants-cli JSON schema:
-    https://github.com/mt-sre/managed-tenants-cli/blob/main/docs/tenants/zz_schema_generated.md.
-	`
-	validateCmd = &cobra.Command{
+	validateLong = "Validate an addon metadata and it's bundles against custom validators."
+	validateCmd  = &cobra.Command{
 		Use:     "validate",
 		Short:   "Validate addon metadata, bundles and imagesets.",
 		Long:    validateLong,
@@ -70,7 +75,11 @@ func validateMain(cmd *cobra.Command, args []string) {
 	}
 
 	metaBundle := utils.NewMetaBundle(meta, bundles)
-	success, errs := validate.Validate(*metaBundle)
+	filter, err := validate.NewFilter(validateDisabled, validateEnabled)
+	if err != nil {
+		log.Fatal(err)
+	}
+	success, errs := validate.Validate(*metaBundle, filter)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
 		os.Exit(1)
