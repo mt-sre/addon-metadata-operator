@@ -11,7 +11,7 @@ RUN curl -sL https://git.io/goreleaser -o /tmp/goreleaser.sh \
 
 # Cache optimization
 COPY go.mod go.sum Makefile ./
-RUN go mod download && make vendor
+RUN go mod download
 
 COPY . ./
 

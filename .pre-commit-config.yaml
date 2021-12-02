@@ -5,21 +5,8 @@
 # Update hooks:
 #   $ pre-commit autoupdate
 ---
-exclude: |
-  (?x)(
-    (^vendor/)|
-    (.deepcopy.go$)
-  )
+exclude: ".*.deepcopy.go"
 repos:
-  # vendor
-  - repo: local
-    hooks:
-      - id: govendor
-        name: govendor
-        language: system
-        entry: make vendor
-        pass_filenames: false
-
   # vet + fmt + golangci-lint + goimports
   - repo: local
     hooks:

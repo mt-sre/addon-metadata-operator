@@ -7,7 +7,6 @@
 project_name: mtcli
 before:
   hooks:
-    - make vendor
     - make check
 builds:
   - env:

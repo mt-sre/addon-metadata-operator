@@ -2,7 +2,7 @@
 .SHELLFLAGS=-euo pipefail -c
 SHELL := /bin/bash
 
-.PHONY: all test fmt vet clean build vendor docker-build docker-push test-e2e
+.PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e
 
 REPO := quay.io/app-sre/addon-metadata-operator
 TAG := $(shell git rev-parse --short HEAD)
@@ -18,6 +18,8 @@ INTEGRATION_TESTS := $(shell go list ./integration...)
 E2E_MTCLI_PATH := $(CACHE)/mtcli
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
+# make prow to NOT expect this project to have vendoring
+GOFLAGS=
 
 all: build
 
@@ -28,7 +30,7 @@ test: ## Run tests.
 
 
 test-e2e: ## Run e2e integration tests
-	@CGO_ENABLED=1 go build -mod=vendor -a -o $(E2E_MTCLI_PATH) cmd/mtcli/main.go
+	@CGO_ENABLED=1 go build -a -o $(E2E_MTCLI_PATH) cmd/mtcli/main.go
 	@E2E_MTCLI_PATH=$(E2E_MTCLI_PATH) go test -count=1 -race $(INTEGRATION_TESTS)
 
 check: golangci-lint goimports ## Runs all checks.
@@ -41,14 +43,13 @@ clean: ## Clean this directory
 
 ##@ Build
 
-build: vendor generate ## Build binaries
+build: tidy generate ## Build binaries
 	# Disable cgo for for cross-compilation: https://pkg.go.dev/cmd/cgo
-	@CGO_ENABLED=1 go build -mod=vendor -a -o bin/mtcli cmd/mtcli/main.go
-	@CGO_ENABLED=0 go build -mod=vendor -a -o bin/addon-metadata-operator cmd/addon-metadata-operator/main.go
+	@CGO_ENABLED=1 go build -a -o bin/mtcli cmd/mtcli/main.go
+	@CGO_ENABLED=0 go build -a -o bin/addon-metadata-operator cmd/addon-metadata-operator/main.go
 
-vendor:
+tidy:
 	@go mod tidy
-	@go mod vendor
 	@go mod verify
 
 docker-build: ## Build docker image with the operator.
