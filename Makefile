@@ -1,3 +1,7 @@
+# These shell flags are REQUIRED for an early exit in case any program called by make errors!
+.SHELLFLAGS=-euo pipefail -c
+SHELL := /bin/bash
+
 .PHONY: all test fmt vet clean build vendor docker-build docker-push test-e2e
 
 REPO := quay.io/app-sre/addon-metadata-operator
