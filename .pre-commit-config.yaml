@@ -7,6 +7,14 @@
 ---
 exclude: ".*.deepcopy.go"
 repos:
+  - repo: local
+    hooks:
+      - id: tidy
+        name: tidy
+        language: system
+        entry: make tidy
+        pass_filenames: false
+
   # vet + fmt + golangci-lint + goimports
   - repo: local
     hooks:
