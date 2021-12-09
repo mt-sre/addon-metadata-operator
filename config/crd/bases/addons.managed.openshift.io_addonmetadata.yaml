@@ -164,11 +164,34 @@ spec:
                 description: A string which specifies the imageset to use. Can either
                   be 'latest' or a version string MAJOR.MINOR.PATCH
                 type: string
+              addonNotifications:
+                items:
+                  pattern: ^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$
+                  type: string
+                type: array
               addonOwner:
                 description: 'Team or individual responsible for this addon. Needs
                   to match: ''some name <some-email@redhat.com>''.'
                 pattern: ^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$
                 type: string
+              bundleParameters:
+                properties:
+                  addonParamsSecretName:
+                    pattern: ^addon-[0-9A-Za-z-]+-parameters$
+                    type: string
+                  alertSMTPFrom:
+                    pattern: ^[0-9A-Za-z._-]+@(devshift\.net|rhmw\.io)$
+                    type: string
+                  alertingEmailAddress:
+                    pattern: ^([0-9A-Za-z_.-]+@redhat\.com,? ?)+$
+                    type: string
+                  buAlertingEmailAddress:
+                    pattern: ^([0-9A-Za-z_.-]+@redhat\.com,? ?)+$
+                    type: string
+                  useClusterStorage:
+                    pattern: ^(true|false|^$)$
+                    type: string
+                type: object
               channels:
                 description: List of channels where the addon operator is available.
                 items:
@@ -183,6 +206,90 @@ spec:
                   - name
                   type: object
                 type: array
+              commonAnnotations:
+                additionalProperties:
+                  type: string
+                description: Annotations to be applied to all objects created in the
+                  SelectorSyncSet.
+                type: object
+              commonLabels:
+                additionalProperties:
+                  type: string
+                description: Labels to be applied to all objects created in the SelectorSyncSet.
+                type: object
+              deadmanssnitch:
+                description: Denotes the Deadmans Snitch Configuration which is supposed
+                  to be setup alongside the Addon.
+                properties:
+                  clusterDeploymentSelector:
+                    description: A label selector is a label query over a set of resources.
+                      The result of matchLabels and matchExpressions are ANDed. An
+                      empty label selector matches all objects. A null label selector
+                      matches no objects.
+                    properties:
+                      matchExpressions:
+                        description: matchExpressions is a list of label selector
+                          requirements. The requirements are ANDed.
+                        items:
+                          description: A label selector requirement is a selector
+                            that contains values, a key, and an operator that relates
+                            the key and values.
+                          properties:
+                            key:
+                              description: key is the label key that the selector
+                                applies to.
+                              type: string
+                            operator:
+                              description: operator represents a key's relationship
+                                to a set of values. Valid operators are In, NotIn,
+                                Exists and DoesNotExist.
+                              type: string
+                            values:
+                              description: values is an array of string values. If
+                                the operator is In or NotIn, the values array must
+                                be non-empty. If the operator is Exists or DoesNotExist,
+                                the values array must be empty. This array is replaced
+                                during a strategic merge patch.
+                              items:
+                                type: string
+                              type: array
+                          required:
+                          - key
+                          - operator
+                          type: object
+                        type: array
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: matchLabels is a map of {key,value} pairs. A
+                          single {key,value} in the matchLabels map is equivalent
+                          to an element of matchExpressions, whose key field is "key",
+                          the operator is "In", and the values array contains only
+                          "value". The requirements are ANDed.
+                        type: object
+                    type: object
+                  snitchNamePostFix:
+                    type: string
+                  tags:
+                    items:
+                      pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$
+                      type: string
+                    type: array
+                  targetSecretRef:
+                    properties:
+                      name:
+                        pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$
+                        type: string
+                      namespace:
+                        pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$
+                        type: string
+                    type: object
+                required:
+                - clusterDeploymentSelector
+                - snitchNamePostFix
+                - tags
+                - targetSecretRef
+                type: object
               defaultChannel:
                 description: 'OLM channel from which to install the addon-operator.
                   One of: alpha, beta, stable, edge or rc.'
@@ -198,6 +305,13 @@ spec:
                 type: string
               enabled:
                 description: Set to true to allow installation of the addon.
+                type: boolean
+              extraResources:
+                description: Extra Resources to be applied to the Hive cluster.
+                items:
+                  type: string
+                type: array
+              hasExternalResources:
                 type: boolean
               icon:
                 description: Icon to be shown in UI. Should be around 200px and base64
@@ -226,6 +340,30 @@ spec:
                 description: Link to the addon documentation
                 pattern: ^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$
                 type: string
+              manualInstallPlanApproval:
+                type: boolean
+              monitoring:
+                description: Configuration parameters to be injected in the ServiceMonitor
+                  used for federation. The target prometheus server found by matchLabels
+                  needs to serve service-ca signed TLS traffic (https://docs.openshift.com/container-platform/4.6/security/certificate_types_descriptions/service-ca-certificates.html),
+                  and it needs to be runing inside the monitoring.namespace, with
+                  the service name 'prometheus'.
+                properties:
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  matchNames:
+                    items:
+                      type: string
+                    type: array
+                  namespace:
+                    type: string
+                required:
+                - matchLabels
+                - matchNames
+                - namespace
+                type: object
               name:
                 description: Friendly name for the addon, displayed in the UI
                 pattern: ^[0-9A-Z][A-Za-z0-9-_ ()]+$
@@ -259,10 +397,38 @@ spec:
                 description: Name of the addon operator.
                 pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$
                 type: string
+              pagerduty:
+                properties:
+                  acknowledgeTimeout:
+                    minimum: 0
+                    type: integer
+                  resolveTimeout:
+                    minimum: 0
+                    type: integer
+                  secretName:
+                    pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$
+                    type: string
+                  secretNamespace:
+                    pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$
+                    type: string
+                  snitchNamePostFix:
+                    pattern: ^[A-Za-z0-9]+$
+                    type: string
+                required:
+                - acknowledgeTimeout
+                - resolveTimeout
+                - secretName
+                - secretNamespace
+                - snitchNamePostFix
+                type: object
+              pullSecret:
+                type: string
               quayRepo:
                 description: 'Quay repository for the addon operator. Needs to match:
                   ''quay.io/osd-addons/<my-addon-repo>''.'
                 pattern: ^quay\.io/osd-addons/[a-z-]+$
+                type: string
+              startingCSV:
                 type: string
               subOperators:
                 description: OCM representation of an add-on sub operator. A sub operator
@@ -286,6 +452,24 @@ spec:
                     type: array
                 required:
                 - items
+                type: object
+              subscriptionConfig:
+                description: Configs to be passed to the subscription OLM object.
+                properties:
+                  env:
+                    items:
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                      - name
+                      - value
+                      type: object
+                    type: array
+                required:
+                - env
                 type: object
               targetNamespace:
                 description: Namespace where the addon operator should be installed.

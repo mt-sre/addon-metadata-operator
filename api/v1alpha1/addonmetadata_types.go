@@ -142,6 +142,51 @@ type AddonMetadataSpec struct {
 	// A string which specifies the imageset to use. Can either be 'latest' or a version string
 	// MAJOR.MINOR.PATCH
 	ImageSetVersion *string `json:"addonImageSetVersion"`
+
+	// +optional
+	HasExternalResources *bool `json:"hasExternalResources"`
+
+	// +optional
+	AddonNotifications *[]ocmv1.Notification `json:"addonNotifications"`
+
+	// +optional
+	ManualInstallPlanApproval *bool `json:"manualInstallPlanApproval"`
+
+	// +optional
+	PullSecret string `json:"pullSecret"`
+
+	// +optional
+	// Labels to be applied to all objects created in the SelectorSyncSet.
+	CommonLabels *map[string]string `json:"commonLabels"`
+
+	// +optional
+	// Annotations to be applied to all objects created in the SelectorSyncSet.
+	CommonAnnotations *map[string]string `json:"commonAnnotations"`
+
+	// +optional
+	// Configuration parameters to be injected in the ServiceMonitor used for federation. The target prometheus server found by matchLabels needs to serve service-ca signed TLS traffic (https://docs.openshift.com/container-platform/4.6/security/certificate_types_descriptions/service-ca-certificates.html), and it needs to be runing inside the monitoring.namespace, with the service name 'prometheus'.
+	Monitoring *ocmv1.Monitoring `json:"monitoring"`
+
+	// +optional
+	BundleParameters *ocmv1.BundleParameters `json:"bundleParameters"`
+
+	// +optional
+	StartingCSV *string `json:"startingCSV"`
+
+	// +optional
+	PagerDuty *ocmv1.PagerDuty `json:"pagerduty"`
+
+	// +optional
+	// Denotes the Deadmans Snitch Configuration which is supposed to be setup alongside the Addon.
+	DeadmansSnitch *ocmv1.DeadmansSnitch `json:"deadmanssnitch"`
+
+	// +optional
+	// Extra Resources to be applied to the Hive cluster.
+	ExtraResources *[]string `json:"extraResources"`
+
+	// +optional
+	// Configs to be passed to the subscription OLM object.
+	SubscriptionConfig *ocmv1.SubscriptionConfig `json:"subscriptionConfig"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata

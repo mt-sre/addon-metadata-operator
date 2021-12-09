@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 /*
@@ -119,4 +120,106 @@ type AddOnSubOperatorList struct {
 
 func (a AddOnSubOperatorList) UnmarshalJSON(b []byte) error {
 	return json.Unmarshal(b, &a.Items)
+}
+
+// +kubebuilder:validation:Pattern=`^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$`
+type Notification string
+
+//+kubebuilder:object:generate=true
+type Monitoring struct {
+	// +kubebuilder:validation:Required
+	Namespace string `json:"namespace"`
+
+	// +kubebuilder:validation:Required
+	MatchNames []string `json:"matchNames"`
+
+	// +kubebuilder:validation:Required
+	MatchLabels map[string]string `json:"matchLabels"`
+}
+
+//+kubebuilder:object:generate=true
+type BundleParameters struct {
+	// +optional
+	// +kubebuilder:validation:Pattern=`^(true|false|^$)$`
+	UseClusterStorage *string `json:"useClusterStorage"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^([0-9A-Za-z_.-]+@redhat\.com,? ?)+$`
+	AlertingEmailAddress *string `json:"alertingEmailAddress"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^([0-9A-Za-z_.-]+@redhat\.com,? ?)+$`
+	BuAlertingEmailAddress *string `json:"buAlertingEmailAddress"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^[0-9A-Za-z._-]+@(devshift\.net|rhmw\.io)$`
+	AlertSMTPFrom *string `json:"alertSMTPFrom"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^addon-[0-9A-Za-z-]+-parameters$`
+	AddonParamsSecretName *string `json:"addonParamsSecretName"`
+}
+
+//+kubebuilder:object:generate=true
+type PagerDuty struct {
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9]+$`
+	EscalationPolicy string `json:"snitchNamePostFix"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Minimum=0
+	AcknowledgeTimeout int `json:"acknowledgeTimeout"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Minimum=0
+	ResolveTimeout int `json:"resolveTimeout"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	SecretName string `json:"secretName"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	SecretNamespace string `json:"secretNamespace"`
+}
+
+//+kubebuilder:object:generate=true
+type DeadmansSnitch struct {
+	ClusterDeploymentSelector *metav1.LabelSelector `json:"clusterDeploymentSelector"`
+
+	SnitchNamePostFix *string `json:"snitchNamePostFix"`
+
+	TargetSecretRef *TargetSecretRef `json:"targetSecretRef"`
+
+	// +kubebuilder:validation:Required
+	Tags []Tag `json:"tags"`
+}
+
+// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+type Tag string
+
+//+kubebuilder:object:generate=true
+type TargetSecretRef struct {
+	// +optional
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	Name *string `json:"name"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	Namespace *string `json:"namespace"`
+}
+
+//+kubebuilder:object:generate=true
+type SubscriptionConfig struct {
+	// +kubebuilder:validation:Required
+	Env *[]EnvItem `json:"env"`
+}
+
+//+kubebuilder:object:generate=true
+type EnvItem struct {
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+
+	// +kubebuilder:validation:Required
+	Value string `json:"value"`
 }
