@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
+    controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
   name: addonmetadata.addons.managed.openshift.io
 spec:
@@ -48,33 +48,27 @@ spec:
                           items:
                             properties:
                               data:
-                                properties:
-                                  aws.sts.enabled:
-                                    type: boolean
-                                  ccs.enabled:
-                                    type: boolean
-                                  cloud_provider.id:
-                                    items:
-                                      type: string
-                                    type: array
-                                  product.id:
-                                    items:
-                                      type: string
-                                    type: array
-                                  version.raw_id:
-                                    type: string
-                                required:
-                                - aws.sts.enabled
-                                - ccs.enabled
-                                - cloud_provider.id
-                                - product.id
-                                - version.raw_id
+                                additionalProperties:
+                                  x-kubernetes-preserve-unknown-fields: true
                                 type: object
                               resource:
                                 type: string
+                              status:
+                                properties:
+                                  error_msgs:
+                                    items:
+                                      type: string
+                                    type: array
+                                  fulfilled:
+                                    type: boolean
+                                required:
+                                - error_msgs
+                                - fulfilled
+                                type: object
                             required:
                             - data
                             - resource
+                            - status
                             type: object
                           type: array
                         default_value:
@@ -101,6 +95,8 @@ spec:
                             - value
                             type: object
                           type: array
+                        order:
+                          type: integer
                         required:
                           type: boolean
                         validation:
@@ -116,6 +112,7 @@ spec:
                       - id
                       - name
                       - options
+                      - order
                       - required
                       - validation
                       - value_type
@@ -131,55 +128,8 @@ spec:
                     items:
                       properties:
                         data:
-                          properties:
-                            aws.sts.enabled:
-                              type: boolean
-                            ccs.enabled:
-                              type: boolean
-                            cloud_provider.id:
-                              items:
-                                type: string
-                              type: array
-                            compute.cpu:
-                              type: integer
-                            compute.memory:
-                              type: integer
-                            id:
-                              type: string
-                            instance_type:
-                              items:
-                                type: string
-                              type: array
-                            nodes.compute:
-                              type: integer
-                            nodes.compute_machine_type.id:
-                              items:
-                                type: string
-                              type: array
-                            product.id:
-                              items:
-                                type: string
-                              type: array
-                            replicas:
-                              type: integer
-                            state:
-                              type: string
-                            version.raw_id:
-                              type: string
-                          required:
-                          - aws.sts.enabled
-                          - ccs.enabled
-                          - cloud_provider.id
-                          - compute.cpu
-                          - compute.memory
-                          - id
-                          - instance_type
-                          - nodes.compute
-                          - nodes.compute_machine_type.id
-                          - product.id
-                          - replicas
-                          - state
-                          - version.raw_id
+                          additionalProperties:
+                            x-kubernetes-preserve-unknown-fields: true
                           type: object
                         enabled:
                           type: boolean
@@ -187,11 +137,24 @@ spec:
                           type: string
                         resource:
                           type: string
+                        status:
+                          properties:
+                            error_msgs:
+                              items:
+                                type: string
+                              type: array
+                            fulfilled:
+                              type: boolean
+                          required:
+                          - error_msgs
+                          - fulfilled
+                          type: object
                       required:
                       - data
                       - enabled
                       - id
                       - resource
+                      - status
                       type: object
                     type: array
                 required:
@@ -311,14 +274,14 @@ spec:
                       properties:
                         enabled:
                           type: boolean
-                        operatorName:
+                        operator_name:
                           type: string
-                        operatorNamespace:
+                        operator_namespace:
                           type: string
                       required:
                       - enabled
-                      - operatorName
-                      - operatorNamespace
+                      - operator_name
+                      - operator_namespace
                       type: object
                     type: array
                 required:
