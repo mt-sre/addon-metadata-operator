@@ -1,13 +1,20 @@
 package v1
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+)
 
 /*
-Please keep in sync with managed-tenants-cli schema:
-https://github.com/mt-sre/managed-tenants-cli/blob/main/managedtenants/data/metadata.schema.yaml
+Please keep in sync with managed-tenants-cli schemas and OCM API spec:
+- https://github.com/mt-sre/managed-tenants-cli/blob/main/managedtenants/data/metadata.schema.yaml
+- https://github.com/mt-sre/managed-tenants-cli/blob/main/managedtenants/data/imageset.schema.yaml
+- <redhat_internal_gitlab>/service/uhc-clusters-service/pkg/api/addons.go
 
 We need to generate deepcopy methods for all complex types. Using the non-root
 generation annotation as these types don't implement runtime.Object interface.
+
 
 Update zz_generated.deepcopy.go with:
 	$ make generate
@@ -24,19 +31,9 @@ type AddOnParameter struct {
 	Editable     bool                        `json:"editable" validate:"required"`
 	Enabled      bool                        `json:"enabled" validate:"required"`
 	DefaultValue *string                     `json:"default_value"`
+	Order        *int                        `json:"order"`
 	Options      *[]AddOnParameterOption     `json:"options"`
-	Conditions   *[]AddOnParameterConditions `json:"conditions"`
-}
-
-//+kubebuilder:object:generate=true
-// using list so we can easily DeepCopy
-type AddOnParameterList struct {
-	Items []AddOnParameter `json:"items"`
-}
-
-func (a AddOnParameterList) UnmarshalJSON(b []byte) error {
-	res := AddOnParameterList{}
-	return json.Unmarshal(b, &res.Items)
+	Conditions   *[]AddOnResourceRequirement `json:"conditions"`
 }
 
 type AddOnParameterValueType string
@@ -56,43 +53,28 @@ type AddOnParameterOption struct {
 }
 
 //+kubebuilder:object:generate=true
-type AddOnParameterConditions struct {
-	Resource AddOnParameterResourceType `json:"resource" validate:"required"`
-	Data     AddOnParameterData         `json:"data" validate:"required"`
+type AddOnResourceRequirement struct {
+	Resource AddOnRequirementResourceType    `json:"resource" validate:"required"`
+	Data     AddOnRequirementData            `json:"data" validate:"required"`
+	Status   *AddOnResourceRequirementStatus `json:"status"`
 }
 
-type AddOnParameterResourceType string
-
-const (
-	AddOnParameterResourceTypeCluster AddOnParameterResourceType = "cluster"
-)
+type AddOnRequirementData map[string]apiextensionsv1.JSON
 
 //+kubebuilder:object:generate=true
-type AddOnParameterData struct {
-	AWSStsEnabled   *bool     `json:"aws.sts.enabled"`
-	CCSEnabled      *bool     `json:"ccs.enabled"`
-	CloudProviderID *[]string `json:"cloud_provider.id"`
-	ProductID       *[]string `json:"product.id"`
-	VersionRawID    *string   `json:"version.raw_id"`
-}
-
-//+kubebuilder:object:generate=true
-type AddOnRequirement struct {
-	ID       string                       `json:"id" validate:"required"`
-	Resource AddOnRequirementResourceType `json:"resource" validate:"required"`
-	Data     AddOnRequirementData         `json:"data" validate:"required"`
-	Enabled  bool                         `json:"enabled" validate:"required"`
+type AddOnResourceRequirementStatus struct {
+	Fulfilled *bool    `json:"fulfilled"`
+	ErrorMsgs []string `json:"error_msgs"`
 }
 
 //+kubebuilder:object:generate=true
 // using list so we can easily DeepCopy
-type AddOnRequirementList struct {
-	Items []AddOnRequirement `json:"items"`
+type AddOnParameterList struct {
+	Items []AddOnParameter `json:"items"`
 }
 
-func (a AddOnRequirementList) UnmarshalJSON(b []byte) error {
-	res := AddOnRequirementList{}
-	return json.Unmarshal(b, &res.Items)
+func (a *AddOnParameterList) UnmarshalJSON(b []byte) error {
+	return json.Unmarshal(b, &a.Items)
 }
 
 type AddOnRequirementResourceType string
@@ -104,26 +86,28 @@ const (
 )
 
 //+kubebuilder:object:generate=true
-type AddOnRequirementData struct {
-	ID                      *string   `json:"id"`
-	State                   *string   `json:"state"`
-	AWSStsEnabled           *bool     `json:"aws.sts.enabled"`
-	CloudProviderID         *[]string `json:"cloud_provider.id"`
-	ProductID               *[]string `json:"product.id"`
-	ComputeMemory           *int      `json:"compute.memory"`
-	ComputeCPU              *int      `json:"compute.cpu"`
-	CCSEnabled              *bool     `json:"ccs.enabled"`
-	NodesCompute            *int      `json:"nodes.compute"`
-	NodesComputeMachineType *[]string `json:"nodes.compute_machine_type.id"`
-	VersionRawID            *string   `json:"version.raw_id"`
-	InstanceType            *[]string `json:"instance_type"`
-	Replicas                *int      `json:"replicas"`
+type AddOnRequirement struct {
+	ID       string                          `json:"id" validate:"required"`
+	Resource AddOnRequirementResourceType    `json:"resource" validate:"required"`
+	Data     AddOnRequirementData            `json:"data" validate:"required"`
+	Status   *AddOnResourceRequirementStatus `json:"status"`
+	Enabled  bool                            `json:"enabled" validate:"required"`
+}
+
+//+kubebuilder:object:generate=true
+// using list so we can easily DeepCopy
+type AddOnRequirementList struct {
+	Items []AddOnRequirement `json:"items"`
+}
+
+func (a *AddOnRequirementList) UnmarshalJSON(b []byte) error {
+	return json.Unmarshal(b, &a.Items)
 }
 
 //+kubebuilder:object:generate=true
 type AddOnSubOperator struct {
-	OperatorName      string `json:"operatorName" validate:"required"`
-	OperatorNamespace string `json:"operatorNamespace" validate:"required"`
+	OperatorName      string `json:"operator_name" validate:"required"`
+	OperatorNamespace string `json:"operator_namespace" validate:"required"`
 	Enabled           bool   `json:"enabled" validate:"required"`
 }
 
@@ -134,6 +118,5 @@ type AddOnSubOperatorList struct {
 }
 
 func (a AddOnSubOperatorList) UnmarshalJSON(b []byte) error {
-	res := AddOnSubOperatorList{}
-	return json.Unmarshal(b, &res.Items)
+	return json.Unmarshal(b, &a.Items)
 }
