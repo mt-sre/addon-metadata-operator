@@ -31,6 +31,11 @@ func (obj DefaultBundleParser) ParseBundles(addonName, manifestsDir string) ([]r
 	}
 	for _, bundlePath := range bundlesDir {
 		if bundlePath.IsDir() {
+			// TODO - (sblaisdo) enable after we migrate extraction format to bundles instead of packageManifest
+			// annotations, err := readAnnotations(filepath.Join(manifestsDir, bundlePath.Name()))
+			// if err != nil {
+			// 	errors = append(errors, err)
+			// }
 			bundle := registry.Bundle{
 				Name:        addonName,
 				Annotations: &registry.Annotations{},
@@ -104,3 +109,20 @@ func concatParseErrors(errs []error, errMsgPrefix string) error {
 		errStrsJoined,
 	)
 }
+
+// TODO - (sblaisdo) enable when extration format is bundles not packageManifest
+// func readAnnotations(bundlePath string) (*registry.Annotations, error) {
+// 	annotationsPath := filepath.Join(bundlePath, "metadata", "annotations.yaml")
+// 	content, err := ioutil.ReadFile(annotationsPath)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("Could not read annotationsPath %v, got %v.", annotationsPath, err)
+// 	}
+
+// 	var annotationsFile registry.AnnotationsFile
+// 	err = yaml.Unmarshal(content, &annotationsFile)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("Could not unmarshal annotationsFile, got %v.", err)
+// 	}
+
+// 	return &annotationsFile.Annotations, nil
+// }

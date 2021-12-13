@@ -1,0 +1,6 @@
+name: reference-addon.v0.0.5
+indexImage: quay.io/osd-addons/reference-addon-index@sha256:0c8b02008f2c2faeb681ae8cd454821266a794435aea4b3f7ae28c74bc2e280d
+relatedImages: []
+addOnParameters: []
+addOnRequirements: []
+subOperators: []

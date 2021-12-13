@@ -1,15 +1,16 @@
-package utils
+package utils_test
 
 import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestExtractAndParseAddons(t *testing.T) {
-	defer testutils.RemoveDir(DefaultDownloadPath)
+	defer testutils.RemoveDir(utils.DefaultDownloadPath)
 	testCases := []struct {
 		indexImage             string
 		operatorName           string
@@ -28,7 +29,7 @@ func TestExtractAndParseAddons(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err := ExtractAndParseAddons(testCase.indexImage, testCase.operatorName)
+		_, err := utils.ExtractAndParseAddons(testCase.indexImage, testCase.operatorName)
 		if testCase.expectedErrorSubstring == nil {
 			require.NoError(t, err)
 		} else {

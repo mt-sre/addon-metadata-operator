@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 )
 
 type MetaLoader interface {
@@ -55,20 +54,8 @@ func (l defaultMetaLoader) Load() (*addonsv1alpha1.AddonMetadataSpec, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Could not read imageSet, got %v.\n", err)
 		}
-		// deepcopy to be safe
-		meta.IndexImage = &imageSet.IndexImage
-		// TODO(ykukreja): function to perform safer and consistent deep copies and use that function here
-		if meta.AddOnParameters != nil && imageSet.AddOnParameters != nil {
-			*meta.AddOnParameters = make([]ocmv1.AddOnParameter, len(*imageSet.AddOnParameters))
-			copy(*meta.AddOnParameters, *imageSet.AddOnParameters)
-		}
-		if meta.AddOnRequirements != nil && imageSet.AddOnRequirements != nil {
-			*meta.AddOnRequirements = make([]ocmv1.AddOnRequirement, len(*imageSet.AddOnRequirements))
-			copy(*meta.AddOnRequirements, *imageSet.AddOnRequirements)
-		}
-		if meta.SubOperators != nil && imageSet.SubOperators != nil {
-			*meta.SubOperators = make([]ocmv1.AddOnSubOperator, len(*imageSet.SubOperators))
-			copy(*meta.SubOperators, *imageSet.SubOperators)
+		if err := meta.PatchWithImageSet(imageSet); err != nil {
+			return nil, fmt.Errorf("Could not patch metadata with imageset, got %v.", err)
 		}
 	}
 	return meta, nil
@@ -118,7 +105,7 @@ func (l defaultMetaLoader) getImagesetPath(version string) (string, error) {
 	baseDir := path.Join(l.AddonDir, "addonimagesets", l.Env)
 	target := fmt.Sprintf("%s.v%s.yaml", l.AddonName, version)
 	if version == "latest" {
-		latest, err := getLatestImageSetVersion(baseDir)
+		latest, err := GetLatestImageSetVersion(baseDir)
 		if err != nil {
 			return "", err
 		}
@@ -127,7 +114,7 @@ func (l defaultMetaLoader) getImagesetPath(version string) (string, error) {
 	return path.Join(baseDir, target), nil
 }
 
-func getLatestImageSetVersion(dir string) (string, error) {
+func GetLatestImageSetVersion(dir string) (string, error) {
 	sortDescending := func(files []os.FileInfo) {
 		sort.Slice(files, func(i, j int) bool {
 			return files[i].Name() > files[j].Name()

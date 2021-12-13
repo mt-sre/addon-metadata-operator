@@ -11,7 +11,7 @@ func (val ValidatorAddonLabelTestBundle) Name() string {
 	return "Addon Label Validator"
 }
 
-func (val ValidatorAddonLabelTestBundle) Run(mb utils.MetaBundle) (bool, error) {
+func (val ValidatorAddonLabelTestBundle) Run(mb utils.MetaBundle) (bool, string, error) {
 	return ValidateAddonLabel(mb)
 }
 

@@ -108,9 +108,10 @@ type AddonMetadataSpec struct {
 	// OLM channel from which to install the addon-operator. One of: alpha, beta, stable, edge or rc.
 	DefaultChannel string `json:"defaultChannel" validate:"required"`
 
-	// +kubebuilder:validation:Required
-	// List of channels where the addon operator is available.
-	Channels []Channel `json:"channels" validate:"required,gt=0"`
+	// +optional
+	// Deprecated: List of channels where the addon operator is available.
+	// Only needed for legacy addon builds.
+	Channels *[]Channel `json:"channels"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:default:{}

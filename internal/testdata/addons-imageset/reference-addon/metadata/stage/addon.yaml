@@ -16,10 +16,10 @@ ocmQuotaName: addon-reference-addon
 ocmQuotaCost: 1
 operatorName: reference-addon
 channels:
-  - currentCSV: reference-addon.v0.0.1
+  - currentCSV: reference-addon.v0.0.5
     name: alpha
 defaultChannel: alpha
 bundleParameters: {}
 namespaceLabels: {}
 namespaceAnnotations: {}
-addonImageSetVersion: 0.0.1
+addonImageSetVersion: 0.0.5

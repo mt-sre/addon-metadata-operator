@@ -221,8 +221,12 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 	}
 	if in.Channels != nil {
 		in, out := &in.Channels, &out.Channels
-		*out = make([]Channel, len(*in))
-		copy(*out, *in)
+		*out = new([]Channel)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]Channel, len(*in))
+			copy(*out, *in)
+		}
 	}
 	if in.NamespaceLabels != nil {
 		in, out := &in.NamespaceLabels, &out.NamespaceLabels
