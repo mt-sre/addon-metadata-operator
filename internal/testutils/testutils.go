@@ -1,8 +1,10 @@
 package testutils
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -37,3 +39,12 @@ func dirContainsGoMod(root string) bool {
 	}
 	return false
 }
+
+func RemoveDir(downloadDir string) {
+	err := os.RemoveAll(downloadDir)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to cleanup download dir")
+	}
+}
+
+func GetStringLiteralRef(s string) *string { return &s }
