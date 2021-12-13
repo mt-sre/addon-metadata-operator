@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"encoding/json"
-
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -68,16 +66,6 @@ type AddOnResourceRequirementStatus struct {
 	ErrorMsgs []string `json:"error_msgs"`
 }
 
-//+kubebuilder:object:generate=true
-// using list so we can easily DeepCopy
-type AddOnParameterList struct {
-	Items []AddOnParameter `json:"items"`
-}
-
-func (a *AddOnParameterList) UnmarshalJSON(b []byte) error {
-	return json.Unmarshal(b, &a.Items)
-}
-
 type AddOnRequirementResourceType string
 
 const (
@@ -96,30 +84,10 @@ type AddOnRequirement struct {
 }
 
 //+kubebuilder:object:generate=true
-// using list so we can easily DeepCopy
-type AddOnRequirementList struct {
-	Items []AddOnRequirement `json:"items"`
-}
-
-func (a *AddOnRequirementList) UnmarshalJSON(b []byte) error {
-	return json.Unmarshal(b, &a.Items)
-}
-
-//+kubebuilder:object:generate=true
 type AddOnSubOperator struct {
 	OperatorName      string `json:"operator_name" validate:"required"`
 	OperatorNamespace string `json:"operator_namespace" validate:"required"`
 	Enabled           bool   `json:"enabled" validate:"required"`
-}
-
-//+kubebuilder:object:generate=true
-// using list so we can easily DeepCopy
-type AddOnSubOperatorList struct {
-	Items []AddOnSubOperator `json:"items"`
-}
-
-func (a AddOnSubOperatorList) UnmarshalJSON(b []byte) error {
-	return json.Unmarshal(b, &a.Items)
 }
 
 // +kubebuilder:validation:Pattern=`^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$`
@@ -185,10 +153,13 @@ type PagerDuty struct {
 
 //+kubebuilder:object:generate=true
 type DeadmansSnitch struct {
+	// +optional
 	ClusterDeploymentSelector *metav1.LabelSelector `json:"clusterDeploymentSelector"`
 
+	// +optional
 	SnitchNamePostFix *string `json:"snitchNamePostFix"`
 
+	// +optional
 	TargetSecretRef *TargetSecretRef `json:"targetSecretRef"`
 
 	// +kubebuilder:validation:Required

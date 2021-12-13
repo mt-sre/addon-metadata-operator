@@ -127,16 +127,16 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// OCM representation of an add-on parameter
-	AddOnParameters *ocmv1.AddOnParameterList `json:"addOnParameters"`
+	AddOnParameters *[]ocmv1.AddOnParameter `json:"addOnParameters"`
 
 	// +optional
 	// OCM representation of an addon-requirement
-	AddOnRequirements *ocmv1.AddOnRequirementList `json:"addOnRequirements"`
+	AddOnRequirements *[]ocmv1.AddOnRequirement `json:"addOnRequirements"`
 
 	// +optional
 	// OCM representation of an add-on sub operator. A sub operator is an
 	// operator who's life cycle is controlled by the add-on umbrella operator.
-	SubOperators *ocmv1.AddOnSubOperatorList `json:"subOperators"`
+	SubOperators *[]ocmv1.AddOnSubOperator `json:"subOperators"`
 
 	// +optional
 	// A string which specifies the imageset to use. Can either be 'latest' or a version string

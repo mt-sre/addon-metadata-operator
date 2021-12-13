@@ -95,18 +95,34 @@ func (in *AddonImageSetSpec) DeepCopyInto(out *AddonImageSetSpec) {
 	}
 	if in.AddOnParameters != nil {
 		in, out := &in.AddOnParameters, &out.AddOnParameters
-		*out = new(v1.AddOnParameterList)
-		(*in).DeepCopyInto(*out)
+		*out = new([]v1.AddOnParameter)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]v1.AddOnParameter, len(*in))
+			for i := range *in {
+				(*in)[i].DeepCopyInto(&(*out)[i])
+			}
+		}
 	}
 	if in.AddOnRequirements != nil {
 		in, out := &in.AddOnRequirements, &out.AddOnRequirements
-		*out = new(v1.AddOnRequirementList)
-		(*in).DeepCopyInto(*out)
+		*out = new([]v1.AddOnRequirement)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]v1.AddOnRequirement, len(*in))
+			for i := range *in {
+				(*in)[i].DeepCopyInto(&(*out)[i])
+			}
+		}
 	}
 	if in.SubOperators != nil {
 		in, out := &in.SubOperators, &out.SubOperators
-		*out = new(v1.AddOnSubOperatorList)
-		(*in).DeepCopyInto(*out)
+		*out = new([]v1.AddOnSubOperator)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]v1.AddOnSubOperator, len(*in))
+			copy(*out, *in)
+		}
 	}
 }
 
@@ -228,18 +244,34 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 	}
 	if in.AddOnParameters != nil {
 		in, out := &in.AddOnParameters, &out.AddOnParameters
-		*out = new(v1.AddOnParameterList)
-		(*in).DeepCopyInto(*out)
+		*out = new([]v1.AddOnParameter)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]v1.AddOnParameter, len(*in))
+			for i := range *in {
+				(*in)[i].DeepCopyInto(&(*out)[i])
+			}
+		}
 	}
 	if in.AddOnRequirements != nil {
 		in, out := &in.AddOnRequirements, &out.AddOnRequirements
-		*out = new(v1.AddOnRequirementList)
-		(*in).DeepCopyInto(*out)
+		*out = new([]v1.AddOnRequirement)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]v1.AddOnRequirement, len(*in))
+			for i := range *in {
+				(*in)[i].DeepCopyInto(&(*out)[i])
+			}
+		}
 	}
 	if in.SubOperators != nil {
 		in, out := &in.SubOperators, &out.SubOperators
-		*out = new(v1.AddOnSubOperatorList)
-		(*in).DeepCopyInto(*out)
+		*out = new([]v1.AddOnSubOperator)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]v1.AddOnSubOperator, len(*in))
+			copy(*out, *in)
+		}
 	}
 	if in.ImageSetVersion != nil {
 		in, out := &in.ImageSetVersion, &out.ImageSetVersion

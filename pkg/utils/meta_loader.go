@@ -56,9 +56,15 @@ func (l defaultMetaLoader) Load() (*addonsv1alpha1.AddonMetadataSpec, error) {
 		}
 		// deepcopy to be safe
 		meta.IndexImage = &imageSet.IndexImage
-		meta.AddOnParameters = imageSet.AddOnParameters.DeepCopy()
-		meta.AddOnRequirements = imageSet.AddOnRequirements.DeepCopy()
-		meta.SubOperators = imageSet.SubOperators.DeepCopy()
+		if meta.AddOnParameters != nil && imageSet.AddOnParameters != nil {
+			copy(*meta.AddOnParameters, *imageSet.AddOnParameters)
+		}
+		if meta.AddOnRequirements != nil && imageSet.AddOnRequirements != nil {
+			copy(*meta.AddOnRequirements, *imageSet.AddOnRequirements)
+		}
+		if meta.SubOperators != nil && imageSet.SubOperators != nil {
+			copy(*meta.SubOperators, *imageSet.SubOperators)
+		}
 	}
 	return meta, nil
 }
