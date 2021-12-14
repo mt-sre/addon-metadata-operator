@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 )
 
 type MetaLoader interface {
@@ -56,13 +57,17 @@ func (l defaultMetaLoader) Load() (*addonsv1alpha1.AddonMetadataSpec, error) {
 		}
 		// deepcopy to be safe
 		meta.IndexImage = &imageSet.IndexImage
+		// TODO(ykukreja): function to perform safer and consistent deep copies and use that function here
 		if meta.AddOnParameters != nil && imageSet.AddOnParameters != nil {
+			*meta.AddOnParameters = make([]ocmv1.AddOnParameter, len(*imageSet.AddOnParameters))
 			copy(*meta.AddOnParameters, *imageSet.AddOnParameters)
 		}
 		if meta.AddOnRequirements != nil && imageSet.AddOnRequirements != nil {
+			*meta.AddOnRequirements = make([]ocmv1.AddOnRequirement, len(*imageSet.AddOnRequirements))
 			copy(*meta.AddOnRequirements, *imageSet.AddOnRequirements)
 		}
 		if meta.SubOperators != nil && imageSet.SubOperators != nil {
+			*meta.SubOperators = make([]ocmv1.AddOnSubOperator, len(*imageSet.SubOperators))
 			copy(*meta.SubOperators, *imageSet.SubOperators)
 		}
 	}
