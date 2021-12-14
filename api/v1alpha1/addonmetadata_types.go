@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	mtsrev1 "github.com/mt-sre/addon-metadata-operator/pkg/mtsre/v1"
 	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -127,21 +128,66 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// OCM representation of an add-on parameter
-	AddOnParameters *ocmv1.AddOnParameterList `json:"addOnParameters"`
+	AddOnParameters *[]ocmv1.AddOnParameter `json:"addOnParameters"`
 
 	// +optional
 	// OCM representation of an addon-requirement
-	AddOnRequirements *ocmv1.AddOnRequirementList `json:"addOnRequirements"`
+	AddOnRequirements *[]ocmv1.AddOnRequirement `json:"addOnRequirements"`
 
 	// +optional
 	// OCM representation of an add-on sub operator. A sub operator is an
 	// operator who's life cycle is controlled by the add-on umbrella operator.
-	SubOperators *ocmv1.AddOnSubOperatorList `json:"subOperators"`
+	SubOperators *[]ocmv1.AddOnSubOperator `json:"subOperators"`
 
 	// +optional
 	// A string which specifies the imageset to use. Can either be 'latest' or a version string
 	// MAJOR.MINOR.PATCH
 	ImageSetVersion *string `json:"addonImageSetVersion"`
+
+	// +optional
+	HasExternalResources *bool `json:"hasExternalResources"`
+
+	// +optional
+	AddonNotifications *[]mtsrev1.Notification `json:"addonNotifications"`
+
+	// +optional
+	ManualInstallPlanApproval *bool `json:"manualInstallPlanApproval"`
+
+	// +optional
+	PullSecret string `json:"pullSecret"`
+
+	// +optional
+	// Labels to be applied to all objects created in the SelectorSyncSet.
+	CommonLabels *map[string]string `json:"commonLabels"`
+
+	// +optional
+	// Annotations to be applied to all objects created in the SelectorSyncSet.
+	CommonAnnotations *map[string]string `json:"commonAnnotations"`
+
+	// +optional
+	// Configuration parameters to be injected in the ServiceMonitor used for federation. The target prometheus server found by matchLabels needs to serve service-ca signed TLS traffic (https://docs.openshift.com/container-platform/4.6/security/certificate_types_descriptions/service-ca-certificates.html), and it needs to be runing inside the monitoring.namespace, with the service name 'prometheus'.
+	Monitoring *mtsrev1.Monitoring `json:"monitoring"`
+
+	// +optional
+	BundleParameters *mtsrev1.BundleParameters `json:"bundleParameters"`
+
+	// +optional
+	StartingCSV *string `json:"startingCSV"`
+
+	// +optional
+	PagerDuty *mtsrev1.PagerDuty `json:"pagerduty"`
+
+	// +optional
+	// Denotes the Deadmans Snitch Configuration which is supposed to be setup alongside the Addon.
+	DeadmansSnitch *mtsrev1.DeadmansSnitch `json:"deadmanssnitch"`
+
+	// +optional
+	// Extra Resources to be applied to the Hive cluster.
+	ExtraResources *[]string `json:"extraResources"`
+
+	// +optional
+	// Configs to be passed to the subscription OLM object.
+	SubscriptionConfig *mtsrev1.SubscriptionConfig `json:"subscriptionConfig"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata

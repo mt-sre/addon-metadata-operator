@@ -38,126 +38,103 @@ spec:
             properties:
               addOnParameters:
                 description: OCM representation of an add-on parameter
-                properties:
-                  items:
-                    items:
-                      properties:
-                        conditions:
-                          items:
-                            properties:
-                              data:
-                                additionalProperties:
-                                  x-kubernetes-preserve-unknown-fields: true
-                                type: object
-                              resource:
-                                type: string
-                              status:
-                                properties:
-                                  error_msgs:
-                                    items:
-                                      type: string
-                                    type: array
-                                  fulfilled:
-                                    type: boolean
-                                required:
-                                - error_msgs
-                                - fulfilled
-                                type: object
-                            required:
-                            - data
-                            - resource
-                            - status
+                items:
+                  properties:
+                    conditions:
+                      items:
+                        properties:
+                          data:
+                            additionalProperties:
+                              x-kubernetes-preserve-unknown-fields: true
                             type: object
-                          type: array
-                        default_value:
-                          type: string
-                        description:
-                          type: string
-                        editable:
-                          type: boolean
-                        enabled:
-                          type: boolean
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        options:
-                          items:
+                          resource:
+                            type: string
+                          status:
                             properties:
-                              name:
-                                type: string
-                              value:
-                                type: string
-                            required:
-                            - name
-                            - value
+                              error_msgs:
+                                items:
+                                  type: string
+                                type: array
+                              fulfilled:
+                                type: boolean
                             type: object
-                          type: array
-                        order:
-                          type: integer
                         required:
-                          type: boolean
-                        validation:
-                          type: string
-                        value_type:
-                          type: string
-                      required:
-                      - conditions
-                      - default_value
-                      - description
-                      - editable
-                      - enabled
-                      - id
-                      - name
-                      - options
-                      - order
-                      - required
-                      - validation
-                      - value_type
-                      type: object
-                    type: array
-                required:
-                - items
-                type: object
+                        - data
+                        - resource
+                        type: object
+                      type: array
+                    default_value:
+                      type: string
+                    description:
+                      type: string
+                    editable:
+                      type: boolean
+                    enabled:
+                      type: boolean
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    options:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                        required:
+                        - name
+                        - value
+                        type: object
+                      type: array
+                    order:
+                      type: integer
+                    required:
+                      type: boolean
+                    validation:
+                      type: string
+                    value_type:
+                      type: string
+                  required:
+                  - description
+                  - editable
+                  - enabled
+                  - id
+                  - name
+                  - required
+                  - value_type
+                  type: object
+                type: array
               addOnRequirements:
                 description: OCM representation of an addon-requirement
-                properties:
-                  items:
-                    items:
-                      properties:
-                        data:
-                          additionalProperties:
-                            x-kubernetes-preserve-unknown-fields: true
-                          type: object
-                        enabled:
-                          type: boolean
-                        id:
-                          type: string
-                        resource:
-                          type: string
-                        status:
-                          properties:
-                            error_msgs:
-                              items:
-                                type: string
-                              type: array
-                            fulfilled:
-                              type: boolean
-                          required:
-                          - error_msgs
-                          - fulfilled
-                          type: object
-                      required:
-                      - data
-                      - enabled
-                      - id
-                      - resource
-                      - status
+                items:
+                  properties:
+                    data:
+                      additionalProperties:
+                        x-kubernetes-preserve-unknown-fields: true
                       type: object
-                    type: array
-                required:
-                - items
-                type: object
+                    enabled:
+                      type: boolean
+                    id:
+                      type: string
+                    resource:
+                      type: string
+                    status:
+                      properties:
+                        error_msgs:
+                          items:
+                            type: string
+                          type: array
+                        fulfilled:
+                          type: boolean
+                      type: object
+                  required:
+                  - data
+                  - enabled
+                  - id
+                  - resource
+                  type: object
+                type: array
               indexImage:
                 description: The url for the index image
                 pattern: ^quay\.io/osd-addons/[a-z-]+
@@ -174,25 +151,20 @@ spec:
                 description: OCM representation of an add-on sub operator. A sub operator
                   is an operator who's life cycle is controlled by the add-on umbrella
                   operator.
-                properties:
-                  items:
-                    items:
-                      properties:
-                        enabled:
-                          type: boolean
-                        operator_name:
-                          type: string
-                        operator_namespace:
-                          type: string
-                      required:
-                      - enabled
-                      - operator_name
-                      - operator_namespace
-                      type: object
-                    type: array
-                required:
-                - items
-                type: object
+                items:
+                  properties:
+                    enabled:
+                      type: boolean
+                    operator_name:
+                      type: string
+                    operator_namespace:
+                      type: string
+                  required:
+                  - enabled
+                  - operator_name
+                  - operator_namespace
+                  type: object
+                type: array
             required:
             - indexImage
             - name
