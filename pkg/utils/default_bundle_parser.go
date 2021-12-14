@@ -17,6 +17,14 @@ type DefaultBundleParser struct{}
 func (obj DefaultBundleParser) ParseBundles(addonName, manifestsDir string) ([]registry.Bundle, error) {
 	var bundles []registry.Bundle
 	var errors []error
+
+	if !checkFileExists(manifestsDir) {
+		return []registry.Bundle{}, fmt.Errorf(
+			"can't find any bundles for the operator '%s'. Looked in: '%s'",
+			addonName,
+			manifestsDir,
+		)
+	}
 	bundlesDir, err := os.ReadDir(manifestsDir)
 	if err != nil {
 		return []registry.Bundle{}, err
