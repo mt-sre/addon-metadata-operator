@@ -20,18 +20,40 @@ Update zz_generated.deepcopy.go with:
 
 //+kubebuilder:object:generate=true
 type AddOnParameter struct {
-	ID           string                      `json:"id" validate:"required"`
-	Name         string                      `json:"name" validate:"required"`
-	Description  string                      `json:"description" validate:"required"`
-	ValueType    AddOnParameterValueType     `json:"value_type" validate:"required"`
-	Validation   *string                     `json:"validation"`
-	Required     bool                        `json:"required" validate:"required"`
-	Editable     bool                        `json:"editable" validate:"required"`
-	Enabled      bool                        `json:"enabled" validate:"required"`
-	DefaultValue *string                     `json:"default_value"`
-	Order        *int                        `json:"order"`
-	Options      *[]AddOnParameterOption     `json:"options"`
-	Conditions   *[]AddOnResourceRequirement `json:"conditions"`
+	// +kubebuilder:validation:Required
+	ID string `json:"id" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Name string `json:"name" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Description string `json:"description" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	ValueType AddOnParameterValueType `json:"value_type" validate:"required"`
+
+	// +optional
+	Validation *string `json:"validation"`
+	// +kubebuilder:validation:Required
+	Required bool `json:"required" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Editable bool `json:"editable" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Enabled bool `json:"enabled" validate:"required"`
+
+	// +optional
+	DefaultValue *string `json:"default_value"`
+
+	// +optional
+	Order *int `json:"order"`
+
+	// +optional
+	Options *[]AddOnParameterOption `json:"options"`
+
+	// +optional
+	Conditions *[]AddOnResourceRequirement `json:"conditions"`
 }
 
 type AddOnParameterValueType string
@@ -46,22 +68,33 @@ const (
 
 //+kubebuilder:object:generate=true
 type AddOnParameterOption struct {
-	Name  string `json:"name" validate:"required"`
+	// +kubebuilder:validation:Required
+	Name string `json:"name" validate:"required"`
+
+	// +kubebuilder:validation:Required
 	Value string `json:"value" validate:"required"`
 }
 
 //+kubebuilder:object:generate=true
 type AddOnResourceRequirement struct {
-	Resource AddOnRequirementResourceType    `json:"resource" validate:"required"`
-	Data     AddOnRequirementData            `json:"data" validate:"required"`
-	Status   *AddOnResourceRequirementStatus `json:"status"`
+	// +kubebuilder:validation:Required
+	Resource AddOnRequirementResourceType `json:"resource" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Data AddOnRequirementData `json:"data" validate:"required"`
+
+	// +optional
+	Status *AddOnResourceRequirementStatus `json:"status"`
 }
 
 type AddOnRequirementData map[string]apiextensionsv1.JSON
 
 //+kubebuilder:object:generate=true
 type AddOnResourceRequirementStatus struct {
-	Fulfilled *bool    `json:"fulfilled"`
+	// +optional
+	Fulfilled *bool `json:"fulfilled"`
+
+	// +optional
 	ErrorMsgs []string `json:"error_msgs"`
 }
 
@@ -75,16 +108,30 @@ const (
 
 //+kubebuilder:object:generate=true
 type AddOnRequirement struct {
-	ID       string                          `json:"id" validate:"required"`
-	Resource AddOnRequirementResourceType    `json:"resource" validate:"required"`
-	Data     AddOnRequirementData            `json:"data" validate:"required"`
-	Status   *AddOnResourceRequirementStatus `json:"status"`
-	Enabled  bool                            `json:"enabled" validate:"required"`
+	// +kubebuilder:validation:Required
+	ID string `json:"id" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Resource AddOnRequirementResourceType `json:"resource" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Data AddOnRequirementData `json:"data" validate:"required"`
+
+	// +optional
+	Status *AddOnResourceRequirementStatus `json:"status"`
+
+	// +kubebuilder:validation:Required
+	Enabled bool `json:"enabled" validate:"required"`
 }
 
 //+kubebuilder:object:generate=true
 type AddOnSubOperator struct {
-	OperatorName      string `json:"operator_name" validate:"required"`
+	// +kubebuilder:validation:Required
+	OperatorName string `json:"operator_name" validate:"required"`
+
+	// +kubebuilder:validation:Required
 	OperatorNamespace string `json:"operator_namespace" validate:"required"`
-	Enabled           bool   `json:"enabled" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Enabled bool `json:"enabled" validate:"required"`
 }

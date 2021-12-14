@@ -57,14 +57,10 @@ spec:
                                 type: array
                               fulfilled:
                                 type: boolean
-                            required:
-                            - error_msgs
-                            - fulfilled
                             type: object
                         required:
                         - data
                         - resource
-                        - status
                         type: object
                       type: array
                     default_value:
@@ -100,17 +96,12 @@ spec:
                     value_type:
                       type: string
                   required:
-                  - conditions
-                  - default_value
                   - description
                   - editable
                   - enabled
                   - id
                   - name
-                  - options
-                  - order
                   - required
-                  - validation
                   - value_type
                   type: object
                 type: array
@@ -136,16 +127,12 @@ spec:
                           type: array
                         fulfilled:
                           type: boolean
-                      required:
-                      - error_msgs
-                      - fulfilled
                       type: object
                   required:
                   - data
                   - enabled
                   - id
                   - resource
-                  - status
                   type: object
                 type: array
               indexImage:
