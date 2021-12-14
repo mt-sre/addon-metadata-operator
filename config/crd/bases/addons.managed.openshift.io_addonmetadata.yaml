@@ -275,10 +275,7 @@ spec:
                         type: string
                     type: object
                 required:
-                - clusterDeploymentSelector
-                - snitchNamePostFix
                 - tags
-                - targetSecretRef
                 type: object
               defaultChannel:
                 description: 'OLM channel from which to install the addon-operator.

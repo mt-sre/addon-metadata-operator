@@ -22,6 +22,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	mtsrev1 "github.com/mt-sre/addon-metadata-operator/pkg/mtsre/v1"
 	v1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -285,10 +286,10 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 	}
 	if in.AddonNotifications != nil {
 		in, out := &in.AddonNotifications, &out.AddonNotifications
-		*out = new([]v1.Notification)
+		*out = new([]mtsrev1.Notification)
 		if **in != nil {
 			in, out := *in, *out
-			*out = make([]v1.Notification, len(*in))
+			*out = make([]mtsrev1.Notification, len(*in))
 			copy(*out, *in)
 		}
 	}
@@ -321,12 +322,12 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 	}
 	if in.Monitoring != nil {
 		in, out := &in.Monitoring, &out.Monitoring
-		*out = new(v1.Monitoring)
+		*out = new(mtsrev1.Monitoring)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.BundleParameters != nil {
 		in, out := &in.BundleParameters, &out.BundleParameters
-		*out = new(v1.BundleParameters)
+		*out = new(mtsrev1.BundleParameters)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.StartingCSV != nil {
@@ -336,12 +337,12 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 	}
 	if in.PagerDuty != nil {
 		in, out := &in.PagerDuty, &out.PagerDuty
-		*out = new(v1.PagerDuty)
+		*out = new(mtsrev1.PagerDuty)
 		**out = **in
 	}
 	if in.DeadmansSnitch != nil {
 		in, out := &in.DeadmansSnitch, &out.DeadmansSnitch
-		*out = new(v1.DeadmansSnitch)
+		*out = new(mtsrev1.DeadmansSnitch)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.ExtraResources != nil {
@@ -355,7 +356,7 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 	}
 	if in.SubscriptionConfig != nil {
 		in, out := &in.SubscriptionConfig, &out.SubscriptionConfig
-		*out = new(v1.SubscriptionConfig)
+		*out = new(mtsrev1.SubscriptionConfig)
 		(*in).DeepCopyInto(*out)
 	}
 }

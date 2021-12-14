@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	mtsrev1 "github.com/mt-sre/addon-metadata-operator/pkg/mtsre/v1"
 	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -147,7 +148,7 @@ type AddonMetadataSpec struct {
 	HasExternalResources *bool `json:"hasExternalResources"`
 
 	// +optional
-	AddonNotifications *[]ocmv1.Notification `json:"addonNotifications"`
+	AddonNotifications *[]mtsrev1.Notification `json:"addonNotifications"`
 
 	// +optional
 	ManualInstallPlanApproval *bool `json:"manualInstallPlanApproval"`
@@ -165,20 +166,20 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// Configuration parameters to be injected in the ServiceMonitor used for federation. The target prometheus server found by matchLabels needs to serve service-ca signed TLS traffic (https://docs.openshift.com/container-platform/4.6/security/certificate_types_descriptions/service-ca-certificates.html), and it needs to be runing inside the monitoring.namespace, with the service name 'prometheus'.
-	Monitoring *ocmv1.Monitoring `json:"monitoring"`
+	Monitoring *mtsrev1.Monitoring `json:"monitoring"`
 
 	// +optional
-	BundleParameters *ocmv1.BundleParameters `json:"bundleParameters"`
+	BundleParameters *mtsrev1.BundleParameters `json:"bundleParameters"`
 
 	// +optional
 	StartingCSV *string `json:"startingCSV"`
 
 	// +optional
-	PagerDuty *ocmv1.PagerDuty `json:"pagerduty"`
+	PagerDuty *mtsrev1.PagerDuty `json:"pagerduty"`
 
 	// +optional
 	// Denotes the Deadmans Snitch Configuration which is supposed to be setup alongside the Addon.
-	DeadmansSnitch *ocmv1.DeadmansSnitch `json:"deadmanssnitch"`
+	DeadmansSnitch *mtsrev1.DeadmansSnitch `json:"deadmanssnitch"`
 
 	// +optional
 	// Extra Resources to be applied to the Hive cluster.
@@ -186,7 +187,7 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// Configs to be passed to the subscription OLM object.
-	SubscriptionConfig *ocmv1.SubscriptionConfig `json:"subscriptionConfig"`
+	SubscriptionConfig *mtsrev1.SubscriptionConfig `json:"subscriptionConfig"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata
