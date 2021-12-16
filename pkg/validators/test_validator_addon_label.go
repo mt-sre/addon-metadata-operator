@@ -5,6 +5,9 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
+// check interface implemented
+var _ = utils.ValidatorTest(ValidatorAddonLabelTestBundle{})
+
 type ValidatorAddonLabelTestBundle struct{}
 
 func (val ValidatorAddonLabelTestBundle) Name() string {

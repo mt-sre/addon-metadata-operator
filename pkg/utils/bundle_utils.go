@@ -2,7 +2,9 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"sync"
 
 	"github.com/operator-framework/operator-registry/pkg/registry"
 	log "github.com/sirupsen/logrus"
@@ -12,6 +14,7 @@ const AllAddonsIdentifier = "all"
 
 var (
 	bundleParser BundleParser
+	lock         = sync.Mutex{}
 )
 
 func init() {
@@ -19,6 +22,12 @@ func init() {
 }
 
 func ExtractAndParseAddons(indexImage, addonIdentifier string) ([]registry.Bundle, error) {
+	// TODO (sblaisdo) - when migrating to server code, need something more complex as this
+	// is a global lock that will prevent goroutines from extracting indexImage in parallel
+	// avoid race condition when extracting same indexImage in two goroutines
+	lock.Lock()
+	defer lock.Unlock()
+
 	if indexImage == "" {
 		return []registry.Bundle{}, errors.New("Missing index image!")
 	}
@@ -70,6 +79,9 @@ func parseAllAddons(indexImageExtractor DefaultIndexImageExtractor, addonsDir st
 		allBundles = append(allBundles, bundles...)
 	}
 
+	if len(allBundles) == 0 {
+		return []registry.Bundle{}, errors.New("No bundles were found.")
+	}
 	return allBundles, nil
 }
 
@@ -85,4 +97,13 @@ func allOperatorsFound(path string) ([]string, error) {
 		}
 	}
 	return operatorsFound, nil
+}
+
+// GetBundleNameVersion - useful for validation error reporting
+func GetBundleNameVersion(b registry.Bundle) (string, error) {
+	version, err := b.Version()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%v:%v", b.Name, version), nil
 }

@@ -7,8 +7,8 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-// ValidateDefaultChannel validates whether the 'defaultChannel' provided under an addon.yaml also exists under 'channels' field
-func ValidateDefaultChannel(metabundle utils.MetaBundle) (bool, string, error) {
+// Validate001DefaultChannel validates whether the 'defaultChannel' provided under an addon.yaml also exists under 'channels' field
+func Validate001DefaultChannel(metabundle utils.MetaBundle) (bool, string, error) {
 	defaultChannel := metabundle.AddonMeta.DefaultChannel
 	channels := metabundle.AddonMeta.Channels
 
@@ -60,14 +60,14 @@ func isListedInChannels(channels *[]v1alpha1.Channel, defaultChannel string) (bo
 // if the annotation is not present, make sure the defaultChannel is alpha
 // func matchesDefaultChannelAnnotations(bundles []registry.Bundle, defaultChannel string) (bool, string, error) {
 // 	for _, bundle := range bundles {
-// 		version, err := bundle.Version()
+// 		bundleName, err := utils.GetBundleNameVersion()
 // 		if err != nil {
-// 			return false, "", fmt.Errorf("Could not read bundle version, got %v.", err)
+// 			return false, "", err
 // 		}
-// 		failureMsgs := []string{fmt.Sprintf("Missing or invalid channel annotation for bundle '%v:%v'", bundle.Name, version)}
+// 		failureMsgs := []string{fmt.Sprintf("Missing or invalid channel annotation for bundle '%v'", bundleName)}
 
 // 		if bundle.Annotations == nil {
-// 			err := fmt.Errorf("bundles.Annotations is nil for %v:%v. The extractor should have reported an error.", bundle.Name, version)
+// 			err := fmt.Errorf("bundles.Annotations is nil for '%v'. The extractor should have reported an error.", bundleName)
 // 			return false, strings.Join(failureMsgs, ": "), err
 // 		}
 

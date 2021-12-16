@@ -10,6 +10,21 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
+// AllValidators - list of all existing validators. Names have to be unique and follow
+// the following formatting rule: [0-9]{3}_([a-z]*_?)*
+var AllValidators = map[string]utils.Validator{
+	"001_default_channel": {
+		Name:        "001_default_channel",
+		Description: "Ensure defaultChannel is present in list of channels",
+		Runner:      validators.Validate001DefaultChannel,
+	},
+	"002_label_format": {
+		Name:        "002_label_format",
+		Description: "Ensure `label` follows the format api.openshift.com/addon-<operator-id>",
+		Runner:      validators.ValidateAddonLabel,
+	},
+}
+
 func Validate(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
 	errs := []error{}
 	allSuccess := true
@@ -31,22 +46,6 @@ func Validate(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
 		fmt.Println()
 	}
 	return allSuccess, errs
-}
-
-// name formatting rule: [0-9]{3}_([a-z]*_?)*
-var AllValidators = map[string]utils.Validator{
-	"001_default_channel": {
-		Description: "Ensure defaultChannel is present in list of channels",
-		Runner:      validators.ValidateDefaultChannel,
-	},
-	"002_label_format": {
-		Description: "Ensure `label` to follow the format api.openshift.com/addon-<operator-id>",
-		Runner:      validators.ValidateAddonLabel,
-	},
-	"003_csv_present": {
-		Description: "Ensure current csv is present in the index image",
-		Runner:      validators.ValidateCSVPresent,
-	},
 }
 
 func getExistingValidatorNames() []string {

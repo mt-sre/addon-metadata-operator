@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,7 +17,7 @@ type DefaultBundleParser struct{}
 
 func (obj DefaultBundleParser) ParseBundles(addonName, manifestsDir string) ([]registry.Bundle, error) {
 	var bundles []registry.Bundle
-	var errors []error
+	var allErrs []error
 
 	if !checkFileExists(manifestsDir) {
 		return []registry.Bundle{}, fmt.Errorf(
@@ -34,7 +35,7 @@ func (obj DefaultBundleParser) ParseBundles(addonName, manifestsDir string) ([]r
 			// TODO - (sblaisdo) enable after we migrate extraction format to bundles instead of packageManifest
 			// annotations, err := readAnnotations(filepath.Join(manifestsDir, bundlePath.Name()))
 			// if err != nil {
-			// 	errors = append(errors, err)
+			//	allErrs = append(allErrs, err)
 			// }
 			bundle := registry.Bundle{
 				Name:        addonName,
@@ -42,7 +43,7 @@ func (obj DefaultBundleParser) ParseBundles(addonName, manifestsDir string) ([]r
 			}
 			k8sObjs, err := parseK8sObjects(bundlePath, addonName, manifestsDir)
 			if err != nil {
-				errors = append(errors, err)
+				allErrs = append(allErrs, err)
 			} else {
 				for index := range k8sObjs {
 					bundle.Add(&k8sObjs[index])
@@ -51,9 +52,13 @@ func (obj DefaultBundleParser) ParseBundles(addonName, manifestsDir string) ([]r
 			}
 		}
 	}
-	if len(errors) != 0 {
-		errMsgPrefix := "Errors while parsing bundles: \n"
-		return bundles, concatParseErrors(errors, errMsgPrefix)
+	if len(allErrs) != 0 {
+		errMsgPrefix := "allErrs while parsing bundles: \n"
+		return bundles, concatParseErrors(allErrs, errMsgPrefix)
+	}
+
+	if len(bundles) == 0 {
+		return []registry.Bundle{}, errors.New("No bundles were found.")
 	}
 	return bundles, nil
 }
@@ -112,17 +117,17 @@ func concatParseErrors(errs []error, errMsgPrefix string) error {
 
 // TODO - (sblaisdo) enable when extration format is bundles not packageManifest
 // func readAnnotations(bundlePath string) (*registry.Annotations, error) {
-// 	annotationsPath := filepath.Join(bundlePath, "metadata", "annotations.yaml")
-// 	content, err := ioutil.ReadFile(annotationsPath)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("Could not read annotationsPath %v, got %v.", annotationsPath, err)
-// 	}
+//	annotationsPath := filepath.Join(bundlePath, "metadata", "annotations.yaml")
+//	content, err := ioutil.ReadFile(annotationsPath)
+//	if err != nil {
+//		return nil, fmt.Errorf("Could not read annotationsPath %v, got %v.", annotationsPath, err)
+//	}
 
-// 	var annotationsFile registry.AnnotationsFile
-// 	err = yaml.Unmarshal(content, &annotationsFile)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("Could not unmarshal annotationsFile, got %v.", err)
-// 	}
+//	var annotationsFile registry.AnnotationsFile
+//	err = yaml.Unmarshal(content, &annotationsFile)
+//	if err != nil {
+//		return nil, fmt.Errorf("Could not unmarshal annotationsFile, got %v.", err)
+//	}
 
-// 	return &annotationsFile.Annotations, nil
+//	return &annotationsFile.Annotations, nil
 // }

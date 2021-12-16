@@ -28,12 +28,18 @@ func TestExtractAndParseAddons(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		_, err := utils.ExtractAndParseAddons(testCase.indexImage, testCase.operatorName)
-		if testCase.expectedErrorSubstring == nil {
-			require.NoError(t, err)
-		} else {
-			require.Contains(t, err.Error(), *testCase.expectedErrorSubstring)
-		}
+	for _, tc := range testCases {
+		tc := tc // pin
+		t.Run(tc.operatorName, func(t *testing.T) {
+			t.Parallel()
+			bundles, err := utils.ExtractAndParseAddons(tc.indexImage, tc.operatorName)
+			if tc.expectedErrorSubstring == nil {
+				require.Greater(t, len(bundles), 0)
+				require.NoError(t, err)
+			} else {
+				require.Equal(t, len(bundles), 0)
+				require.Contains(t, err.Error(), *tc.expectedErrorSubstring)
+			}
+		})
 	}
 }

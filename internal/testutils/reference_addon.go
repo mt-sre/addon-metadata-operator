@@ -3,7 +3,9 @@ package testutils
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"path"
+	"sync"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
@@ -22,7 +24,7 @@ import (
     - https://quay.io/osd-addons/reference-addon-index:<tag>
 */
 
-type ReferenceAddonStage struct {
+type singleton struct {
 	MetaIndexImage *addonsv1alpha1.AddonMetadataSpec
 	MetaImageSet   *addonsv1alpha1.AddonMetadataSpec
 	Env            string
@@ -31,39 +33,40 @@ type ReferenceAddonStage struct {
 var (
 	ReferenceAddonImageSetDir   = path.Join(AddonsImagesetDir, "reference-addon")
 	ReferenceAddonIndexImageDir = path.Join(AddonsIndexImageDir, "reference-addon")
-	instance                    *ReferenceAddonStage
+	instance                    *singleton
+	once                        = sync.Once{}
 )
 
 // GetReferenceAddonStage - uses singleton pattern to avoid loading yaml manifests over and over
 // currently supports:
 // - (DEPRECATED) static indexImage reference-addon
 // - imageSet reference-addon
-func GetReferenceAddonStage() (*ReferenceAddonStage, error) {
-	if instance == nil {
-		instance = &ReferenceAddonStage{Env: "stage"}
+func GetReferenceAddonStage() *singleton {
+	once.Do(func() {
+		instance = &singleton{Env: "stage"}
 		metaIndexImage, err := instance.GetMetadata(false)
 		if err != nil {
-			return nil, fmt.Errorf("Could not load indexImage metadata for reference-addon, got %v.", err)
+			log.Fatalf("Could not load indexImage metadata for reference-addon, got %v.", err)
 		}
 		metaImageSet, err := instance.GetMetadata(true)
 		if err != nil {
-			return nil, fmt.Errorf("Could not load imageSet metadata for reference-addon, got %v.", err)
+			log.Fatalf("Could not load imageSet metadata for reference-addon, got %v.", err)
 		}
 		instance.MetaIndexImage = metaIndexImage
 		instance.MetaImageSet = metaImageSet
-	}
-	return instance, nil
+	})
+	return instance
 }
 
-func (r *ReferenceAddonStage) ImageSetDir() string {
+func (r *singleton) ImageSetDir() string {
 	return path.Join(AddonsImagesetDir, "reference-addon")
 }
 
-func (r *ReferenceAddonStage) IndexImageDir() string {
+func (r *singleton) IndexImageDir() string {
 	return path.Join(AddonsIndexImageDir, "reference-addon")
 }
 
-func (r *ReferenceAddonStage) GetMetadata(useImageSet bool) (*addonsv1alpha1.AddonMetadataSpec, error) {
+func (r *singleton) GetMetadata(useImageSet bool) (*addonsv1alpha1.AddonMetadataSpec, error) {
 	var metaPath string
 	if useImageSet {
 		metaPath = path.Join(r.ImageSetDir(), "metadata", r.Env, "addon.yaml")
@@ -79,7 +82,7 @@ func (r *ReferenceAddonStage) GetMetadata(useImageSet bool) (*addonsv1alpha1.Add
 	return meta, err
 }
 
-func (r *ReferenceAddonStage) GetImageSet(version string) (*addonsv1alpha1.AddonImageSetSpec, error) {
+func (r *singleton) GetImageSet(version string) (*addonsv1alpha1.AddonImageSetSpec, error) {
 	baseDir := path.Join(r.ImageSetDir(), "addonimagesets", r.Env)
 	target := fmt.Sprintf("reference-addon.v%v.yaml", version)
 	if version == "latest" {
@@ -102,7 +105,7 @@ func (r *ReferenceAddonStage) GetImageSet(version string) (*addonsv1alpha1.Addon
 	return imageSet, err
 }
 
-func (r *ReferenceAddonStage) GetMetaBundle(version string) (*utils.MetaBundle, error) {
+func (r *singleton) GetMetaBundle(version string) (*utils.MetaBundle, error) {
 	imageSet, err := r.GetImageSet(version)
 	if err != nil {
 		return nil, fmt.Errorf("Could not get reference-addon imageset got %v.", err)

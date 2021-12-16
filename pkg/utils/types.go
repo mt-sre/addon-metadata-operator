@@ -6,8 +6,16 @@ import (
 )
 
 type Validator struct {
+	Name        string
 	Description string
 	Runner      ValidateFunc
+}
+
+type ValidatorTest interface {
+	Name() string
+	Run(MetaBundle) (bool, string, error)
+	SucceedingCandidates() []MetaBundle
+	FailingCandidates() []MetaBundle
 }
 
 type IndexImageExtractor interface {
@@ -35,7 +43,6 @@ type MetaBundle struct {
 	Bundles   []registry.Bundle
 }
 
-// TODO: This will return a MetaBundle with corresponding bundle
 func NewMetaBundle(addonMeta *v1alpha1.AddonMetadataSpec, bundles []registry.Bundle) *MetaBundle {
 	return &MetaBundle{
 		AddonMeta: addonMeta,
