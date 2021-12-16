@@ -10,20 +10,20 @@ import (
 // Registry - holds all registered Validators
 var Registry = NewDefaultRegistry()
 
-func NewDefaultRegistry() registry {
-	return registry{
+func NewDefaultRegistry() defaultRegistry {
+	return defaultRegistry{
 		&sync.Mutex{},
 		make(map[string]utils.Validator),
 	}
 }
 
-type registry struct {
+type defaultRegistry struct {
 	*sync.Mutex
 	Data map[string]utils.Validator
 }
 
 // Add - update the registry in a thread-safe way. Called in init() functions
-func (r *registry) Add(v utils.Validator) {
+func (r *defaultRegistry) Add(v utils.Validator) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -33,15 +33,15 @@ func (r *registry) Add(v utils.Validator) {
 	r.Data[v.Code] = v
 }
 
-func (r registry) Len() int {
+func (r defaultRegistry) Len() int {
 	return len(r.Data)
 }
 
-func (r registry) All() map[string]utils.Validator {
+func (r defaultRegistry) All() map[string]utils.Validator {
 	return r.Data
 }
 
-func (r registry) Get(k string) (utils.Validator, bool) {
+func (r defaultRegistry) Get(k string) (utils.Validator, bool) {
 	v, ok := r.Data[k]
 	return v, ok
 }

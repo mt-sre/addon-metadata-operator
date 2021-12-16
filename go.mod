@@ -7,7 +7,8 @@ require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/fatih/color v1.13.0
-	github.com/novln/docker-parser v1.0.0 // indirect
+	github.com/novln/docker-parser v1.0.0
+	github.com/operator-framework/api v0.10.5
 	github.com/operator-framework/operator-registry v1.19.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
