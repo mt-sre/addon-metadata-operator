@@ -8,6 +8,8 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+
+	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
 var (
@@ -48,3 +50,20 @@ func RemoveDir(downloadDir string) {
 }
 
 func GetStringLiteralRef(s string) *string { return &s }
+
+// DefaultSucceedingCandidates - returns a slice of valid metaBundles that are supposed
+// to pass all validators successfully. If it is not the case, please make the required adjustments.
+func DefaultSucceedingCandidates() ([]utils.MetaBundle, error) {
+	var res []utils.MetaBundle
+	refAddonStage, err := GetReferenceAddonStage()
+	if err != nil {
+		return nil, fmt.Errorf("Could not load reference-addon, got %v.", err)
+	}
+	refAddonMetaBundle, err := refAddonStage.GetMetaBundle(*refAddonStage.MetaImageSet.ImageSetVersion)
+	if err != nil {
+		return nil, fmt.Errorf("Could not get reference-addon meta bundles, got %v.", err)
+	}
+	res = append(res, *refAddonMetaBundle)
+
+	return res, nil
+}

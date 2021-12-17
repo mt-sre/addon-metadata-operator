@@ -170,7 +170,8 @@ spec:
                     type: string
                 type: object
               channels:
-                description: List of channels where the addon operator is available.
+                description: 'Deprecated: List of channels where the addon operator
+                  is available. Only needed for legacy addon builds.'
                 items:
                   description: Channel - list all channels for a given operator
                   properties:
@@ -451,7 +452,6 @@ spec:
                 type: string
             required:
             - addonOwner
-            - channels
             - defaultChannel
             - description
             - enabled

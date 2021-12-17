@@ -1,30 +1,29 @@
 package validators
 
 import (
-	"fmt"
-
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
-func ValidateCSVPresent(metabundle utils.MetaBundle) (bool, error) {
+// TODO - review failureMsg ++ missing test_validate_csv testing bundle
+func ValidateCSVPresent(metabundle utils.MetaBundle) (bool, string, error) {
 	if len(metabundle.Bundles) == 0 {
-		return false, fmt.Errorf("No bundles present!")
+		return false, "No bundles present", nil
 	}
 
 	channels := metabundle.AddonMeta.Channels
 	allOkay := true
-	for _, channel := range channels {
+	for _, channel := range *channels {
 		requiredCsv := channel.CurrentCSV
 		present, err := csvPresent(metabundle.Bundles, requiredCsv)
 		if err != nil {
-			return false, err
+			return false, "", err
 		}
 		if !present {
 			allOkay = false
 		}
 	}
-	return allOkay, nil
+	return allOkay, "", nil
 }
 
 func csvPresent(bundles []registry.Bundle, requiredCsv string) (bool, error) {

@@ -16,14 +16,14 @@ func Validate(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
 
 	printMetaHeading()
 
-	for _, validator := range filter.GetValidators() {
+	for validatorName, validator := range filter.GetValidators() {
 		fmt.Printf("\r%s\t\t", validator.Description)
-		success, err := validator.Runner(mb)
+		success, failureMsg, err := validator.Runner(mb)
 		if err != nil {
 			errs = append(errs, err)
 			printErrorMessage(validator.Description)
 		} else if !success {
-			printFailureMessage(validator.Description)
+			printFailureMessage(fmt.Sprintf("%v: %v.", validatorName, failureMsg))
 			allSuccess = false
 		} else {
 			printSuccessMessage(validator.Description)

@@ -24,7 +24,11 @@ type BundleParser interface {
 	ParseBundles(addonName string, manifestsPath string) ([]registry.Bundle, error)
 }
 
-type ValidateFunc func(mb MetaBundle) (bool, error)
+// ValidateFunc - returns a triple consisting of:
+// 1. bool       - true if MetaBundle validation was successful
+// 2. failureMsg - "" if the result was true, else information about why the validation failed
+// 3. error      - report any error that happened in the validation code
+type ValidateFunc func(mb MetaBundle) (bool, string, error)
 
 type MetaBundle struct {
 	AddonMeta *v1alpha1.AddonMetadataSpec

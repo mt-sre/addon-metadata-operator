@@ -12,15 +12,15 @@ import (
 
 type Validator interface {
 	Name() string
-	Run(utils.MetaBundle) (bool, error)
+	Run(utils.MetaBundle) (bool, string, error)
 	SucceedingCandidates() []utils.MetaBundle
 	FailingCandidates() []utils.MetaBundle
 }
 
 // register the validators to test here by appending them to the following slice
 var validatorsToTest []Validator = []Validator{
+	validators.Validator001DefaultChannel{},
 	validators.ValidatorAddonLabelTestBundle{},
-	validators.ValidatorDefaultChannelTestBundle{},
 }
 
 func TestAllValidators(t *testing.T) {
@@ -31,16 +31,16 @@ func TestAllValidators(t *testing.T) {
 			// testing the succeeding candidates
 			succeedingMetaBundles := validator.SucceedingCandidates()
 			for _, mb := range succeedingMetaBundles {
-				success, err := validator.Run(mb)
+				success, failureMsg, err := validator.Run(mb)
 				require.NoError(t, err)
-				assert.True(t, success)
+				assert.True(t, success, failureMsg)
 			}
 
 			// testing the failing candidates
 			failingMetaBundles := validator.FailingCandidates()
 			for _, mb := range failingMetaBundles {
-				success, _ := validator.Run(mb)
-				assert.False(t, success)
+				success, failureMsg, _ := validator.Run(mb)
+				assert.False(t, success, failureMsg)
 			}
 		})
 	}
