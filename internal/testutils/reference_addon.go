@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
+	"sync"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
@@ -31,6 +32,8 @@ type ReferenceAddonStage struct {
 var (
 	ReferenceAddonImageSetDir   = path.Join(AddonsImagesetDir, "reference-addon")
 	ReferenceAddonIndexImageDir = path.Join(AddonsIndexImageDir, "reference-addon")
+	instanceMutex               sync.Mutex
+	metaBundleMutex             sync.Mutex
 	instance                    *ReferenceAddonStage
 )
 
@@ -39,6 +42,9 @@ var (
 // - (DEPRECATED) static indexImage reference-addon
 // - imageSet reference-addon
 func GetReferenceAddonStage() (*ReferenceAddonStage, error) {
+	defer instanceMutex.Unlock()
+	instanceMutex.Lock()
+
 	if instance == nil {
 		instance = &ReferenceAddonStage{Env: "stage"}
 		metaIndexImage, err := instance.GetMetadata(false)
@@ -103,6 +109,9 @@ func (r *ReferenceAddonStage) GetImageSet(version string) (*addonsv1alpha1.Addon
 }
 
 func (r *ReferenceAddonStage) GetMetaBundle(version string) (*utils.MetaBundle, error) {
+	defer metaBundleMutex.Unlock()
+	metaBundleMutex.Lock()
+
 	imageSet, err := r.GetImageSet(version)
 	if err != nil {
 		return nil, fmt.Errorf("Could not get reference-addon imageset got %v.", err)
