@@ -5,20 +5,21 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-// check interface implemented
-var _ = utils.ValidatorTest(ValidatorAddonLabelTestBundle{})
-
-type ValidatorAddonLabelTestBundle struct{}
-
-func (val ValidatorAddonLabelTestBundle) Name() string {
-	return "Addon Label Validator"
+func init() {
+	TestRegistry.Add(TestAM0002{})
 }
 
-func (val ValidatorAddonLabelTestBundle) Run(mb utils.MetaBundle) (bool, string, error) {
-	return ValidateAddonLabel(mb)
+type TestAM0002 struct{}
+
+func (val TestAM0002) Name() string {
+	return AM0002.Name
 }
 
-func (val ValidatorAddonLabelTestBundle) SucceedingCandidates() []utils.MetaBundle {
+func (val TestAM0002) Run(mb utils.MetaBundle) (bool, string, error) {
+	return AM0002.Runner(mb)
+}
+
+func (val TestAM0002) SucceedingCandidates() []utils.MetaBundle {
 	return []utils.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
@@ -29,7 +30,7 @@ func (val ValidatorAddonLabelTestBundle) SucceedingCandidates() []utils.MetaBund
 	}
 }
 
-func (val ValidatorAddonLabelTestBundle) FailingCandidates() []utils.MetaBundle {
+func (val TestAM0002) FailingCandidates() []utils.MetaBundle {
 	return []utils.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
