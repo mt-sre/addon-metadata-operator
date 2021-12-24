@@ -12,8 +12,7 @@ import (
 // Version is ignored in the case of the static indexImage
 func TestMetaLoaderStaticIndexImage(t *testing.T) {
 	env := "stage"
-	refAddonStage, err := testutils.GetReferenceAddonStage()
-	require.NoError(t, err)
+	refAddonStage := testutils.GetReferenceAddonStage()
 
 	versions := []string{"latest", "0.0.1"}
 	for _, version := range versions {
@@ -36,8 +35,7 @@ func TestMetaLoaderStaticIndexImage(t *testing.T) {
 // 3. ""       uses value from reference-addon/metadata/stage/addon.yaml::addonImageSetVersion
 func TestMetaLoaderImageSet(t *testing.T) {
 	env := "stage"
-	refAddonStage, err := testutils.GetReferenceAddonStage()
-	require.NoError(t, err)
+	refAddonStage := testutils.GetReferenceAddonStage()
 
 	cases := []struct {
 		version         string

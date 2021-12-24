@@ -1,33 +1,30 @@
 package validators
 
 import (
-	"log"
-
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-type Validator001DefaultChannel struct{}
+// check interface implemented
+var _ = utils.ValidatorTest(ValidatorTest001DefaultChannel{})
 
-func (v Validator001DefaultChannel) Name() string {
+type ValidatorTest001DefaultChannel struct{}
+
+func (v ValidatorTest001DefaultChannel) Name() string {
 	return "Addon Default Channel Validator"
 }
 
-func (v Validator001DefaultChannel) Run(mb utils.MetaBundle) (bool, string, error) {
-	return ValidateDefaultChannel(mb)
+func (v ValidatorTest001DefaultChannel) Run(mb utils.MetaBundle) (bool, string, error) {
+	return Validate001DefaultChannel(mb)
 }
 
-func (v Validator001DefaultChannel) SucceedingCandidates() []utils.MetaBundle {
-	res, err := testutils.DefaultSucceedingCandidates()
-	if err != nil {
-		log.Fatalf("Could not load default succeeding candidates, got %v. Exiting.", err)
-	}
-	return res
+func (v ValidatorTest001DefaultChannel) SucceedingCandidates() []utils.MetaBundle {
+	return testutils.DefaultSucceedingCandidates()
 }
 
-// TODO - get succeeding candidates and modify them???
-func (v Validator001DefaultChannel) FailingCandidates() []utils.MetaBundle {
+// not implemented
+func (v ValidatorTest001DefaultChannel) FailingCandidates() []utils.MetaBundle {
 	return []utils.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
@@ -52,6 +49,12 @@ func (v Validator001DefaultChannel) FailingCandidates() []utils.MetaBundle {
 						Name: "alpha",
 					},
 				},
+			},
+		},
+		{
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				ID:             "random-operator",
+				DefaultChannel: "invalid",
 			},
 		},
 	}
