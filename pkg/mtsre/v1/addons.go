@@ -23,13 +23,13 @@ type Notification string
 //+kubebuilder:object:generate=true
 type Monitoring struct {
 	// +kubebuilder:validation:Required
-	Namespace string `json:"namespace" validate:"required"`
+	Namespace string `json:"namespace"`
 
 	// +kubebuilder:validation:Required
-	MatchNames []string `json:"matchNames" validate:"required"`
+	MatchNames []string `json:"matchNames"`
 
 	// +kubebuilder:validation:Required
-	MatchLabels map[string]string `json:"matchLabels" validate:"required"`
+	MatchLabels map[string]string `json:"matchLabels"`
 }
 
 //+kubebuilder:object:generate=true
@@ -59,23 +59,23 @@ type BundleParameters struct {
 type PagerDuty struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9]+$`
-	EscalationPolicy string `json:"snitchNamePostFix" validate:"required"`
+	EscalationPolicy string `json:"snitchNamePostFix"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=0
-	AcknowledgeTimeout int `json:"acknowledgeTimeout" validate:"required"`
+	AcknowledgeTimeout int `json:"acknowledgeTimeout"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=0
-	ResolveTimeout int `json:"resolveTimeout" validate:"required"`
+	ResolveTimeout int `json:"resolveTimeout"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
-	SecretName string `json:"secretName" validate:"required"`
+	SecretName string `json:"secretName"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
-	SecretNamespace string `json:"secretNamespace" validate:"required"`
+	SecretNamespace string `json:"secretNamespace"`
 }
 
 //+kubebuilder:object:generate=true
@@ -90,7 +90,7 @@ type DeadmansSnitch struct {
 	TargetSecretRef *TargetSecretRef `json:"targetSecretRef"`
 
 	// +kubebuilder:validation:Required
-	Tags []Tag `json:"tags" validate:"required"`
+	Tags []Tag `json:"tags"`
 }
 
 // +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
@@ -110,14 +110,14 @@ type TargetSecretRef struct {
 //+kubebuilder:object:generate=true
 type SubscriptionConfig struct {
 	// +kubebuilder:validation:Required
-	Env *[]EnvItem `json:"env" validate:"required"`
+	Env *[]EnvItem `json:"env"`
 }
 
 //+kubebuilder:object:generate=true
 type EnvItem struct {
 	// +kubebuilder:validation:Required
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name"`
 
 	// +kubebuilder:validation:Required
-	Value string `json:"value" validate:"required"`
+	Value string `json:"value"`
 }

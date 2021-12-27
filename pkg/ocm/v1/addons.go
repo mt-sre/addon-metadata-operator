@@ -21,27 +21,27 @@ Update zz_generated.deepcopy.go with:
 //+kubebuilder:object:generate=true
 type AddOnParameter struct {
 	// +kubebuilder:validation:Required
-	ID string `json:"id" validate:"required"`
+	ID string `json:"id"`
 
 	// +kubebuilder:validation:Required
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name"`
 
 	// +kubebuilder:validation:Required
-	Description string `json:"description" validate:"required"`
+	Description string `json:"description"`
 
 	// +kubebuilder:validation:Required
-	ValueType AddOnParameterValueType `json:"value_type" validate:"required"`
+	ValueType AddOnParameterValueType `json:"value_type"`
 
 	// +optional
 	Validation *string `json:"validation"`
 	// +kubebuilder:validation:Required
-	Required bool `json:"required" validate:"required"`
+	Required bool `json:"required"`
 
 	// +kubebuilder:validation:Required
-	Editable bool `json:"editable" validate:"required"`
+	Editable bool `json:"editable"`
 
 	// +kubebuilder:validation:Required
-	Enabled bool `json:"enabled" validate:"required"`
+	Enabled bool `json:"enabled"`
 
 	// +optional
 	DefaultValue *string `json:"default_value"`
@@ -69,19 +69,19 @@ const (
 //+kubebuilder:object:generate=true
 type AddOnParameterOption struct {
 	// +kubebuilder:validation:Required
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name"`
 
 	// +kubebuilder:validation:Required
-	Value string `json:"value" validate:"required"`
+	Value string `json:"value"`
 }
 
 //+kubebuilder:object:generate=true
 type AddOnResourceRequirement struct {
 	// +kubebuilder:validation:Required
-	Resource AddOnRequirementResourceType `json:"resource" validate:"required"`
+	Resource AddOnRequirementResourceType `json:"resource"`
 
 	// +kubebuilder:validation:Required
-	Data AddOnRequirementData `json:"data" validate:"required"`
+	Data AddOnRequirementData `json:"data"`
 
 	// +optional
 	Status *AddOnResourceRequirementStatus `json:"status"`
@@ -109,29 +109,29 @@ const (
 //+kubebuilder:object:generate=true
 type AddOnRequirement struct {
 	// +kubebuilder:validation:Required
-	ID string `json:"id" validate:"required"`
+	ID string `json:"id"`
 
 	// +kubebuilder:validation:Required
-	Resource AddOnRequirementResourceType `json:"resource" validate:"required"`
+	Resource AddOnRequirementResourceType `json:"resource"`
 
 	// +kubebuilder:validation:Required
-	Data AddOnRequirementData `json:"data" validate:"required"`
+	Data AddOnRequirementData `json:"data"`
 
 	// +optional
 	Status *AddOnResourceRequirementStatus `json:"status"`
 
 	// +kubebuilder:validation:Required
-	Enabled bool `json:"enabled" validate:"required"`
+	Enabled bool `json:"enabled"`
 }
 
 //+kubebuilder:object:generate=true
 type AddOnSubOperator struct {
 	// +kubebuilder:validation:Required
-	OperatorName string `json:"operator_name" validate:"required"`
+	OperatorName string `json:"operator_name"`
 
 	// +kubebuilder:validation:Required
-	OperatorNamespace string `json:"operator_namespace" validate:"required"`
+	OperatorNamespace string `json:"operator_namespace"`
 
 	// +kubebuilder:validation:Required
-	Enabled bool `json:"enabled" validate:"required"`
+	Enabled bool `json:"enabled"`
 }

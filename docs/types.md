@@ -19,12 +19,3 @@ The use of pointers is required for optional fields so we can distinguish betwee
 | `int`      | `*int`        |
 | `<struct>` | `*<struct>`   |
 | `[]<type>` | `*[]<type>`   |
-
-
-## Go validator guideline
-
-Make sure to add a `validate:"<validation>"` tag to all fields as a recursive tag-base validator runs as part of the validation framework.
-
-Make sure to add the `required` on required fields.
-
-View the full list of [Baked-in Validations](https://github.com/go-playground/validator#baked-in-validations).

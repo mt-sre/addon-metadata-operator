@@ -29,16 +29,16 @@ type AddonMetadataSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$`
 	// Unique ID of the addon
-	ID string `json:"id" validate:"required"`
+	ID string `json:"id"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[0-9A-Z][A-Za-z0-9-_ ()]+$`
 	// Friendly name for the addon, displayed in the UI
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name"`
 
 	// +kubebuilder:validation:Required
 	// Short description for the addon
-	Description string `json:"description" validate:"required"`
+	Description string `json:"description"`
 
 	// +optional
 	// +kubebuilder:validation:Pattern=`^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$`
@@ -47,66 +47,66 @@ type AddonMetadataSpec struct {
 
 	// +kubebuilder:validation:Required
 	// Icon to be shown in UI. Should be around 200px and base64 encoded.
-	Icon string `json:"icon" validate:"required"`
+	Icon string `json:"icon"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^api\.openshift\.com/addon-[0-9a-z][0-9a-z-]{0,30}[0-9a-z]$`
 	// Kubernetes label for the addon. Needs to match: 'api.openshift.com/<addon-id>'.
-	Label string `json:"label" validate:"required"`
+	Label string `json:"label"`
 
 	// +kubebuilder:validation:Required
 	// Set to true to allow installation of the addon.
-	Enabled bool `json:"enabled" validate:"required"`
+	Enabled bool `json:"enabled"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$`
 	// Team or individual responsible for this addon. Needs to match: 'some name <some-email@redhat.com>'.
-	AddonOwner string `json:"addonOwner" validate:"required"`
+	AddonOwner string `json:"addonOwner"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^quay\.io/osd-addons/[a-z-]+$`
 	// Quay repository for the addon operator. Needs to match: 'quay.io/osd-addons/<my-addon-repo>'.
-	QuayRepo string `json:"quayRepo" validate:"required"`
+	QuayRepo string `json:"quayRepo"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^quay\.io/[0-9A-Za-z._-]+/[0-9A-Za-z._-]+(:[A-Za-z0-9._-]+)?$`
 	// Quay repository for the testHarness image. Needs to match: 'quay.io/<my-repo>/<my-test-harness>:<my-tag>'.
-	TestHarness string `json:"testHarness" validate:"required"`
+	TestHarness string `json:"testHarness"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum={AllNamespaces,SingleNamespace,OwnNamespace}
 	// OLM InstallMode for the addon operator. One of: AllNamespaces, SingleNamespace or OwnNamespace.
-	InstallMode string `json:"installMode" validate:"required"`
+	InstallMode string `json:"installMode"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
 	// Namespace where the addon operator should be installed.
-	TargetNamespace string `json:"targetNamespace" validate:"required"`
+	TargetNamespace string `json:"targetNamespace"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:UniqueItems=true
 	// Namespaces managed by the addon-operator. Need to include the TargetNamespace.
-	Namespaces []string `json:"namespaces" validate:"required"`
+	Namespaces []string `json:"namespaces"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-_]{0,35}[A-Za-z0-9]$`
 	// Refers to the SKU name for the addon.
-	OcmQuotaName string `json:"ocmQuotaName" validate:"required"`
+	OcmQuotaName string `json:"ocmQuotaName"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=0
 	// TODO: what is this?
-	OcmQuotaCost int `json:"ocmQuotaCost" validate:"required"`
+	OcmQuotaCost int `json:"ocmQuotaCost"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$`
 	// Name of the addon operator.
-	OperatorName string `json:"operatorName" validate:"required"`
+	OperatorName string `json:"operatorName"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum={alpha,beta,stable,edge,rc}
 	// OLM channel from which to install the addon-operator. One of: alpha, beta, stable, edge or rc.
-	DefaultChannel string `json:"defaultChannel" validate:"required"`
+	DefaultChannel string `json:"defaultChannel"`
 
 	// +optional
 	// Deprecated: List of channels where the addon operator is available.
@@ -116,12 +116,12 @@ type AddonMetadataSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:default:{}
 	// Labels to be applied on all listed namespaces.
-	NamespaceLabels map[string]string `json:"namespaceLabels" validate:"required"`
+	NamespaceLabels map[string]string `json:"namespaceLabels"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:default:{}
 	// Annotations to be applied on all listed namespaces.
-	NamespaceAnnotations map[string]string `json:"namespaceAnnotations" validate:"required"`
+	NamespaceAnnotations map[string]string `json:"namespaceAnnotations"`
 
 	// +optional
 	// +kubebuilder:validation:Pattern=`^quay\.io/osd-addons/[a-z-]+`
@@ -204,7 +204,7 @@ type AddonMetadata struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AddonMetadataSpec   `json:"spec,omitempty" validate:"required"`
+	Spec   AddonMetadataSpec   `json:"spec,omitempty"`
 	Status AddonMetadataStatus `json:"status,omitempty"`
 }
 

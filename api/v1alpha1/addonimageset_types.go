@@ -25,16 +25,16 @@ import (
 type AddonImageSetSpec struct {
 	// +kubebuilder:validation:Required
 	// The name of the imageset along with the version.
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^quay\.io/osd-addons/[a-z-]+`
 	// The url for the index image
-	IndexImage string `json:"indexImage" validate:"required"`
+	IndexImage string `json:"indexImage"`
 
 	// +kubebuilder:validation:Required
 	// A list of image urls of related operators
-	RelatedImages []string `json:"relatedImages" validate:"required"`
+	RelatedImages []string `json:"relatedImages"`
 
 	// +optional
 	// OCM representation of an add-on parameter
