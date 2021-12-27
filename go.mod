@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d // indirect
+	github.com/alexeyco/simpletable v1.0.0
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/fatih/color v1.13.0
 	github.com/operator-framework/operator-registry v1.19.1

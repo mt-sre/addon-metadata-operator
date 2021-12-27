@@ -1,32 +1,49 @@
 package validate
 
 import (
-	"fmt"
-	"strings"
-
+	"github.com/alexeyco/simpletable"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
 var (
-	equalLines = strings.Repeat("=", 6)
-
-	success = utils.Green("Success")
-	failed  = utils.Red("Failed")
-	err     = utils.IntenselyBoldRed("Error")
+	statusSuccess = utils.Green("Success")
+	statusFailed  = utils.Red("Failed")
+	statusError   = utils.IntenselyBoldRed("Error")
 )
 
-func printMetaHeading() {
-	fmt.Printf("\n%sRUNNING METADATA VALIDATORS%s\n\n", equalLines, equalLines)
+func getTableHeaders() *simpletable.Header {
+	return &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "STATUS"},
+			{Align: simpletable.AlignCenter, Text: "CODE"},
+			{Align: simpletable.AlignCenter, Text: "NAME"},
+			{Align: simpletable.AlignCenter, Text: "DESCRIPTION"},
+			{Align: simpletable.AlignCenter, Text: "FAILURE MESSAGE"},
+		},
+	}
 }
 
-func printSuccessMessage(msg string) {
-	fmt.Printf("\r%s\t\t%s", msg, success)
+func newSuccessTableRow(v utils.Validator) []*simpletable.Cell {
+	return newTableRow(v, statusSuccess, "")
 }
 
-func printFailureMessage(msg string) {
-	fmt.Printf("\r%s\t\t%s", msg, failed)
+func newFailedTableRow(v utils.Validator, failureMsg string) []*simpletable.Cell {
+	return newTableRow(v, statusFailed, failureMsg)
 }
 
-func printErrorMessage(msg string) {
-	fmt.Printf("\r%s\t\t%s", msg, err)
+func newErrorTableRow(v utils.Validator, err error) []*simpletable.Cell {
+	return newTableRow(v, statusError, err.Error())
+}
+
+func newTableRow(v utils.Validator, status, failureMsg string) []*simpletable.Cell {
+	if failureMsg == "" {
+		failureMsg = "None"
+	}
+	return []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: status},
+		{Align: simpletable.AlignLeft, Text: v.Code},
+		{Align: simpletable.AlignLeft, Text: v.Name},
+		{Align: simpletable.AlignLeft, Text: v.Description},
+		{Align: simpletable.AlignLeft, Text: failureMsg},
+	}
 }

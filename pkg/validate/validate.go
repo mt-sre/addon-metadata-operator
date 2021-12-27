@@ -7,30 +7,33 @@ import (
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
 
+	"github.com/alexeyco/simpletable"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-// Validate - run all validators on a metaBundle struct
-func Validate(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
+// ValidateCLI - run all validators on a metaBundle struct
+func ValidateCLI(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
 	errs := []error{}
 	allSuccess := true
 
-	printMetaHeading()
+	t := simpletable.New()
+	t.Header = getTableHeaders()
 
-	for validatorName, validator := range filter.GetValidators() {
-		fmt.Printf("\r%s\t\t", validator.Description)
-		success, failureMsg, err := validator.Runner(mb)
+	for _, v := range filter.GetValidators() {
+		row := newSuccessTableRow(v)
+		success, failureMsg, err := v.Runner(mb)
 		if err != nil {
 			errs = append(errs, err)
-			printErrorMessage(validator.Description)
+			row = newErrorTableRow(v, err)
 		} else if !success {
-			printFailureMessage(fmt.Sprintf("%v: %v.", validatorName, failureMsg))
 			allSuccess = false
-		} else {
-			printSuccessMessage(validator.Description)
+			row = newFailedTableRow(v, failureMsg)
 		}
-		fmt.Println()
+		t.Body.Cells = append(t.Body.Cells, row)
 	}
+	t.SetStyle(simpletable.StyleCompactLite)
+	fmt.Printf("%v\n\n", t.String())
+	fmt.Println("Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
 	return allSuccess, errs
 }
 
