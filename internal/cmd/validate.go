@@ -36,9 +36,9 @@ var (
 		"  # Validate a staging addon that is not using imageset, but a static indexImage.",
 		"  mtcli validate --env stage <path/to/addon_dir>",
 		"  # Validate an integration addon using imageset, disabling validators 001_foo and 002_bar.",
-		"  mtcli validate --env integration --disabled 001_foo,002_bar <path/to/addon_dir>",
+		"  mtcli validate --env integration --disabled AM0001,AM0002 <path/to/addon_dir>",
 		"  # Validate an integration addon using imageset, enabled only 001_foo.",
-		"  mtcli validate --env integration --enabled 001_foo <path/to/addon_dir>",
+		"  mtcli validate --env integration --enabled AM0001 <path/to/addon_dir>",
 	}
 	validateLong = "Validate an addon metadata and it's bundles against custom validators."
 	validateCmd  = &cobra.Command{

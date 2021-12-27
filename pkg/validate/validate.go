@@ -10,21 +10,7 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-// AllValidators - list of all existing validators. Names have to be unique and follow
-// the following formatting rule: [0-9]{3}_([a-z]*_?)*
-var AllValidators = map[string]utils.Validator{
-	"001_default_channel": {
-		Name:        "001_default_channel",
-		Description: "Ensure defaultChannel is present in list of channels",
-		Runner:      validators.Validate001DefaultChannel,
-	},
-	"002_label_format": {
-		Name:        "002_label_format",
-		Description: "Ensure `label` follows the format api.openshift.com/addon-<operator-id>",
-		Runner:      validators.ValidateAddonLabel,
-	},
-}
-
+// Validate - run all validators on a metaBundle struct
 func Validate(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
 	errs := []error{}
 	allSuccess := true
@@ -48,17 +34,17 @@ func Validate(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
 	return allSuccess, errs
 }
 
-func getExistingValidatorNames() []string {
+func getExistingValidatorCodes() []string {
 	var res []string
-	for name := range AllValidators {
-		res = append(res, name)
+	for code := range validators.Registry.All() {
+		res = append(res, code)
 	}
 	return res
 }
 
 type validatorsFilter struct {
 	AllEnabled     bool
-	ValidatorNames []string
+	ValidatorCodes []string
 }
 
 func NewFilter(disabled, enabled string) (*validatorsFilter, error) {
@@ -71,14 +57,14 @@ func NewFilter(disabled, enabled string) (*validatorsFilter, error) {
 		return nil, err
 	}
 
-	var validatorNames []string
+	var validatorCodes []string
 	if enabled != "" {
-		validatorNames = strings.Split(enabled, ",")
+		validatorCodes = strings.Split(enabled, ",")
 	} else {
-		validatorNames = getEnabledValidatorNamesFromDisabled(disabled)
+		validatorCodes = getEnabledValidatorCodesFromDisabled(disabled)
 	}
 
-	return &validatorsFilter{AllEnabled: false, ValidatorNames: validatorNames}, nil
+	return &validatorsFilter{AllEnabled: false, ValidatorCodes: validatorCodes}, nil
 }
 
 func verifyDisabledEnabled(disabled, enabled string) error {
@@ -86,33 +72,33 @@ func verifyDisabledEnabled(disabled, enabled string) error {
 	if disabled != "" && enabled != "" {
 		return errors.New("Can't set both --disabled and --enabled. They are mutually exclusive.")
 	}
-	var rawNames string
+	var rawCodes string
 	if enabled != "" {
-		rawNames = enabled
+		rawCodes = enabled
 	} else {
-		rawNames = disabled
+		rawCodes = disabled
 	}
 
-	validNames := strings.Join(getExistingValidatorNames(), ",")
-	for _, name := range strings.Split(rawNames, ",") {
-		if _, ok := AllValidators[name]; !ok {
-			return fmt.Errorf("Could not find validator with name %v. Existing validators are %v.", name, validNames)
+	validCodes := strings.Join(getExistingValidatorCodes(), ",")
+	for _, code := range strings.Split(rawCodes, ",") {
+		if _, ok := validators.Registry.Get(code); !ok {
+			return fmt.Errorf("Could not find validator with code %v. Existing validators are %v.", code, validCodes)
 		}
 	}
 	return nil
 }
 
-func getEnabledValidatorNamesFromDisabled(disabled string) []string {
+func getEnabledValidatorCodesFromDisabled(disabled string) []string {
 	var res []string
 
 	allDisabled := make(map[string]bool)
-	for _, disabledName := range strings.Split(disabled, ",") {
-		allDisabled[disabledName] = true
+	for _, disabledCode := range strings.Split(disabled, ",") {
+		allDisabled[disabledCode] = true
 	}
 
-	for _, name := range getExistingValidatorNames() {
-		if _, ok := allDisabled[name]; !ok {
-			res = append(res, name)
+	for _, code := range getExistingValidatorCodes() {
+		if _, ok := allDisabled[code]; !ok {
+			res = append(res, code)
 		}
 	}
 	return res
@@ -121,13 +107,13 @@ func getEnabledValidatorNamesFromDisabled(disabled string) []string {
 func (f *validatorsFilter) GetValidators() []utils.Validator {
 	var res []utils.Validator
 	if f.AllEnabled {
-		for _, validator := range AllValidators {
+		for _, validator := range validators.Registry.All() {
 			res = append(res, validator)
 		}
 	} else {
-		for _, name := range f.ValidatorNames {
+		for _, code := range f.ValidatorCodes {
 			// no need to track 'ok' as it was already validated by NewFilter func
-			validator := AllValidators[name]
+			validator, _ := validators.Registry.Get(code)
 			res = append(res, validator)
 		}
 	}

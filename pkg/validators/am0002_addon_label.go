@@ -6,6 +6,17 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
+func init() {
+	Registry.Add(AM0002)
+}
+
+var AM0002 = utils.Validator{
+	Code:        "AM0002",
+	Name:        "label_format",
+	Description: "Ensure defaultChannel is present in list of channels",
+	Runner:      ValidateAddonLabel,
+}
+
 // ValidateAddonLabel validates whether the 'label' field under an addon.yaml follows the format 'api.openshift.com/addon-<id>'
 // TODO - remove this validator once we do field level validation
 func ValidateAddonLabel(metabundle utils.MetaBundle) (bool, string, error) {

@@ -7,6 +7,7 @@ import (
 
 type Validator struct {
 	Name        string
+	Code        string
 	Description string
 	Runner      ValidateFunc
 }

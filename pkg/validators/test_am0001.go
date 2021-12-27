@@ -6,25 +6,25 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-// check interface implemented
-var _ = utils.ValidatorTest(ValidatorTest001DefaultChannel{})
-
-type ValidatorTest001DefaultChannel struct{}
-
-func (v ValidatorTest001DefaultChannel) Name() string {
-	return "Addon Default Channel Validator"
+func init() {
+	TestRegistry.Add(TestAM0001{})
 }
 
-func (v ValidatorTest001DefaultChannel) Run(mb utils.MetaBundle) (bool, string, error) {
-	return Validate001DefaultChannel(mb)
+type TestAM0001 struct{}
+
+func (t TestAM0001) Name() string {
+	return AM0001.Name
 }
 
-func (v ValidatorTest001DefaultChannel) SucceedingCandidates() []utils.MetaBundle {
+func (t TestAM0001) Run(mb utils.MetaBundle) (bool, string, error) {
+	return AM0001.Runner(mb)
+}
+
+func (t TestAM0001) SucceedingCandidates() []utils.MetaBundle {
 	return testutils.DefaultSucceedingCandidates()
 }
 
-// not implemented
-func (v ValidatorTest001DefaultChannel) FailingCandidates() []utils.MetaBundle {
+func (t TestAM0001) FailingCandidates() []utils.MetaBundle {
 	return []utils.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{

@@ -7,6 +7,17 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
+func init() {
+	Registry.Add(AM0001)
+}
+
+var AM0001 = utils.Validator{
+	Code:        "AM0001",
+	Name:        "default_channel",
+	Description: "Ensure defaultChannel is present in list of channels",
+	Runner:      Validate001DefaultChannel,
+}
+
 // Validate001DefaultChannel validates whether the 'defaultChannel' provided under an addon.yaml also exists under 'channels' field
 func Validate001DefaultChannel(metabundle utils.MetaBundle) (bool, string, error) {
 	defaultChannel := metabundle.AddonMeta.DefaultChannel
