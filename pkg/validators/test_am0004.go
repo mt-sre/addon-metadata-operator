@@ -21,7 +21,7 @@ func (val TestAM0004) Run(mb utils.MetaBundle) (bool, string, error) {
 }
 
 func (val TestAM0004) SucceedingCandidates() []utils.MetaBundle {
-	defaultSucceedingCandidates := testutils.DefaultSucceedingCandidates()
+	res := testutils.DefaultSucceedingCandidates()
 
 	moreCandidates := []utils.MetaBundle{
 		{
@@ -32,7 +32,7 @@ func (val TestAM0004) SucceedingCandidates() []utils.MetaBundle {
 		},
 	}
 
-	return append(defaultSucceedingCandidates, moreCandidates...)
+	return append(res, moreCandidates...)
 }
 
 func (val TestAM0004) FailingCandidates() []utils.MetaBundle {
@@ -46,6 +46,12 @@ func (val TestAM0004) FailingCandidates() []utils.MetaBundle {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID:   "random-operator-4",
 				Icon: "not-base64",
+			},
+		},
+		{
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				ID:   "random-operator-4",
+				Icon: "dGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==",
 			},
 		},
 	}

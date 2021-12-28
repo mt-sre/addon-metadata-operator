@@ -1,8 +1,10 @@
 package validators
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"image/png"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
@@ -24,6 +26,13 @@ func ValidateIconBase64(metabundle utils.MetaBundle) (bool, string, error) {
 	if icon == "" {
 		return false, fmt.Sprintf("`icon` not found under the addon metadata of %s", metabundle.AddonMeta.ID), nil
 	}
-	_, err := base64.StdEncoding.DecodeString(icon)
-	return err == nil, fmt.Sprintf("`icon` found to be improperly base64 populated under the addon metadata of %s", metabundle.AddonMeta.ID), nil
+
+	b64decoded, err := base64.StdEncoding.DecodeString(icon)
+	if err != nil {
+		return false, fmt.Sprintf("`icon` found to be improperly base64 populated under the addon metadata of %s", metabundle.AddonMeta.ID), nil
+	}
+
+	_, err = png.Decode(bytes.NewReader(b64decoded))
+	return err == nil, fmt.Sprintf("`icon`'s base64 value found to correspond to a non-png data under the addon metadata of %s", metabundle.AddonMeta.ID), nil
+
 }
