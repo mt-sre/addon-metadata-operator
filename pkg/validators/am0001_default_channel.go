@@ -15,13 +15,13 @@ var AM0001 = types.Validator{
 	Code:        "AM0001",
 	Name:        "default_channel",
 	Description: "Ensure defaultChannel is present in list of channels",
-	Runner:      Validate001DefaultChannel,
+	Runner:      validateDefaultChannel,
 }
 
-// Validate001DefaultChannel validates whether the 'defaultChannel' provided under an addon.yaml also exists under 'channels' field
-func Validate001DefaultChannel(metabundle types.MetaBundle) types.ValidatorResult {
-	defaultChannel := metabundle.AddonMeta.DefaultChannel
-	channels := metabundle.AddonMeta.Channels
+// validateDefaultChannel validates whether the 'defaultChannel' provided under an addon.yaml also exists under 'channels' field
+func validateDefaultChannel(mb types.MetaBundle) types.ValidatorResult {
+	defaultChannel := mb.AddonMeta.DefaultChannel
+	channels := mb.AddonMeta.Channels
 
 	if res := isPartOfEnum(defaultChannel); !res.IsSuccess() {
 		return res
@@ -31,9 +31,6 @@ func Validate001DefaultChannel(metabundle types.MetaBundle) types.ValidatorResul
 		return res
 	}
 
-	// if success, failureMsg, err := matchesDefaultChannelAnnotations(metabundle.Bundles, defaultChannel); !success {
-	//	return false, failureMsg, err
-	// }
 	return Success()
 }
 
