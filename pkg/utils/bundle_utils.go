@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"sync"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/operator-framework/operator-registry/pkg/registry"
 	log "github.com/sirupsen/logrus"
 )
@@ -13,7 +14,7 @@ import (
 const AllAddonsIdentifier = "all"
 
 var (
-	bundleParser BundleParser
+	bundleParser types.BundleParser
 	lock         = sync.Mutex{}
 )
 

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
 	log "github.com/sirupsen/logrus"
@@ -74,7 +75,7 @@ func validateMain(cmd *cobra.Command, args []string) {
 		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
 	}
 
-	metaBundle := utils.NewMetaBundle(meta, bundles)
+	metaBundle := types.NewMetaBundle(meta, bundles)
 	filter, err := validate.NewFilter(validateDisabled, validateEnabled)
 	if err != nil {
 		log.Fatal(err)
