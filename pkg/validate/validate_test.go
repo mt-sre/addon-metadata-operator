@@ -17,16 +17,17 @@ func TestAllValidators(t *testing.T) {
 			// testing the succeeding candidates
 			succeedingMetaBundles := validator.SucceedingCandidates()
 			for _, mb := range succeedingMetaBundles {
-				success, failureMsg, err := validator.Run(mb)
-				require.NoError(t, err)
-				assert.True(t, success, failureMsg)
+				res := validator.Run(mb)
+				require.False(t, res.IsError())
+				assert.True(t, res.IsSuccess())
 			}
 
 			// (optional) testing the failing candidates
 			failingMetaBundles := validator.FailingCandidates()
 			for _, mb := range failingMetaBundles {
-				success, failureMsg, _ := validator.Run(mb)
-				assert.False(t, success, failureMsg)
+				res := validator.Run(mb)
+				require.False(t, res.IsError())
+				assert.False(t, res.IsSuccess())
 			}
 		})
 	}

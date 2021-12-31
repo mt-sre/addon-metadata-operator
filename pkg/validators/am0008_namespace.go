@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 )
 
 var namespaceRegexExceptions = []string{
@@ -22,7 +22,7 @@ var namespacePresenceExceptions = []string{
 
 var namespaceRegex = regexp.MustCompile(`^redhat-.*$`)
 
-var AM0008 = utils.Validator{
+var AM0008 = types.Validator{
 	Code:        "AM0008",
 	Name:        "ensure_namespace",
 	Description: "Ensure that the target namespace is listed in the set of channels listed",
@@ -33,19 +33,19 @@ func init() {
 	Registry.Add(AM0008)
 }
 
-func ValidateNamespace(metabundle utils.MetaBundle) (bool, string, error) {
-	targetNamespace := metabundle.AddonMeta.TargetNamespace
-	namespaceList := metabundle.AddonMeta.Namespaces
+func ValidateNamespace(mb types.MetaBundle) types.ValidatorResult {
+	targetNamespace := mb.AddonMeta.TargetNamespace
+	namespaceList := mb.AddonMeta.Namespaces
 	valid := validateNamespacePresence(targetNamespace, namespaceList, namespacePresenceExceptions)
 	if !valid {
-		return false, "Target namespace is not in the list of supplied namespaces", nil
+		return Fail("Target namespace is not in the list of supplied namespaces")
 	}
 
 	allValid, failedNamespaces := validateNamespaceRegex(namespaceList, namespaceRegexExceptions)
 	if !allValid {
-		return false, fmt.Sprintf("Some namespaces doesn't start with 'redhat-*' %v", failedNamespaces), nil
+		return Fail(fmt.Sprintf("Some namespaces doesn't start with 'redhat-*' %v", failedNamespaces))
 	}
-	return true, "", nil
+	return Success()
 }
 
 func validateNamespaceRegex(namespaceList []string, exceptionList []string) (bool, []string) {

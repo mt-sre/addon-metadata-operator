@@ -13,7 +13,7 @@ Every validator test is represented by a dedicated type (struct) which implement
 ```go
 type Validator interface {
     Name() string
-    Run(MetaBundle) (bool, error)
+    Run(types.MetaBundle) types.ValidatorResult
     SucceedingCandidates() []types.MetaBundle
     FailingCandidates() []types.MetaBundle
 }

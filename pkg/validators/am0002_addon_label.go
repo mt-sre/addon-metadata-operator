@@ -17,11 +17,12 @@ var AM0002 = types.Validator{
 	Runner:      validateAddonLabel,
 }
 
-func validateAddonLabel(mb types.MetaBundle) (bool, string, error) {
+func validateAddonLabel(mb types.MetaBundle) types.ValidatorResult {
 	operatorId, label := mb.AddonMeta.ID, mb.AddonMeta.Label
 	if label != "api.openshift.com/addon-"+operatorId {
-		return false, fmt.Sprintf("addon label '%s' wasn't recognized to follow the 'api.openshift.com/addon-<id>' format", label), nil
+		msg := fmt.Sprintf("addon label '%s' wasn't recognized to follow the 'api.openshift.com/addon-<id>' format", label)
+		return Fail(msg)
 	}
 
-	return true, "", nil
+	return Success()
 }

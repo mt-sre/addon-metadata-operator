@@ -2,6 +2,7 @@ package validate
 
 import (
 	"github.com/alexeyco/simpletable"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
@@ -23,19 +24,19 @@ func getTableHeaders() *simpletable.Header {
 	}
 }
 
-func newSuccessTableRow(v utils.Validator) []*simpletable.Cell {
+func newSuccessTableRow(v types.Validator) []*simpletable.Cell {
 	return newTableRow(v, statusSuccess, "")
 }
 
-func newFailedTableRow(v utils.Validator, failureMsg string) []*simpletable.Cell {
+func newFailedTableRow(v types.Validator, failureMsg string) []*simpletable.Cell {
 	return newTableRow(v, statusFailed, failureMsg)
 }
 
-func newErrorTableRow(v utils.Validator, err error) []*simpletable.Cell {
+func newErrorTableRow(v types.Validator, err error) []*simpletable.Cell {
 	return newTableRow(v, statusError, err.Error())
 }
 
-func newTableRow(v utils.Validator, status, failureMsg string) []*simpletable.Cell {
+func newTableRow(v types.Validator, status, failureMsg string) []*simpletable.Cell {
 	if failureMsg == "" {
 		failureMsg = "None"
 	}

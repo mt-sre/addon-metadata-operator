@@ -21,13 +21,13 @@ func ValidateCLI(mb types.MetaBundle, filter *validatorsFilter) (bool, []error) 
 
 	for _, v := range filter.GetValidators() {
 		row := newSuccessTableRow(v)
-		success, failureMsg, err := v.Runner(mb)
-		if err != nil {
-			errs = append(errs, err)
-			row = newErrorTableRow(v, err)
-		} else if !success {
+		res := v.Runner(mb)
+		if res.IsError() {
+			errs = append(errs, res.Error)
+			row = newErrorTableRow(v, res.Error)
+		} else if !res.IsSuccess() {
 			allSuccess = false
-			row = newFailedTableRow(v, failureMsg)
+			row = newFailedTableRow(v, res.FailureMsg)
 		}
 		t.Body.Cells = append(t.Body.Cells, row)
 	}
