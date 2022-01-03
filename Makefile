@@ -2,7 +2,7 @@
 .SHELLFLAGS=-euo pipefail -c
 SHELL := /bin/bash
 
-.PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e goreleaser
+.PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e
 
 REPO := quay.io/app-sre/addon-metadata-operator
 TAG := $(shell git rev-parse --short HEAD)
@@ -51,14 +51,10 @@ tidy:
 	@go mod tidy
 	@go mod verify
 
-goreleaser: # Run goreleaser and make sure the binary is not broken.
-	@/tmp/goreleaser.sh
-	@./dist/mtcli_linux_amd64/mtcli version
-
-docker-build: ## Build the operator's docker image
+docker-build: ## Build docker image with the operator.
 	@docker build -t $(REPO):$(TAG) -f Dockerfile.build .
 
-docker-push: ## Push the operator's docker image.
+docker-push: ## Push docker image with the operator.
 	@if [ -z "$(DOCKER_CONF)" ]; then echo "Please set DOCKER_CONF. Exiting." && exit 1; fi
 	@docker tag $(REPO):$(TAG) $(REPO):latest
 	@docker --config=$(DOCKER_CONF) push $(REPO):$(TAG)

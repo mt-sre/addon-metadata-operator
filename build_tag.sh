@@ -14,5 +14,6 @@ docker_run_args=(
     -e "VERSION=v0.184.0"
     # github API token to post release
     -e "GITHUB_TOKEN=${GITHUB_TOKEN}"
+    --entrypoint=/bin/sh
 )
-docker run "${docker_run_args[@]}" "${IMAGE_TEST}" goreleaser
+docker run "${docker_run_args[@]}" "${IMAGE_TEST}" -c /tmp/goreleaser.sh
