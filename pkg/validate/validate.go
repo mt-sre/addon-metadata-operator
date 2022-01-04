@@ -21,7 +21,7 @@ func ValidateCLI(mb types.MetaBundle, filter *validatorsFilter) (bool, []error) 
 
 	for _, v := range filter.GetValidators() {
 		row := newSuccessTableRow(v)
-		res := v.Runner(mb)
+		res := validators.CLIMiddlewares(v).Runner(mb)
 		if res.IsError() {
 			errs = append(errs, res.Error)
 			row = newErrorTableRow(v, res.Error)

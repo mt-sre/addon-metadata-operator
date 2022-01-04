@@ -12,6 +12,17 @@ type Validator struct {
 	Code        string
 	Description string
 	Runner      ValidateFunc
+	// Optional: override defaults from RetryMiddleware
+	RetryCount int
+	// Optional: override defaults from RetryMiddleware
+	RetryDelaySeconds int
+}
+
+// WithRunner - Needs to create a new validator otherwise the memory address of
+// the original Runner is lost, and it causes infinite loop scenarios (e.g.: RetryMiddleware)
+func (v Validator) WithRunner(fn ValidateFunc) Validator {
+	v.Runner = fn
+	return v
 }
 
 type ValidatorTest interface {
@@ -52,3 +63,9 @@ func (vr ValidatorResult) IsSuccess() bool {
 func (vr ValidatorResult) IsError() bool {
 	return vr.Error != nil
 }
+
+func (vr ValidatorResult) IsRetryableError() bool {
+	return vr.Error != nil && vr.RetryableError
+}
+
+type Middleware func(Validator) Validator
