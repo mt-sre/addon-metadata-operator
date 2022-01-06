@@ -79,7 +79,7 @@ func validateMain(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	success, errs := validate.Validate(*metaBundle, filter)
+	success, errs := validate.ValidateCLI(*metaBundle, filter)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
 		os.Exit(1)
