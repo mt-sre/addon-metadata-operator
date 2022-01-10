@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	mtsrev1 "github.com/mt-sre/addon-metadata-operator/pkg/mtsre/v1"
 	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -48,6 +49,10 @@ type AddonImageSetSpec struct {
 	// OCM representation of an add-on sub operator. A sub operator is an
 	// operator who's life cycle is controlled by the add-on umbrella operator.
 	SubOperators *[]ocmv1.AddOnSubOperator `json:"subOperators"`
+
+	// +optional
+	// Configs to be passed to the subscription OLM object.
+	SubscriptionConfig *mtsrev1.SubscriptionConfig `json:"subscriptionConfig"`
 }
 
 // AddonImageSetStatus defines the observed state of AddonImageSet

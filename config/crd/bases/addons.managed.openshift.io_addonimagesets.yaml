@@ -165,6 +165,24 @@ spec:
                   - operator_namespace
                   type: object
                 type: array
+              subscriptionConfig:
+                description: Configs to be passed to the subscription OLM object.
+                properties:
+                  env:
+                    items:
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: string
+                      required:
+                      - name
+                      - value
+                      type: object
+                    type: array
+                required:
+                - env
+                type: object
             required:
             - indexImage
             - name
