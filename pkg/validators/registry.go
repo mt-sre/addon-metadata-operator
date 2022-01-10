@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 )
 
 // Registry - holds all registered Validators
@@ -13,17 +13,17 @@ var Registry = NewDefaultRegistry()
 func NewDefaultRegistry() defaultRegistry {
 	return defaultRegistry{
 		&sync.Mutex{},
-		make(map[string]utils.Validator),
+		make(map[string]types.Validator),
 	}
 }
 
 type defaultRegistry struct {
 	*sync.Mutex
-	Data map[string]utils.Validator
+	Data map[string]types.Validator
 }
 
 // Add - update the registry in a thread-safe way. Called in init() functions
-func (r *defaultRegistry) Add(v utils.Validator) {
+func (r *defaultRegistry) Add(v types.Validator) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -37,11 +37,11 @@ func (r defaultRegistry) Len() int {
 	return len(r.Data)
 }
 
-func (r defaultRegistry) All() map[string]utils.Validator {
+func (r defaultRegistry) All() map[string]types.Validator {
 	return r.Data
 }
 
-func (r defaultRegistry) Get(k string) (utils.Validator, bool) {
+func (r defaultRegistry) Get(k string) (types.Validator, bool) {
 	v, ok := r.Data[k]
 	return v, ok
 }
@@ -52,23 +52,23 @@ var TestRegistry = NewTestRegistry()
 func NewTestRegistry() *testRegistry {
 	return &testRegistry{
 		&sync.Mutex{},
-		[]utils.ValidatorTest{},
+		[]types.ValidatorTest{},
 	}
 }
 
 type testRegistry struct {
 	*sync.Mutex
-	Data []utils.ValidatorTest
+	Data []types.ValidatorTest
 }
 
 // Add - update the test registry in a thread-safe way. Called in init() functions
-func (t *testRegistry) Add(v utils.ValidatorTest) {
+func (t *testRegistry) Add(v types.ValidatorTest) {
 	t.Lock()
 	defer t.Unlock()
 
 	t.Data = append(t.Data, v)
 }
 
-func (t *testRegistry) All() []utils.ValidatorTest {
+func (t *testRegistry) All() []types.ValidatorTest {
 	return t.Data
 }

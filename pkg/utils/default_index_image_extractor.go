@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/operator-framework/operator-registry/pkg/containertools"
 	"github.com/operator-framework/operator-registry/pkg/lib/indexer"
 	log "github.com/sirupsen/logrus"
@@ -82,3 +83,6 @@ func checkFileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
+
+// validate interface implemented
+var _ = types.IndexImageExtractor(DefaultIndexImageExtractor{})

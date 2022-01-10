@@ -3,7 +3,7 @@ package validators
 import (
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 )
 
 func init() {
@@ -16,16 +16,16 @@ func (t TestAM0001) Name() string {
 	return AM0001.Name
 }
 
-func (t TestAM0001) Run(mb utils.MetaBundle) (bool, string, error) {
+func (t TestAM0001) Run(mb types.MetaBundle) types.ValidatorResult {
 	return AM0001.Runner(mb)
 }
 
-func (t TestAM0001) SucceedingCandidates() []utils.MetaBundle {
+func (t TestAM0001) SucceedingCandidates() []types.MetaBundle {
 	return testutils.DefaultSucceedingCandidates()
 }
 
-func (t TestAM0001) FailingCandidates() []utils.MetaBundle {
-	return []utils.MetaBundle{
+func (t TestAM0001) FailingCandidates() []types.MetaBundle {
+	return []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID:             "random-operator",

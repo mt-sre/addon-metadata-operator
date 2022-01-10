@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
@@ -17,7 +18,7 @@ import (
    as the only environment for now.
 
    Bundles live here:
-   	<internal_gitlab>/managed-tenants-bundles/addons/reference-addon/**
+	<internal_gitlab>/managed-tenants-bundles/addons/reference-addon/**
 
    Catalog/Bundles images live here:
     - https://quay.io/osd-addons/reference-addon-bundle:<tag>
@@ -105,7 +106,7 @@ func (r *singleton) GetImageSet(version string) (*addonsv1alpha1.AddonImageSetSp
 	return imageSet, err
 }
 
-func (r *singleton) GetMetaBundle(version string) (*utils.MetaBundle, error) {
+func (r *singleton) GetMetaBundle(version string) (*types.MetaBundle, error) {
 	imageSet, err := r.GetImageSet(version)
 	if err != nil {
 		return nil, fmt.Errorf("Could not get reference-addon imageset got %v.", err)
@@ -120,5 +121,5 @@ func (r *singleton) GetMetaBundle(version string) (*utils.MetaBundle, error) {
 		return nil, fmt.Errorf("Could not patch metadata with imageset, got %v.", err)
 	}
 
-	return utils.NewMetaBundle(meta, bundles), nil
+	return types.NewMetaBundle(meta, bundles), nil
 }

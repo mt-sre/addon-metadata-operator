@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 )
 
 var (
@@ -34,8 +34,8 @@ func GetStringLiteralRef(s string) *string { return &s }
 
 // DefaultSucceedingCandidates - returns a slice of valid metaBundles that are supposed
 // to pass all validators successfully. If it is not the case, please make the required adjustments.
-func DefaultSucceedingCandidates() []utils.MetaBundle {
-	var res []utils.MetaBundle
+func DefaultSucceedingCandidates() []types.MetaBundle {
+	var res []types.MetaBundle
 	refAddonStage := GetReferenceAddonStage()
 	refAddonMetaBundle, err := refAddonStage.GetMetaBundle(*refAddonStage.MetaImageSet.ImageSetVersion)
 	if err != nil {

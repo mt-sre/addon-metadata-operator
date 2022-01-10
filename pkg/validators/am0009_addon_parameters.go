@@ -4,24 +4,24 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 )
 
 func init() {
 	Registry.Add(AM0009)
 }
 
-var AM0009 = utils.Validator{
+var AM0009 = types.Validator{
 	Code:        "AM0009",
 	Name:        "addon_parameters",
 	Description: "Ensure `addOnParameters` section in the addon metadata is rightfully defined",
 	Runner:      ValidateAddonParameters,
 }
 
-func ValidateAddonParameters(metabundle utils.MetaBundle) (bool, string, error) {
-	addonParams := metabundle.AddonMeta.AddOnParameters
+func ValidateAddonParameters(mb types.MetaBundle) types.ValidatorResult {
+	addonParams := mb.AddonMeta.AddOnParameters
 	if addonParams == nil {
-		return true, "", nil
+		return Success()
 	}
 	for _, param := range *addonParams {
 		validation := param.Validation
@@ -29,30 +29,30 @@ func ValidateAddonParameters(metabundle utils.MetaBundle) (bool, string, error) 
 		defaultValue := param.DefaultValue
 
 		if validation != nil && options != nil {
-			return false, "validation and options can't both be set", nil
+			return Fail("validation and options can't both be set")
 		}
 
 		if defaultValue != nil {
 			if validation != nil {
 				r, err := regexp.Compile(*validation)
 				if err != nil {
-					return false, "", fmt.Errorf("failed parse `validation` as regex: %w", err)
+					return Error(fmt.Errorf("failed parse `validation` as regex: %w", err))
 				}
 				if !r.MatchString(*defaultValue) {
-					return false, fmt.Sprintf("defaultValue %s didn't match its validation", *defaultValue), nil
+					return Fail(fmt.Sprintf("defaultValue %s didn't match its validation", *defaultValue))
 				}
-				return true, "", nil
+				return Success()
 			}
 
 			if options != nil {
 				for _, opt := range *options {
 					if *defaultValue == opt.Value {
-						return true, "", nil
+						return Success()
 					}
 				}
-				return false, fmt.Sprintf("defaultValue '%s' not found in `options`", *defaultValue), nil
+				return Fail(fmt.Sprintf("defaultValue '%s' not found in `options`", *defaultValue))
 			}
 		}
 	}
-	return true, "", nil
+	return Success()
 }

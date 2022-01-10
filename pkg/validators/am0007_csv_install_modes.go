@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	operatorsv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	"github.com/operator-framework/operator-registry/pkg/registry"
@@ -13,30 +14,30 @@ func init() {
 	Registry.Add(AM0007)
 }
 
-var AM0007 = utils.Validator{
+var AM0007 = types.Validator{
 	Code:        "AM0007",
 	Name:        "csv_install_modes",
 	Description: "Validate installMode is supported.",
 	Runner:      validateCSVInstallModes,
 }
 
-func validateCSVInstallModes(mb utils.MetaBundle) (bool, string, error) {
+func validateCSVInstallModes(mb types.MetaBundle) types.ValidatorResult {
 	installMode := mb.AddonMeta.InstallMode
 
 	for _, bundle := range mb.Bundles {
 		bundleName, err := utils.GetBundleNameVersion(bundle)
 		if err != nil {
-			return false, "", err
+			return Error(err)
 		}
 		spec, err := extractCSVSpec(bundle)
 		if err != nil {
-			return false, "", fmt.Errorf("Can't extract CSV for %v, got %v.", bundleName, err)
+			return Error(fmt.Errorf("Can't extract CSV for %v, got %v.", bundleName, err))
 		}
 		if success, failureMsg := isInstallModeSupported(spec.InstallModes, installMode); !success {
-			return false, fmt.Sprintf("Bundle %v failed CSV validation: %v.", bundleName, failureMsg), nil
+			return Fail(fmt.Sprintf("Bundle %v failed CSV validation: %v.", bundleName, failureMsg))
 		}
 	}
-	return true, "", nil
+	return Success()
 }
 
 func isInstallModeSupported(installModes []operatorsv1alpha1.InstallMode, target string) (bool, string) {

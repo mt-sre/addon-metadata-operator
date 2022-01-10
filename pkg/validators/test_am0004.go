@@ -3,7 +3,7 @@ package validators
 import (
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 )
 
 func init() {
@@ -16,14 +16,14 @@ func (val TestAM0004) Name() string {
 	return AM0004.Name
 }
 
-func (val TestAM0004) Run(mb utils.MetaBundle) (bool, string, error) {
+func (val TestAM0004) Run(mb types.MetaBundle) types.ValidatorResult {
 	return AM0004.Runner(mb)
 }
 
-func (val TestAM0004) SucceedingCandidates() []utils.MetaBundle {
+func (val TestAM0004) SucceedingCandidates() []types.MetaBundle {
 	res := testutils.DefaultSucceedingCandidates()
 
-	moreCandidates := []utils.MetaBundle{
+	moreCandidates := []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID:   "random-operator-1",
@@ -35,8 +35,8 @@ func (val TestAM0004) SucceedingCandidates() []utils.MetaBundle {
 	return append(res, moreCandidates...)
 }
 
-func (val TestAM0004) FailingCandidates() []utils.MetaBundle {
-	return []utils.MetaBundle{
+func (val TestAM0004) FailingCandidates() []types.MetaBundle {
+	return []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID: "random-operator-3",

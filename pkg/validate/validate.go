@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
 
 	"github.com/alexeyco/simpletable"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
 // ValidateCLI - run all validators on a metaBundle struct
-func ValidateCLI(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) {
+func ValidateCLI(mb types.MetaBundle, filter *validatorsFilter) (bool, []error) {
 	errs := []error{}
 	allSuccess := true
 
@@ -21,13 +21,13 @@ func ValidateCLI(mb utils.MetaBundle, filter *validatorsFilter) (bool, []error) 
 
 	for _, v := range filter.GetValidators() {
 		row := newSuccessTableRow(v)
-		success, failureMsg, err := v.Runner(mb)
-		if err != nil {
-			errs = append(errs, err)
-			row = newErrorTableRow(v, err)
-		} else if !success {
+		res := v.Runner(mb)
+		if res.IsError() {
+			errs = append(errs, res.Error)
+			row = newErrorTableRow(v, res.Error)
+		} else if !res.IsSuccess() {
 			allSuccess = false
-			row = newFailedTableRow(v, failureMsg)
+			row = newFailedTableRow(v, res.FailureMsg)
 		}
 		t.Body.Cells = append(t.Body.Cells, row)
 	}
@@ -107,8 +107,8 @@ func getEnabledValidatorCodesFromDisabled(disabled string) []string {
 	return res
 }
 
-func (f *validatorsFilter) GetValidators() []utils.Validator {
-	var res []utils.Validator
+func (f *validatorsFilter) GetValidators() []types.Validator {
+	var res []types.Validator
 	if f.AllEnabled {
 		for _, validator := range validators.Registry.All() {
 			res = append(res, validator)

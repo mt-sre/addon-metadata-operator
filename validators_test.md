@@ -12,32 +12,33 @@ Every validator test is represented by a dedicated type (struct) which implement
 
 ```go
 type Validator interface {
-	Name() string
-	Run(utils.MetaBundle) (bool, error)
-	SucceedingCandidates() []utils.MetaBundle
-	FailingCandidates() []utils.MetaBundle
+    Name() string
+    Run(types.MetaBundle) types.ValidatorResult
+    SucceedingCandidates() []types.MetaBundle
+    FailingCandidates() []types.MetaBundle
 }
 ```
 
 For implementing that interface, the Validator test's struct must have four methods:
+
 - `Name() string` : Returns the name of the validator to which the test corresponds.
-- `SucceedingCandidates() []utils.MetaBundle`: Returns a slice of `MetaBundle` where each element can successfully pass the validator.
-- `FailingCandidates() []utils.MetaBundle`: Returns a slice of `MetaBundle` where each element fails the validator due to any reason.
-- `Run(utils.MetaBundle) (bool, error)`:  Represents running the validator over a `MetaBundle` and returning a `bool` (success: true/false) and `error` (error while executing the validator) accordingly. Succeeding Candidate `MetaBundle` fed to this method will be expected to return `(true, nil)` and Failing Candidate `MetaBundle` fed to this method will be expected to return `(false, nil/non-nil)`.
+- `SucceedingCandidates() []types.MetaBundle`: Returns a slice of `MetaBundle` where each element can successfully pass the validator.
+- `FailingCandidates() []types.MetaBundle`: Returns a slice of `MetaBundle` where each element fails the validator due to any reason.
+- `Run(types.MetaBundle) (bool, error)`: Represents running the validator over a `MetaBundle` and returning a `bool` (success: true/false) and `error` (error while executing the validator) accordingly. Succeeding Candidate `MetaBundle` fed to this method will be expected to return `(true, nil)` and Failing Candidate `MetaBundle` fed to this method will be expected to return `(false, nil/non-nil)`.
 
 **Checkout an [Example](#example)**
-
 
 ## How to add a new validator test
 
 Say, you created a new validator called `validator_default_channel` under the file `pkg/validators/validator_default_channel.go` accordingly.
 
-* Now, go ahead and create a new file `pkg/validators/test_validator_default_channel.go`.
-* Inside this file, define a struct corresponding to this validator. It can be an empty struct or non-empty depending on the way you want to implement the testing of it. For example: `type ValidateDefaultChannelTestBundle struct {}`
-* Now, make this struct implement the `Validator` interface defined under `pkg/validate/validate_test.go`. (Refer to the previous section for the explanation for these methods).
-* After this, your tests are ready but you have to register them to the validators' test suite now.
-* For that, proceed to `pkg/validate/validate_test.go` and look for `var validatorsToTest`.
-* Under it, just append the struct corresponding to the validator-test you defined under `pkg/validators/test_validator_default_channel.go`. For example, in our case, it would look like this:
+- Now, go ahead and create a new file `pkg/validators/test_validator_default_channel.go`.
+- Inside this file, define a struct corresponding to this validator. It can be an empty struct or non-empty depending on the way you want to implement the testing of it. For example: `type ValidateDefaultChannelTestBundle struct {}`
+- Now, make this struct implement the `Validator` interface defined under `pkg/validate/validate_test.go`. (Refer to the previous section for the explanation for these methods).
+- After this, your tests are ready but you have to register them to the validators' test suite now.
+- For that, proceed to `pkg/validate/validate_test.go` and look for `var validatorsToTest`.
+- Under it, just append the struct corresponding to the validator-test you defined under `pkg/validators/test_validator_default_channel.go`. For example, in our case, it would look like this:
+
 ```go
 ...
 // register the validators to test here by appending them to the following slice
@@ -47,10 +48,12 @@ var validatorsToTest []Validator = []Validator{
 }
 ...
 ```
-* That's it! Rest will be taken care of assuming that the methods you defined for the struct are aptly coded.
-* Go ahead and run the all the tests (including the validator tests) by entering `make test` and it will run:
+
+- That's it! Rest will be taken care of assuming that the methods you defined for the struct are aptly coded.
+- Go ahead and run the all the tests (including the validator tests) by entering `make test` and it will run:
 
 Passing Tests
+
 ```sh
 ╰─ make test
 
@@ -68,7 +71,9 @@ Passing Tests
 PASS
 ok      github.com/mt-sre/addon-metadata-operator/internal/testutil     0.641s
 ```
+
 Failing tests
+
 ```sh
 ╰─ make test
 [DEBUG] Go version used is go version go1.17.1 darwin/amd64
@@ -111,95 +116,96 @@ make: *** [test] Error 1
 
 Say, you created a validator under the file `pkg/validators/validator_default_channel.go`.
 
-* Create `pkg/validators/test_validator_default_channel.go` containing the struct `ValidatorDefaultChannelTestBundle` corresponding to this validator-test and the methods making it implement the `Validator` interface.
+- Create `pkg/validators/test_validator_default_channel.go` containing the struct `ValidatorDefaultChannelTestBundle` corresponding to this validator-test and the methods making it implement the `Validator` interface.
 
 <details>
   <summary><b>Click to expand:</b> `pkg/validators/test_validator_default_channel.go`</summary>
 
-  ```go
-	package validators
+```go
+  package validators
 
-	import (
-		"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-		"github.com/mt-sre/addon-metadata-operator/pkg/utils"
-	)
+  import (
+      "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+      "github.com/mt-sre/addon-metadata-operator/pkg/utils"
+  )
 
-	type ValidatorDefaultChannelTestBundle struct{}
+  type ValidatorDefaultChannelTestBundle struct{}
 
-	func (val ValidatorDefaultChannelTestBundle) Name() string {
-		return "Addon Default Channel Validator"
-	}
+  func (val ValidatorDefaultChannelTestBundle) Name() string {
+      return "Addon Default Channel Validator"
+  }
 
-	func (val ValidatorDefaultChannelTestBundle) Run(mb utils.MetaBundle) (bool, error) {
-		return ValidateDefaultChannel(&mb)
-	}
+  func (val ValidatorDefaultChannelTestBundle) Run(mb types.MetaBundle) (bool, error) {
+      return ValidateDefaultChannel(&mb)
+  }
 
-	func (val ValidatorDefaultChannelTestBundle) SucceedingCandidates() []utils.MetaBundle {
-		return []utils.MetaBundle{
-			{
-				AddonMeta: &v1alpha1.AddonMetadataSpec{
-					ID:             "random-operator",
-					DefaultChannel: "alpha",
-					Channels: []v1alpha1.Channel{
-						{
-							Name: "alpha",
-						},
-						{
-							Name: "sigma",
-						},
-					},
-				},
-			},
-			{
-				AddonMeta: &v1alpha1.AddonMetadataSpec{
-					ID:             "random-operator",
-					DefaultChannel: "beta",
-					Channels: []v1alpha1.Channel{
-						{
-							Name: "alpha",
-						},
-						{
-							Name: "beta",
-						},
-					},
-				},
-			},
-		}
-	}
+  func (val ValidatorDefaultChannelTestBundle) SucceedingCandidates() []types.MetaBundle {
+      return []types.MetaBundle{
+          {
+              AddonMeta: &v1alpha1.AddonMetadataSpec{
+                  ID:             "random-operator",
+                  DefaultChannel: "alpha",
+                  Channels: []v1alpha1.Channel{
+                      {
+                          Name: "alpha",
+                      },
+                      {
+                          Name: "sigma",
+                      },
+                  },
+              },
+          },
+          {
+              AddonMeta: &v1alpha1.AddonMetadataSpec{
+                  ID:             "random-operator",
+                  DefaultChannel: "beta",
+                  Channels: []v1alpha1.Channel{
+                      {
+                          Name: "alpha",
+                      },
+                      {
+                          Name: "beta",
+                      },
+                  },
+              },
+          },
+      }
+  }
 
-	func (val ValidatorDefaultChannelTestBundle) FailingCandidates() []utils.MetaBundle {
-		return []utils.MetaBundle{
-			{
-				AddonMeta: &v1alpha1.AddonMetadataSpec{
-					ID:             "random-operator",
-					DefaultChannel: "alpha",
-					Channels: []v1alpha1.Channel{
-						{
-							Name: "beta",
-						},
-						{
-							Name: "sigma",
-						},
-					},
-				},
-			},
-			{
-				AddonMeta: &v1alpha1.AddonMetadataSpec{
-					ID:             "random-operator",
-					DefaultChannel: "beta",
-					Channels: []v1alpha1.Channel{
-						{
-							Name: "alpha",
-						},
-					},
-				},
-			},
-		}
-	}
-  ```
+  func (val ValidatorDefaultChannelTestBundle) FailingCandidates() []types.MetaBundle {
+      return []types.MetaBundle{
+          {
+              AddonMeta: &v1alpha1.AddonMetadataSpec{
+                  ID:             "random-operator",
+                  DefaultChannel: "alpha",
+                  Channels: []v1alpha1.Channel{
+                      {
+                          Name: "beta",
+                      },
+                      {
+                          Name: "sigma",
+                      },
+                  },
+              },
+          },
+          {
+              AddonMeta: &v1alpha1.AddonMetadataSpec{
+                  ID:             "random-operator",
+                  DefaultChannel: "beta",
+                  Channels: []v1alpha1.Channel{
+                      {
+                          Name: "alpha",
+                      },
+                  },
+              },
+          },
+      }
+  }
+```
+
 </details></br>
 
-* Go to `pkg/validate/validate_test.go` and append the `validators.ValidatorDefaultChannelTestBundle{}` under the slice `validatorsToTest`
+- Go to `pkg/validate/validate_test.go` and append the `validators.ValidatorDefaultChannelTestBundle{}` under the slice `validatorsToTest`
 
 ```go
 ...
@@ -211,7 +217,7 @@ var validatorsToTest []Validator = []Validator{
 ...
 ```
 
-* That's it! Run `make test` to see it in action :)
+- That's it! Run `make test` to see it in action :)
 
 ```sh
 ╰─ make test
