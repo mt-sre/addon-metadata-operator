@@ -8,7 +8,15 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"io/ioutil"
+	"strings"
+
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
+
+	"github.com/operator-framework/operator-registry/pkg/registry"
+
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
 var (
@@ -30,6 +38,28 @@ func RemoveDir(downloadDir string) {
 	}
 }
 
+func YamlToDynamicObj(yamlPath string) (unstructured.Unstructured, error) {
+	pathTokens := strings.Split(yamlPath, ".")
+	ext := pathTokens[len(pathTokens)-1]
+	if ext != "yaml" && ext != "yml" {
+		return unstructured.Unstructured{}, fmt.Errorf("non-yaml file found")
+	}
+
+	yamlAbsPath, err := filepath.Abs(yamlPath)
+	if err != nil {
+		return unstructured.Unstructured{}, err
+	}
+	yamlBytes, err := ioutil.ReadFile(yamlAbsPath)
+	if err != nil {
+		return unstructured.Unstructured{}, err
+	}
+	var dynamicObj unstructured.Unstructured
+	if err := yaml.Unmarshal(yamlBytes, &dynamicObj); err != nil {
+		return unstructured.Unstructured{}, err
+	}
+	return dynamicObj, nil
+}
+
 func GetStringLiteralRef(s string) *string { return &s }
 
 // DefaultSucceedingCandidates - returns a slice of valid metaBundles that are supposed
@@ -44,4 +74,16 @@ func DefaultSucceedingCandidates() []types.MetaBundle {
 	res = append(res, *refAddonMetaBundle)
 
 	return res
+}
+
+func NewBundle(name string, yamlFilePaths ...string) registry.Bundle {
+	var objs []*unstructured.Unstructured
+	for _, path := range yamlFilePaths {
+		obj, err := YamlToDynamicObj(path)
+		if err != nil {
+			log.Fatalf("could not generate bundle: %v", err)
+		}
+		objs = append(objs, &obj)
+	}
+	return *registry.NewBundle(name, &registry.Annotations{}, objs...)
 }
