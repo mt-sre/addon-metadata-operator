@@ -14,7 +14,7 @@ func Error(err error) types.ValidatorResult {
 	return types.ValidatorResult{Success: false, Error: err, RetryableError: false}
 }
 
-// RetryableError - used by the Retry middleware re-run the validator
+// RetryableError - used by the Retry middleware to automatically re-run validators
 func RetryableError(err error) types.ValidatorResult {
 	return types.ValidatorResult{Success: false, Error: err, RetryableError: true}
 }
