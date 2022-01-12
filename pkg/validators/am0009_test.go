@@ -1,10 +1,11 @@
-package validators
+package validators_test
 
 import (
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
 )
 
 func init() {
@@ -14,16 +15,18 @@ func init() {
 type TestAM0009 struct{}
 
 func (val TestAM0009) Name() string {
-	return AM0009.Name
+	return validators.AM0009.Name
 }
 
 func (val TestAM0009) Run(mb types.MetaBundle) types.ValidatorResult {
-	return AM0009.Runner(mb)
+	return validators.AM0009.Runner(mb)
 }
 
-func (val TestAM0009) SucceedingCandidates() []types.MetaBundle {
-
-	res := testutils.DefaultSucceedingCandidates()
+func (val TestAM0009) SucceedingCandidates() ([]types.MetaBundle, error) {
+	res, err := testutils.DefaultSucceedingCandidates()
+	if err != nil {
+		return nil, err
+	}
 
 	moreCandidates := []types.MetaBundle{
 		{
@@ -80,11 +83,11 @@ func (val TestAM0009) SucceedingCandidates() []types.MetaBundle {
 		},
 	}
 
-	return append(res, moreCandidates...)
+	return append(res, moreCandidates...), nil
 }
 
-func (val TestAM0009) FailingCandidates() []types.MetaBundle {
-	return []types.MetaBundle{
+func (val TestAM0009) FailingCandidates() ([]types.MetaBundle, error) {
+	res := []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID: "both-options-and-validation",
@@ -143,4 +146,5 @@ func (val TestAM0009) FailingCandidates() []types.MetaBundle {
 			},
 		},
 	}
+	return res, nil
 }

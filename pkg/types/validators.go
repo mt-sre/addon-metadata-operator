@@ -28,8 +28,8 @@ func (v Validator) WithRunner(fn ValidateFunc) Validator {
 type ValidatorTest interface {
 	Name() string
 	Run(MetaBundle) ValidatorResult
-	SucceedingCandidates() []MetaBundle
-	FailingCandidates() []MetaBundle
+	SucceedingCandidates() ([]MetaBundle, error)
+	FailingCandidates() ([]MetaBundle, error)
 }
 
 type MetaBundle struct {

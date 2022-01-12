@@ -3,7 +3,6 @@ package testutils
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"path"
 	"sync"
 
@@ -35,28 +34,32 @@ var (
 	ReferenceAddonImageSetDir   = path.Join(AddonsImagesetDir, "reference-addon")
 	ReferenceAddonIndexImageDir = path.Join(AddonsIndexImageDir, "reference-addon")
 	instance                    *singleton
-	once                        = sync.Once{}
+	lock                        = sync.Mutex{}
 )
 
 // GetReferenceAddonStage - uses singleton pattern to avoid loading yaml manifests over and over
 // currently supports:
 // - (DEPRECATED) static indexImage reference-addon
 // - imageSet reference-addon
-func GetReferenceAddonStage() *singleton {
-	once.Do(func() {
-		instance = &singleton{Env: "stage"}
-		metaIndexImage, err := instance.GetMetadata(false)
-		if err != nil {
-			log.Fatalf("Could not load indexImage metadata for reference-addon, got %v.", err)
-		}
-		metaImageSet, err := instance.GetMetadata(true)
-		if err != nil {
-			log.Fatalf("Could not load imageSet metadata for reference-addon, got %v.", err)
-		}
-		instance.MetaIndexImage = metaIndexImage
-		instance.MetaImageSet = metaImageSet
-	})
-	return instance
+func GetReferenceAddonStage() (*singleton, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
+	if instance != nil {
+		return instance, nil
+	}
+	instance = &singleton{Env: "stage"}
+	metaIndexImage, err := instance.GetMetadata(false)
+	if err != nil {
+		return nil, fmt.Errorf("Could not load indexImage metadata for reference-addon, got %v.", err)
+	}
+	metaImageSet, err := instance.GetMetadata(true)
+	if err != nil {
+		return nil, fmt.Errorf("Could not load imageSet metadata for reference-addon, got %v.", err)
+	}
+	instance.MetaIndexImage = metaIndexImage
+	instance.MetaImageSet = metaImageSet
+	return instance, nil
 }
 
 func (r *singleton) ImageSetDir() string {
