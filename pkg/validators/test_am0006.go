@@ -29,7 +29,7 @@ func (t TestAM0006) SucceedingCandidates() []types.MetaBundle {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID: "random-operator-0",
 				DeadmansSnitch: &mtsrev1.DeadmansSnitch{
-					SnitchNamePostFix: testutils.GetStringLiteralRef("addon-123"),
+					SnitchNamePostFix: StringToPtr("addon-123"),
 				},
 			},
 		},
@@ -55,7 +55,7 @@ func (t TestAM0006) FailingCandidates() []types.MetaBundle {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID: "random-operator",
 				DeadmansSnitch: &mtsrev1.DeadmansSnitch{
-					SnitchNamePostFix: testutils.GetStringLiteralRef("hive-123"),
+					SnitchNamePostFix: StringToPtr("hive-123"),
 				},
 			},
 		},
