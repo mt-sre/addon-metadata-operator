@@ -28,6 +28,7 @@ type DefaultIndexImageExtractor struct {
 func (obj DefaultIndexImageExtractor) ExtractBundlesFromImage(indexImage, extractTo string) error {
 	// Write all index image extaction logs to /dev/null
 	logger := log.StandardLogger()
+	logger.Out = ioutil.Discard
 	indexExporter := indexer.NewIndexExporter(
 		containertools.NewContainerTool("", containertools.NoneTool),
 		log.NewEntry(logger),
