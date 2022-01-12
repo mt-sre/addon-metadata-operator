@@ -1,9 +1,10 @@
-package validators
+package validators_test
 
 import (
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
 	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
@@ -14,11 +15,11 @@ func init() {
 type TestAM0007 struct{}
 
 func (v TestAM0007) Name() string {
-	return AM0007.Name
+	return validators.AM0007.Name
 }
 
 func (v TestAM0007) Run(mb types.MetaBundle) types.ValidatorResult {
-	return AM0007.Runner(mb)
+	return validators.AM0007.Runner(mb)
 }
 
 var (
