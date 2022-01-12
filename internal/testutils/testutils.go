@@ -2,7 +2,6 @@ package testutils
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -64,26 +63,29 @@ func GetStringLiteralRef(s string) *string { return &s }
 
 // DefaultSucceedingCandidates - returns a slice of valid metaBundles that are supposed
 // to pass all validators successfully. If it is not the case, please make the required adjustments.
-func DefaultSucceedingCandidates() []types.MetaBundle {
+func DefaultSucceedingCandidates() ([]types.MetaBundle, error) {
 	var res []types.MetaBundle
-	refAddonStage := GetReferenceAddonStage()
+	refAddonStage, err := GetReferenceAddonStage()
+	if err != nil {
+		return nil, fmt.Errorf("Could not get reference-addon singleton, got %v.", err)
+	}
 	refAddonMetaBundle, err := refAddonStage.GetMetaBundle(*refAddonStage.MetaImageSet.ImageSetVersion)
 	if err != nil {
-		log.Fatalf("Could not get reference-addon meta bundles, got %v.", err)
+		return nil, fmt.Errorf("Could not get reference-addon meta bundles, got %v.", err)
 	}
 	res = append(res, *refAddonMetaBundle)
 
-	return res
+	return res, nil
 }
 
-func NewBundle(name string, yamlFilePaths ...string) registry.Bundle {
+func NewBundle(name string, yamlFilePaths ...string) (registry.Bundle, error) {
 	var objs []*unstructured.Unstructured
 	for _, path := range yamlFilePaths {
 		obj, err := YamlToDynamicObj(path)
 		if err != nil {
-			log.Fatalf("could not generate bundle: %v", err)
+			return registry.Bundle{}, fmt.Errorf("could not generate bundle: %v", err)
 		}
 		objs = append(objs, &obj)
 	}
-	return *registry.NewBundle(name, &registry.Annotations{}, objs...)
+	return *registry.NewBundle(name, &registry.Annotations{}, objs...), nil
 }

@@ -20,8 +20,8 @@ func (val TestAM0002) Run(mb types.MetaBundle) types.ValidatorResult {
 	return validators.AM0002.Runner(mb)
 }
 
-func (val TestAM0002) SucceedingCandidates() []types.MetaBundle {
-	return []types.MetaBundle{
+func (val TestAM0002) SucceedingCandidates() ([]types.MetaBundle, error) {
+	res := []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID:    "random-operator",
@@ -29,10 +29,11 @@ func (val TestAM0002) SucceedingCandidates() []types.MetaBundle {
 			},
 		},
 	}
+	return res, nil
 }
 
-func (val TestAM0002) FailingCandidates() []types.MetaBundle {
-	return []types.MetaBundle{
+func (val TestAM0002) FailingCandidates() ([]types.MetaBundle, error) {
+	res := []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID:    "random-operator",
@@ -46,4 +47,5 @@ func (val TestAM0002) FailingCandidates() []types.MetaBundle {
 			},
 		},
 	}
+	return res, nil
 }

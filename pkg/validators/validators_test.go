@@ -33,7 +33,8 @@ func TestAllValidators(t *testing.T) {
 		t.Run(validator.Name(), func(t *testing.T) {
 			t.Parallel()
 			// testing the succeeding candidates
-			succeedingMetaBundles := validator.SucceedingCandidates()
+			succeedingMetaBundles, err := validator.SucceedingCandidates()
+			require.NoError(t, err)
 			for _, mb := range succeedingMetaBundles {
 				res := validator.Run(mb)
 				require.False(t, res.IsError())
@@ -41,7 +42,8 @@ func TestAllValidators(t *testing.T) {
 			}
 
 			// (optional) testing the failing candidates
-			failingMetaBundles := validator.FailingCandidates()
+			failingMetaBundles, err := validator.FailingCandidates()
+			require.NoError(t, err)
 			for _, mb := range failingMetaBundles {
 				res := validator.Run(mb)
 				require.False(t, res.IsError())

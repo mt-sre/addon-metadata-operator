@@ -22,12 +22,18 @@ func (v TestAM0007) Run(mb types.MetaBundle) types.ValidatorResult {
 	return validators.AM0007.Runner(mb)
 }
 
-var (
-	testBundle = testutils.NewBundle("random-bundle", "../../internal/testdata/assets/am0007/csv.yaml")
-)
+func (v TestAM0007) SucceedingCandidates() ([]types.MetaBundle, error) {
+	testBundle, err := testutils.NewBundle("random-bundle", "../../internal/testdata/assets/am0007/csv.yaml")
+	if err != nil {
+		return nil, err
+	}
 
-func (v TestAM0007) SucceedingCandidates() []types.MetaBundle {
-	succeedingCandidates := []types.MetaBundle{
+	res, err := testutils.DefaultSucceedingCandidates()
+	if err != nil {
+		return nil, err
+	}
+
+	moreSucceedingCandidates := []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "OwnNamespace",
@@ -45,11 +51,16 @@ func (v TestAM0007) SucceedingCandidates() []types.MetaBundle {
 			},
 		},
 	}
-	return append(succeedingCandidates, testutils.DefaultSucceedingCandidates()...)
+	return append(moreSucceedingCandidates, res...), nil
 }
 
-func (v TestAM0007) FailingCandidates() []types.MetaBundle {
-	return []types.MetaBundle{
+func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
+	testBundle, err := testutils.NewBundle("random-bundle", "../../internal/testdata/assets/am0007/csv.yaml")
+	if err != nil {
+		return nil, err
+	}
+
+	res := []types.MetaBundle{
 		{
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "something",
@@ -75,4 +86,5 @@ func (v TestAM0007) FailingCandidates() []types.MetaBundle {
 			},
 		},
 	}
+	return res, nil
 }
