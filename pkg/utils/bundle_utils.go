@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"sync"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
@@ -31,6 +32,11 @@ func ExtractAndParseAddons(indexImage, addonIdentifier string) ([]registry.Bundl
 
 	if indexImage == "" {
 		return []registry.Bundle{}, errors.New("Missing index image!")
+	}
+
+	// ignore tagless images used by addons in the process of on-boarding
+	if parts := strings.SplitN(indexImage, ":", 2); len(parts) < 2 {
+		return []registry.Bundle{}, nil
 	}
 
 	indexImageExtractor := DefaultIndexImageExtractor{
