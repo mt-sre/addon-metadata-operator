@@ -1,6 +1,8 @@
 package validators_test
 
 import (
+	"path"
+
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
@@ -23,7 +25,7 @@ func (v TestAM0007) Run(mb types.MetaBundle) types.ValidatorResult {
 }
 
 func (v TestAM0007) SucceedingCandidates() ([]types.MetaBundle, error) {
-	testBundle, err := testutils.NewBundle("random-bundle", "../../internal/testdata/assets/am0007/csv.yaml")
+	testBundle, err := loadAM0007TestBundle()
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +57,7 @@ func (v TestAM0007) SucceedingCandidates() ([]types.MetaBundle, error) {
 }
 
 func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
-	testBundle, err := testutils.NewBundle("random-bundle", "../../internal/testdata/assets/am0007/csv.yaml")
+	testBundle, err := loadAM0007TestBundle()
 	if err != nil {
 		return nil, err
 	}
@@ -87,4 +89,8 @@ func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
 		},
 	}
 	return res, nil
+}
+
+func loadAM0007TestBundle() (registry.Bundle, error) {
+	return testutils.NewBundle("random-bundle", path.Join(testutils.TestdataDir(), "assets/am0007/csv.yaml"))
 }

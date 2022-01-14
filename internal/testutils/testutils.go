@@ -18,16 +18,27 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-var (
-	RootDir             string = getRootDir()
-	TestdataDir         string = path.Join(RootDir, "internal", "testdata")
-	AddonsImagesetDir   string = path.Join(TestdataDir, "addons-imageset")
-	AddonsIndexImageDir string = path.Join(TestdataDir, "addons-indeximage")
-)
+var rootDir string
 
-func getRootDir() string {
+func init() {
 	_, b, _, _ := runtime.Caller(0)
-	return path.Join(filepath.Dir(b), "..", "..")
+	rootDir = path.Join(filepath.Dir(b), "..", "..")
+}
+
+func AddonsIndexImageDir() string {
+	return path.Join(TestdataDir(), "addons-indeximage")
+}
+
+func AddonsImagesetDir() string {
+	return path.Join(TestdataDir(), "addons-imageset")
+}
+
+func TestdataDir() string {
+	return path.Join(RootDir(), "internal", "testdata")
+}
+
+func RootDir() string {
+	return rootDir
 }
 
 func RemoveDir(downloadDir string) {

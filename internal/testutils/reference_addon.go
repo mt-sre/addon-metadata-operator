@@ -31,10 +31,8 @@ type singleton struct {
 }
 
 var (
-	ReferenceAddonImageSetDir   = path.Join(AddonsImagesetDir, "reference-addon")
-	ReferenceAddonIndexImageDir = path.Join(AddonsIndexImageDir, "reference-addon")
-	instance                    *singleton
-	lock                        = sync.Mutex{}
+	instance *singleton
+	lock     = sync.Mutex{}
 )
 
 // GetReferenceAddonStage - uses singleton pattern to avoid loading yaml manifests over and over
@@ -63,11 +61,11 @@ func GetReferenceAddonStage() (*singleton, error) {
 }
 
 func (r *singleton) ImageSetDir() string {
-	return path.Join(AddonsImagesetDir, "reference-addon")
+	return path.Join(AddonsImagesetDir(), "reference-addon")
 }
 
 func (r *singleton) IndexImageDir() string {
-	return path.Join(AddonsIndexImageDir, "reference-addon")
+	return path.Join(AddonsIndexImageDir(), "reference-addon")
 }
 
 func (r *singleton) GetMetadata(useImageSet bool) (*addonsv1alpha1.AddonMetadataSpec, error) {
