@@ -170,7 +170,8 @@ type AddonMetadataSpec struct {
 	Monitoring *mtsrev1.Monitoring `json:"monitoring"`
 
 	// +optional
-	BundleParameters *mtsrev1.BundleParameters `json:"bundleParameters"`
+	// Deprecated: Replaced by SubscriptionConfig.
+	BundleParameters *mtsrev1.BundleParameters `json:"bundleParameters"` //nolint: staticcheck // ignoring self-deprecation SA1019
 
 	// +optional
 	StartingCSV *string `json:"startingCSV"`

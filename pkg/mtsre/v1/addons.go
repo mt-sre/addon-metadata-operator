@@ -32,6 +32,7 @@ type Monitoring struct {
 	MatchLabels map[string]string `json:"matchLabels" validate:"required"`
 }
 
+// Deprecated: Replaced by SubscriptionConfig.
 //+kubebuilder:object:generate=true
 type BundleParameters struct {
 	// +optional

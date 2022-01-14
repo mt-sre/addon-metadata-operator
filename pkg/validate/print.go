@@ -6,14 +6,11 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
-var (
-	statusSuccess = utils.Green("Success")
-	statusFailed  = utils.Red("Failed")
-	statusError   = utils.IntenselyBoldRed("Error")
-)
+func newResultTable() resultTable {
+	var table resultTable
 
-func getTableHeaders() *simpletable.Header {
-	return &simpletable.Header{
+	table.Table = simpletable.New()
+	table.Header = &simpletable.Header{
 		Cells: []*simpletable.Cell{
 			{Align: simpletable.AlignCenter, Text: "STATUS"},
 			{Align: simpletable.AlignCenter, Text: "CODE"},
@@ -22,29 +19,49 @@ func getTableHeaders() *simpletable.Header {
 			{Align: simpletable.AlignCenter, Text: "FAILURE MESSAGE"},
 		},
 	}
+
+	table.SetStyle(simpletable.StyleCompactLite)
+
+	return table
 }
 
-func newSuccessTableRow(v types.Validator) []*simpletable.Cell {
-	return newTableRow(v, statusSuccess, "")
+type resultTable struct {
+	*simpletable.Table
 }
 
-func newFailedTableRow(v types.Validator, failureMsg string) []*simpletable.Cell {
-	return newTableRow(v, statusFailed, failureMsg)
+func (t resultTable) WriteRow(row []*simpletable.Cell) {
+	t.Body.Cells = append(t.Body.Cells, row)
 }
 
-func newErrorTableRow(v types.Validator, err error) []*simpletable.Cell {
-	return newTableRow(v, statusError, err.Error())
-}
+func (t resultTable) WriteResult(res types.ValidatorResult) {
+	row := resultToRow(res)
 
-func newTableRow(v types.Validator, status, failureMsg string) []*simpletable.Cell {
-	if failureMsg == "" {
-		failureMsg = "None"
+	if res.IsSuccess() {
+		t.WriteRow(append(row, &simpletable.Cell{Align: simpletable.AlignLeft, Text: "None"}))
+	} else if res.IsError() {
+		t.WriteRow(append(row, &simpletable.Cell{Align: simpletable.AlignLeft, Text: res.Error.Error()}))
+	} else {
+		for _, msg := range res.FailureMsgs {
+			t.WriteRow(append(row, &simpletable.Cell{Align: simpletable.AlignLeft, Text: msg}))
+		}
 	}
+}
+
+func resultToRow(res types.ValidatorResult) []*simpletable.Cell {
+	var status string
+
+	if res.IsSuccess() {
+		status = utils.Green("Success")
+	} else if res.IsError() {
+		status = utils.IntenselyBoldRed("Error")
+	} else {
+		status = utils.Red("Failed")
+	}
+
 	return []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: status},
-		{Align: simpletable.AlignLeft, Text: v.Code},
-		{Align: simpletable.AlignLeft, Text: v.Name},
-		{Align: simpletable.AlignLeft, Text: v.Description},
-		{Align: simpletable.AlignLeft, Text: failureMsg},
+		{Align: simpletable.AlignLeft, Text: res.ValidatorCode},
+		{Align: simpletable.AlignLeft, Text: res.ValidatorName},
+		{Align: simpletable.AlignLeft, Text: res.ValidatorDescription},
 	}
 }

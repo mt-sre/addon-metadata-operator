@@ -7,8 +7,6 @@ import (
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
-
-	"github.com/alexeyco/simpletable"
 )
 
 // ValidateCLI - run all validators on a metaBundle struct
@@ -16,24 +14,23 @@ func ValidateCLI(mb types.MetaBundle, filter *validatorsFilter) (bool, []error) 
 	errs := []error{}
 	allSuccess := true
 
-	t := simpletable.New()
-	t.Header = getTableHeaders()
+	table := newResultTable()
 
 	for _, v := range filter.GetValidators() {
-		row := newSuccessTableRow(v)
-		res := validators.CLIMiddlewares(v).Runner(mb)
+		res := validators.CLIMiddlewares(v).Run(mb)
+
+		table.WriteResult(res)
+
 		if res.IsError() {
 			errs = append(errs, res.Error)
-			row = newErrorTableRow(v, res.Error)
 		} else if !res.IsSuccess() {
 			allSuccess = false
-			row = newFailedTableRow(v, res.FailureMsg)
 		}
-		t.Body.Cells = append(t.Body.Cells, row)
 	}
-	t.SetStyle(simpletable.StyleCompactLite)
-	fmt.Printf("%v\n\n", t.String())
+
+	fmt.Printf("%v\n\n", table.String())
 	fmt.Println("Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
+
 	return allSuccess, errs
 }
 

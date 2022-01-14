@@ -3,6 +3,7 @@ package validators_test
 import (
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
+	v1 "github.com/mt-sre/addon-metadata-operator/pkg/mtsre/v1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
 )
@@ -55,6 +56,10 @@ func (val TestAM0010) SucceedingCandidates() ([]types.MetaBundle, error) {
 					"foo.bar0.com/Foo-common_label.2": "true",
 					"foo.bar.com/Foo-common_label.3":  "true",
 				},
+				PagerDuty: &v1.PagerDuty{
+					SecretName:      "pagerduty-secret",
+					SecretNamespace: "redhat-foo-operator",
+				},
 			},
 		}), nil
 }
@@ -65,12 +70,15 @@ func (val TestAM0010) FailingCandidates() ([]types.MetaBundle, error) {
 	failingBundles = append(failingBundles, metaBundlesWithBadNamespaces()...)
 	failingBundles = append(failingBundles, metaBundlesWithBadLabels()...)
 	failingBundles = append(failingBundles, metaBundlesWithBadAnnotations()...)
+	failingBundles = append(failingBundles, metaBundlesWithBadSecrets()...)
 
 	return failingBundles, nil
 }
 
 func metaBundlesWithBadNamespaces() []types.MetaBundle {
 	badNamespaces := []string{
+		// Namespace name is empty
+		"",
 		// Namespace name exceeds 63 characters
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 		// Namespace name begins with non-alphanumeric character
@@ -83,7 +91,7 @@ func metaBundlesWithBadNamespaces() []types.MetaBundle {
 		"foo_namespace",
 	}
 
-	bundles := make([]types.MetaBundle, 0, len(badNamespaces)*2)
+	bundles := make([]types.MetaBundle, 0, len(badNamespaces)*3)
 
 	for _, ns := range badNamespaces {
 		bundles = append(bundles,
@@ -102,6 +110,15 @@ func metaBundlesWithBadNamespaces() []types.MetaBundle {
 					},
 				},
 			},
+			types.MetaBundle{
+				AddonMeta: &v1alpha1.AddonMetadataSpec{
+					TargetNamespace: "foo-namespace",
+					Label:           "foo-label",
+					PagerDuty: &v1.PagerDuty{
+						SecretNamespace: ns,
+					},
+				},
+			},
 		)
 	}
 
@@ -110,6 +127,8 @@ func metaBundlesWithBadNamespaces() []types.MetaBundle {
 
 func metaBundlesWithBadLabels() []types.MetaBundle {
 	badLabels := []string{
+		// Label is empty
+		"",
 		// Empty Prefix
 		"/label",
 		// Empty Name
@@ -177,6 +196,8 @@ func metaBundlesWithBadLabels() []types.MetaBundle {
 
 func metaBundlesWithBadAnnotations() []types.MetaBundle {
 	badAnnotations := []string{
+		// Annotation is empty
+		"",
 		// Empty Prefix
 		"/annotation",
 		// Empty Name
@@ -223,6 +244,46 @@ func metaBundlesWithBadAnnotations() []types.MetaBundle {
 					Label:           "foo-label",
 					CommonAnnotations: &map[string]string{
 						annotation: "",
+					},
+				},
+			},
+		)
+	}
+
+	return bundles
+}
+
+func metaBundlesWithBadSecrets() []types.MetaBundle {
+	badSecrets := []string{
+		// Secret name is empty
+		"",
+		// Secret name contains unallowed character
+		"foo*com",
+		// Secret name does not start with alphanumeric
+		".foo.com",
+		// Secret name does not end with alphanumeric
+		"foo.com.",
+		// Secret name contains an uppercase character
+		"Foo.com",
+		// Name exceeds 253 characters
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+	}
+
+	bundles := make([]types.MetaBundle, 0, len(badSecrets))
+
+	for _, secret := range badSecrets {
+		bundles = append(bundles,
+			types.MetaBundle{
+				AddonMeta: &v1alpha1.AddonMetadataSpec{
+					TargetNamespace: "foo-namespace",
+					Label:           "foo-label",
+					PagerDuty: &v1.PagerDuty{
+						SecretName: secret,
 					},
 				},
 			},
