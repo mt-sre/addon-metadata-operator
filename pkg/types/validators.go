@@ -25,6 +25,21 @@ func (v Validator) WithRunner(fn ValidateFunc) Validator {
 	return v
 }
 
+// ValidatorList - implements Sort interface to sort validators per Code
+type ValidatorList []Validator
+
+func (v ValidatorList) Len() int {
+	return len(v)
+}
+
+func (v ValidatorList) Less(i, j int) bool {
+	return v[i].Code < v[j].Code
+}
+
+func (v ValidatorList) Swap(i, j int) {
+	v[i], v[j] = v[j], v[i]
+}
+
 type ValidatorTest interface {
 	Name() string
 	Run(MetaBundle) ValidatorResult
