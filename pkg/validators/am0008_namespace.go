@@ -22,18 +22,18 @@ var namespacePresenceExceptions = []string{
 
 var namespaceRegex = regexp.MustCompile(`^redhat-.*$`)
 
-var AM0008 = types.Validator{
-	Code:        "AM0008",
-	Name:        "ensure_namespace",
-	Description: "Ensure that the target namespace is listed in the set of channels listed",
-	Runner:      ValidateNamespace,
-}
+var AM0008 = types.NewValidator(
+	"AM0008",
+	types.ValidateFunc(ValidateNamespace),
+	types.ValidatorName("ensure_namespace"),
+	types.ValidatorDescription("Ensure that the target namespace is listed in the set of channels listed"),
+)
 
 func init() {
 	Registry.Add(AM0008)
 }
 
-func ValidateNamespace(mb types.MetaBundle) types.ValidatorResult {
+func ValidateNamespace(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	targetNamespace := mb.AddonMeta.TargetNamespace
 	namespaceList := mb.AddonMeta.Namespaces
 	valid := validateNamespacePresence(targetNamespace, namespaceList, namespacePresenceExceptions)

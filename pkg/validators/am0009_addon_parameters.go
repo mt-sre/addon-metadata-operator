@@ -11,14 +11,14 @@ func init() {
 	Registry.Add(AM0009)
 }
 
-var AM0009 = types.Validator{
-	Code:        "AM0009",
-	Name:        "addon_parameters",
-	Description: "Ensure `addOnParameters` section in the addon metadata is rightfully defined",
-	Runner:      ValidateAddonParameters,
-}
+var AM0009 = types.NewValidator(
+	"AM0009",
+	types.ValidateFunc(ValidateAddonParameters),
+	types.ValidatorName("addon_parameters"),
+	types.ValidatorDescription("Ensure `addOnParameters` section in the addon metadata is rightfully defined"),
+)
 
-func ValidateAddonParameters(mb types.MetaBundle) types.ValidatorResult {
+func ValidateAddonParameters(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	addonParams := mb.AddonMeta.AddOnParameters
 	if addonParams == nil {
 		return Success()

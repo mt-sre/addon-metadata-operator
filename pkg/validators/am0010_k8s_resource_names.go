@@ -9,12 +9,12 @@ import (
 	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 )
 
-var AM0010 = types.Validator{
-	Code:        "AM0010",
-	Name:        "k8s_resource_and_field_names",
-	Description: "Validates k8s namespaces, labels, and annotations within Addon metadata against k8s standards",
-	Runner:      Validatek8sResourceAndFieldNames,
-}
+var AM0010 = types.NewValidator(
+	"AM0010",
+	types.ValidateFunc(Validatek8sResourceAndFieldNames),
+	types.ValidatorName("k8s_resource_and_field_names"),
+	types.ValidatorDescription("Validates k8s namespaces, labels, and annotations within Addon metadata against k8s standards"),
+)
 
 func init() {
 	Registry.Add(AM0010)
@@ -44,7 +44,7 @@ func joinFailureMsgs(msgs ...failureMsg) failureMsg {
 	return failureMsg(strings.Join(msgStrings, ", "))
 }
 
-func Validatek8sResourceAndFieldNames(mb types.MetaBundle) types.ValidatorResult {
+func Validatek8sResourceAndFieldNames(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	subValidators := []subValidator{
 		validateLabel,
 		validateTargetNamespace,

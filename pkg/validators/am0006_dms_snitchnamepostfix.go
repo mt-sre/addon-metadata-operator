@@ -11,14 +11,14 @@ func init() {
 	Registry.Add(AM0006)
 }
 
-var AM0006 = types.Validator{
-	Code:        "AM0006",
-	Name:        "dms_snitchnamepostfix",
-	Description: "Ensure `deadmanssnitch.snitchNamePostFix` doesn't begin with 'hive-'",
-	Runner:      ValidateDmsSnitchNamePostFix,
-}
+var AM0006 = types.NewValidator(
+	"AM0006",
+	types.ValidateFunc(ValidateDmsSnitchNamePostFix),
+	types.ValidatorName("dms_snitchnamepostfix"),
+	types.ValidatorDescription("Ensure `deadmanssnitch.snitchNamePostFix` doesn't begin with 'hive-'"),
+)
 
-func ValidateDmsSnitchNamePostFix(mb types.MetaBundle) types.ValidatorResult {
+func ValidateDmsSnitchNamePostFix(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	dmsConf := mb.AddonMeta.DeadmansSnitch
 	if dmsConf == nil || dmsConf.SnitchNamePostFix == nil {
 		return Success()

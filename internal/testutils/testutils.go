@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 
 	"github.com/operator-framework/operator-registry/pkg/registry"
@@ -99,4 +100,12 @@ func NewBundle(name string, yamlFilePaths ...string) (registry.Bundle, error) {
 		objs = append(objs, &obj)
 	}
 	return *registry.NewBundle(name, &registry.Annotations{}, objs...), nil
+}
+
+func EmptyMetaBundle() types.MetaBundle {
+	return types.MetaBundle{
+		AddonMeta: &v1alpha1.AddonMetadataSpec{
+			ID: "random-operator",
+		},
+	}
 }

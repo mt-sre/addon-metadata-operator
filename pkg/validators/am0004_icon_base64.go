@@ -13,15 +13,15 @@ func init() {
 	Registry.Add(AM0004)
 }
 
-var AM0004 = types.Validator{
-	Code:        "AM0004",
-	Name:        "icon_base64",
-	Description: "Ensure that `icon` in Addon metadata is rightfully base64 encoded",
-	Runner:      ValidateIconBase64,
-}
+var AM0004 = types.NewValidator(
+	"AM0004",
+	types.ValidateFunc(ValidateIconBase64),
+	types.ValidatorName("icon_base64"),
+	types.ValidatorDescription("Ensure that `icon` in Addon metadata is rightfully base64 encoded"),
+)
 
 // ValidateIconBase64 validates 'icon' in the addon metadata is rightfully base64 encoded
-func ValidateIconBase64(mb types.MetaBundle) types.ValidatorResult {
+func ValidateIconBase64(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	icon := mb.AddonMeta.Icon
 	if icon == "" {
 		return Fail(fmt.Sprintf("`icon` not found under the addon metadata of %s", mb.AddonMeta.ID))

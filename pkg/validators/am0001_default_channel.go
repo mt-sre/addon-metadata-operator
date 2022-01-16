@@ -11,15 +11,15 @@ func init() {
 	Registry.Add(AM0001)
 }
 
-var AM0001 = types.Validator{
-	Code:        "AM0001",
-	Name:        "default_channel",
-	Description: "Ensure defaultChannel is present in list of channels",
-	Runner:      validateDefaultChannel,
-}
+var AM0001 = types.NewValidator(
+	"AM0001",
+	types.ValidateFunc(validateDefaultChannel),
+	types.ValidatorName("default_channel"),
+	types.ValidatorDescription("Ensure defaultChannel is present in list of channels"),
+)
 
 // validateDefaultChannel validates whether the 'defaultChannel' provided under an addon.yaml also exists under 'channels' field
-func validateDefaultChannel(mb types.MetaBundle) types.ValidatorResult {
+func validateDefaultChannel(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	defaultChannel := mb.AddonMeta.DefaultChannel
 	channels := mb.AddonMeta.Channels
 

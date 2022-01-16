@@ -52,6 +52,6 @@ func newTableRow(v types.Validator) []*simpletable.Cell {
 	return []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: v.Code},
 		{Align: simpletable.AlignLeft, Text: v.Name},
-		{Align: simpletable.AlignLeft, Text: v.Description},
+		{Align: simpletable.AlignLeft, Text: v.Desc},
 	}
 }

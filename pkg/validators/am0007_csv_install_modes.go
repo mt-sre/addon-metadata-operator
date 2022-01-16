@@ -14,14 +14,14 @@ func init() {
 	Registry.Add(AM0007)
 }
 
-var AM0007 = types.Validator{
-	Code:        "AM0007",
-	Name:        "csv_install_modes",
-	Description: "Validate installMode is supported.",
-	Runner:      validateCSVInstallModes,
-}
+var AM0007 = types.NewValidator(
+	"AM0007",
+	types.ValidateFunc(validateCSVInstallModes),
+	types.ValidatorName("csv_install_modes"),
+	types.ValidatorDescription("Validate installMode is supported."),
+)
 
-func validateCSVInstallModes(mb types.MetaBundle) types.ValidatorResult {
+func validateCSVInstallModes(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	installMode := mb.AddonMeta.InstallMode
 
 	for _, bundle := range mb.Bundles {

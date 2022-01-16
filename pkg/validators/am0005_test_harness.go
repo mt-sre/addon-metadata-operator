@@ -12,18 +12,18 @@ import (
 
 const quayRegistryApi = "https://quay.io/v2"
 
-var AM0005 = types.Validator{
-	Code:        "AM0005",
-	Name:        "test_harness",
-	Description: "Ensure that an addon has a valid testharness image",
-	Runner:      ValidateTestHarness,
-}
+var AM0005 = types.NewValidator(
+	"AM0005",
+	types.ValidateFunc(ValidateTestHarness),
+	types.ValidatorName("test_harness"),
+	types.ValidatorDescription("Ensure that an addon has a valid testharness image"),
+)
 
 func init() {
 	Registry.Add(AM0005)
 }
 
-func ValidateTestHarness(mb types.MetaBundle) types.ValidatorResult {
+func ValidateTestHarness(cfg types.ValidatorConfig, mb types.MetaBundle) types.ValidatorResult {
 	res, err := imageparser.Parse(mb.AddonMeta.TestHarness)
 	if err != nil {
 		return Fail("Failed to parse testharness url")

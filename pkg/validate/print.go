@@ -44,7 +44,7 @@ func newTableRow(v types.Validator, status, failureMsg string) []*simpletable.Ce
 		{Align: simpletable.AlignLeft, Text: status},
 		{Align: simpletable.AlignLeft, Text: v.Code},
 		{Align: simpletable.AlignLeft, Text: v.Name},
-		{Align: simpletable.AlignLeft, Text: v.Description},
+		{Align: simpletable.AlignLeft, Text: v.Desc},
 		{Align: simpletable.AlignLeft, Text: failureMsg},
 	}
 }

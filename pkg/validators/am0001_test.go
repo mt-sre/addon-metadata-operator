@@ -18,7 +18,7 @@ func (t TestAM0001) Name() string {
 }
 
 func (t TestAM0001) Run(mb types.MetaBundle) types.ValidatorResult {
-	return validators.AM0001.Runner(mb)
+	return validators.AM0001.Validate(mb)
 }
 
 func (t TestAM0001) SucceedingCandidates() ([]types.MetaBundle, error) {
