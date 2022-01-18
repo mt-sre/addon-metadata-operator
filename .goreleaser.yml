@@ -12,6 +12,8 @@ builds:
   - env:
       - CGO_ENABLED=1
       - GO111MODULE=on
+      # required by opm to extract sql-based catalog
+      - CGO_CFLAGS=-DSQLITE_ENABLE_JSON1
     goos:
       - linux
     goarch:

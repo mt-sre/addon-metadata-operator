@@ -19,6 +19,8 @@ E2E_MTCLI_PATH := $(CACHE)/mtcli
 
 # make prow to NOT expect this project to have vendoring
 GOFLAGS=
+# required by opm to extract sql-based catalog
+export CGO_CFLAGS := -DSQLITE_ENABLE_JSON1
 
 all: build
 
