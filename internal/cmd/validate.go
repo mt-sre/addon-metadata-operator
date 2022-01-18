@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -11,7 +10,6 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
 )
@@ -55,36 +53,34 @@ var (
 func validateMain(cmd *cobra.Command, args []string) {
 	addonDir, err := parseAddonDir(args[0])
 	if err != nil {
-		log.Fatalf("Could not parse addonDir, got %v.\n", err)
+		fail(1, "unable to parse the provided directory '%s': %v", args[0], err)
 	}
 
 	if err := verifyArgsAndFlags(addonDir); err != nil {
-		log.Fatalf("Could not validate CLI flags, got %v.\n", err)
+		fail(1, "unable to process flag or argument: %v", err)
 	}
-	loader := utils.NewMetaLoader(addonDir, validateEnv, validateVersion)
+
+	meta, err := utils.NewMetaLoader(addonDir, validateEnv, validateVersion).Load()
 	if err != nil {
-		log.Fatalf("Could not load the addonDir, got %v.", err)
-	}
-	meta, err := loader.Load()
-	if err != nil {
-		log.Fatalf("Could not load addon metadata from file %v, got %v.\n", addonDir, err)
+		fail(1, "unable to load addon metadata from file '%v': %v", addonDir, err)
 	}
 
 	bundles, err := utils.ExtractAndParseAddons(*meta.IndexImage, meta.OperatorName)
 	if err != nil {
-		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
+		fail(1, "unable to extract and parse bundles from the given index image: %v", err)
 	}
 
-	metaBundle := types.NewMetaBundle(meta, bundles)
 	filter, err := validate.NewFilter(validateDisabled, validateEnabled)
 	if err != nil {
-		log.Fatal(err)
+		fail(1, "unable to process filter flags: %v", err)
 	}
-	success, errs := validate.ValidateCLI(*metaBundle, filter)
+
+	success, errs := validate.ValidateCLI(*types.NewMetaBundle(meta, bundles), filter)
 	if len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
 		os.Exit(1)
 	}
+
 	if !success {
 		os.Exit(1)
 	}
@@ -95,6 +91,12 @@ func parseAddonDir(dir string) (string, error) {
 		return filepath.Abs(dir)
 	}
 	return dir, nil
+}
+
+func fail(code int, msg string, args ...interface{}) {
+	fmt.Printf("A fatal error occurred while preparing validations: "+msg+"\n", args...)
+
+	os.Exit(code)
 }
 
 func verifyArgsAndFlags(addonDir string) error {
@@ -111,17 +113,17 @@ func verifyArgsAndFlags(addonDir string) error {
 func verifyAddonDir(addonDir string) error {
 	dir, err := os.Stat(addonDir)
 	if err != nil {
-		return fmt.Errorf("Error while reading directory, got %v.\n", err)
+		return fmt.Errorf("error while reading directory: %w", err)
 	}
 	if !dir.IsDir() {
-		return errors.New("The provided path is not a directory. \n")
+		return fmt.Errorf("'%s' is not a directory", addonDir)
 	}
 	return nil
 }
 
 func verifyEnv(env string) error {
 	if env != "integration" && env != "stage" && env != "production" {
-		return fmt.Errorf("Invalid environment provided: %v. Needs to be one of 'integration', 'stage' or 'production'.\n", env)
+		return fmt.Errorf("'%s' is not a valid environment; must be one of 'integration', 'stage' or 'production'", env)
 	}
 	return nil
 }
@@ -134,7 +136,7 @@ func verifyVersion(version string) error {
 	// semver.IsValid(...) requires the following format vMAJOR.MINOR.PATCH
 	// so we temporarily prefix the 'v' character
 	if version != "latest" && !semver.IsValid(fmt.Sprintf("v%v", version)) {
-		return fmt.Errorf("Invalid addon version provided: %v. Needs to be either 'latest' or match 'MAJOR.MINOR.PATCH'.", version)
+		return fmt.Errorf("'%s' is not a valid version; must be one of 'latest' or match 'MAJOR.MINOR.PATCH'", version)
 	}
 	return nil
 }
