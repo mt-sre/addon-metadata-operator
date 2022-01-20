@@ -20,7 +20,7 @@ package v1alpha1
 
 import (
 	mtsrev1 "github.com/mt-sre/addon-metadata-operator/pkg/mtsre/v1"
-	v1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
