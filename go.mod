@@ -8,6 +8,7 @@ require (
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/fatih/color v1.13.0
 	github.com/novln/docker-parser v1.0.0
+	github.com/openshift-online/ocm-sdk-go v0.1.235
 	github.com/operator-framework/api v0.10.5
 	github.com/operator-framework/operator-registry v1.19.1
 	github.com/sirupsen/logrus v1.8.1
