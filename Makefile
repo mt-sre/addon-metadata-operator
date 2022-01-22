@@ -41,6 +41,7 @@ check: golangci-lint goimports ## Runs all checks.
 clean: ## Clean this directory
 	@if [ -f "$(KIND)" ]; then $(KIND) delete cluster --name $(KIND_CLUSTER_NAME); fi
 	@rm -fr $(CACHE) $(GOBIN) bin/* dist/ || true
+	@find . -type d -name "*index_tmp_*" -exec rm -fr {} +
 
 ##@ Build
 

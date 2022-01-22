@@ -1,7 +1,6 @@
 package extractor
 
 import (
-	"sort"
 	"sync"
 )
 
@@ -10,15 +9,16 @@ type indexMemoryCache struct {
 	store map[string]map[string][]string
 }
 
-// Simple in-memory cache to avoid extracting indexImages twice
-// Indexes first by indexImage, then by packageName
-func NewIndexMemoryCache() IndexExtractorCache {
+// NewIndexMemoryCache - in-memory cache for bundleImages. Indexes first by indexImage,
+// then by pkgName.
+func NewIndexMemoryCache() IndexCache {
 	return &indexMemoryCache{store: make(map[string]map[string][]string)}
 }
 
-func (c *indexMemoryCache) GetBundles(indexImage string, cacheKey string) []string {
+func (c *indexMemoryCache) GetBundleImages(indexImage string, cacheKey string) []string {
 	c.RLock()
 	defer c.RUnlock()
+
 	var res []string
 	if data, ok := c.store[indexImage]; ok {
 		for pkgName, bundles := range data {
@@ -30,13 +30,14 @@ func (c *indexMemoryCache) GetBundles(indexImage string, cacheKey string) []stri
 	if len(res) == 0 {
 		return nil
 	}
-	sort.Strings(res)
 	return res
 }
 
-func (c *indexMemoryCache) SetBundles(indexImage string, pkgBundlesMap map[string][]string) {
+// SetBundleImages - indexImages are mutable, so we always need to update the cache
+func (c *indexMemoryCache) SetBundleImages(indexImage string, pkgBundlesMap map[string][]string) {
 	c.Lock()
 	defer c.Unlock()
+
 	if _, ok := c.store[indexImage]; ok {
 		for pkgName, bundles := range pkgBundlesMap {
 			c.store[indexImage][pkgName] = bundles
