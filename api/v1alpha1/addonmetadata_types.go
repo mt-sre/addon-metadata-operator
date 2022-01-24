@@ -74,8 +74,8 @@ type AddonMetadataSpec struct {
 	TestHarness string `json:"testHarness" validate:"required"`
 
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum={AllNamespaces,SingleNamespace,OwnNamespace}
-	// OLM InstallMode for the addon operator. One of: AllNamespaces, SingleNamespace or OwnNamespace.
+	// +kubebuilder:validation:Enum={AllNamespaces,OwnNamespace}
+	// OLM InstallMode for the addon operator. One of: AllNamespaces or OwnNamespace.
 	InstallMode string `json:"installMode" validate:"required"`
 
 	// +kubebuilder:validation:Required
