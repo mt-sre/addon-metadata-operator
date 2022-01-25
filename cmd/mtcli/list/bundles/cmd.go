@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
 
 	"github.com/spf13/cobra"
 )
@@ -30,7 +30,8 @@ func Cmd() *cobra.Command {
 func run(cmd *cobra.Command, args []string) error {
 	indexImageURL := args[0]
 
-	allBundles, err := utils.ExtractAndParseAddons(indexImageURL, utils.AllAddonsIdentifier)
+	extractor := extractor.New()
+	allBundles, err := extractor.ExtractAllBundles(indexImageURL)
 	if err != nil {
 		return fmt.Errorf("extracting and parsing bundles from index image %q: %w", indexImageURL, err)
 	}

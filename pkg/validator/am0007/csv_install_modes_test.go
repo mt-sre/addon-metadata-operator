@@ -15,9 +15,6 @@ import (
 func TestCSVInstallModeValid(t *testing.T) {
 	t.Parallel()
 
-	testBundle, err := loadAM0007TestBundle()
-	require.NoError(t, err)
-
 	bundles, err := utils.DefaultValidBundleMap()
 	require.NoError(t, err)
 
@@ -26,16 +23,16 @@ func TestCSVInstallModeValid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "OwnNamespace",
 			},
-			Bundles: []registry.Bundle{
-				testBundle,
+			Bundles: []*registry.Bundle{
+				getTestBundle(t),
 			},
 		},
 		"AllNamespaces": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "AllNamespaces",
 			},
-			Bundles: []registry.Bundle{
-				testBundle,
+			Bundles: []*registry.Bundle{
+				getTestBundle(t),
 			},
 		},
 	} {
@@ -49,38 +46,40 @@ func TestCSVInstallModeValid(t *testing.T) {
 func TestCSVInstallModeInvalid(t *testing.T) {
 	t.Parallel()
 
-	testBundle, err := loadAM0007TestBundle()
-	require.NoError(t, err)
-
 	tester := utils.NewValidatorTester(t, NewCSVInstallModes)
 	tester.TestInvalidBundles(map[string]types.MetaBundle{
 		"invalid install mode": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "something",
 			},
-			Bundles: []registry.Bundle{
-				testBundle,
+			Bundles: []*registry.Bundle{
+				getTestBundle(t),
 			},
 		},
 		"invalid install mode/SingleNamespace": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "SingleNamespace",
 			},
-			Bundles: []registry.Bundle{
-				testBundle,
+			Bundles: []*registry.Bundle{
+				getTestBundle(t),
 			},
 		},
 		"invalid install mode/MultiNamespace": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "MultiNamespace",
 			},
-			Bundles: []registry.Bundle{
-				testBundle,
+			Bundles: []*registry.Bundle{
+				getTestBundle(t),
 			},
 		},
 	})
 }
 
-func loadAM0007TestBundle() (registry.Bundle, error) {
-	return testutils.NewBundle("random-bundle", filepath.Join(testutils.RootDir().TestData().Validators(), "am0007", "csv.yaml"))
+func getTestBundle(t *testing.T) *registry.Bundle {
+	t.Helper()
+
+	res, err := testutils.NewBundle("random-bundle", filepath.Join(testutils.RootDir().TestData().Validators(), "am0007", "csv.yaml"))
+	require.NoError(t, err)
+
+	return res
 }

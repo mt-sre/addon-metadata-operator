@@ -3,8 +3,8 @@ package am0012
 import (
 	"testing"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
 	"github.com/stretchr/testify/require"
 )
@@ -18,8 +18,9 @@ func TestCSVRBAC(t *testing.T) {
 }
 
 func TestCSVRBACInvalid(t *testing.T) {
-	invalidBundles, err := utils.ExtractAndParseAddons(
-		"quay.io/osd-addons/rhods-index@sha256:487e106059aea611af377985e6f30d7879bc36c4a16fe0f70531b7c1befd4675",
+	extractor := extractor.New()
+	invalidBundles, err := extractor.ExtractBundles(
+		"quay.io/osd-addons/rhods-index@sha256:94c934b33096b057c07a4ffb5ae59a6f0c7641fe45d71fc1283182f6c01a8ef3",
 		"rhods-operator",
 	)
 	require.NoError(t, err)

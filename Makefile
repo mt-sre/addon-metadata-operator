@@ -2,7 +2,7 @@
 .SHELLFLAGS=-euo pipefail -c
 SHELL := /bin/bash
 
-.PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e release release-snapshot build-release-container
+.PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e benchmark release release-snapshot build-release-container
 
 REPO := quay.io/mtsre/addon-metadata-operator
 TAG := $(shell git rev-parse --short HEAD)
@@ -32,6 +32,9 @@ test-e2e: ## Run e2e integration tests
 
 check: ## Runs all checks.
 	./mage check
+
+benchmark: ## Run all go benchmarks
+	@go test -bench=. -v -count 5 -run "Benchmark*" $(PKGS)
 
 clean: ## Clean this directory
 	@if [ -f "$(KIND)" ]; then $(KIND) delete cluster --name $(KIND_CLUSTER_NAME); fi
