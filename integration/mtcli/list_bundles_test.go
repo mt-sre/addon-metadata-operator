@@ -1,15 +1,12 @@
 package mtcli_test
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -22,14 +19,6 @@ func TestE2ETestSuite(t *testing.T) {
 	suite.Run(t, &e2eTestSuite{})
 }
 
-func (s *e2eTestSuite) TearDownSuite() {
-	// Remove cache directory
-	err := os.RemoveAll(utils.DefaultCacheDir)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to cleanup cache dirs")
-	}
-}
-
 func (s *e2eTestSuite) SetupSuite() {
 	s.mtcliPath = os.Getenv("E2E_MTCLI_PATH")
 	_, err := os.Stat(s.mtcliPath)
@@ -37,12 +26,13 @@ func (s *e2eTestSuite) SetupSuite() {
 }
 
 func (s *e2eTestSuite) TestMtcliListBundlesE2E() {
-	testCases := []struct {
-		indexImageUrl  string
+	type testCase struct {
+		indexImage     string
 		expectedOutput []string
-	}{
+	}
+	cases := []testCase{
 		{
-			indexImageUrl: "quay.io/osd-addons/reference-addon-index@sha256:b9e87a598e7fd6afb4bfedb31e4098435c2105cc8ebe33231c341e515ba9054d",
+			indexImage: "quay.io/osd-addons/reference-addon-index@sha256:b9e87a598e7fd6afb4bfedb31e4098435c2105cc8ebe33231c341e515ba9054d",
 			expectedOutput: []string{
 				"reference-addon.v0.1.0",
 				"reference-addon.v0.1.1",
@@ -53,7 +43,7 @@ func (s *e2eTestSuite) TestMtcliListBundlesE2E() {
 			},
 		},
 		{
-			indexImageUrl: "quay.io/osd-addons/ocs-converged-index@sha256:24c6519b0d109a8e1e5349706a95d05e268a74f7df8f9040fc3a805700169afe",
+			indexImage: "quay.io/osd-addons/ocs-converged-index@sha256:24c6519b0d109a8e1e5349706a95d05e268a74f7df8f9040fc3a805700169afe",
 			expectedOutput: []string{
 				"ocs-osd-deployer.v1.0.0",
 				"ocs-osd-deployer.v1.0.1",
@@ -64,39 +54,28 @@ func (s *e2eTestSuite) TestMtcliListBundlesE2E() {
 			},
 		},
 	}
-	for _, testCase := range testCases {
-		cmd := prepareListBundlesCmd(s.mtcliPath, testCase.indexImageUrl)
-		outBytes, err := cmd.CombinedOutput()
-		s.Require().NoError(err)
-		// remove last trailing newline
-		outString := strings.TrimSuffix(string(outBytes), "\n")
-		outLines := strings.Split(outString, "\n")
-		s.Equal(testCase.expectedOutput, outLines)
 
-		// ensure cache keys
-		cacheContents, err := readCacheFile(testCase.indexImageUrl)
-		s.Require().NoError(err)
-		s.Equal(cacheContents, expectedCacheValue(testCase.indexImageUrl))
+	var wg sync.WaitGroup
+	for _, tc := range cases {
+		wg.Add(1)
+		tc := tc // pin
+
+		go func(tc testCase) {
+			defer wg.Done()
+			cmd := prepareListBundlesCmd(s.mtcliPath, tc.indexImage)
+
+			// only look at stdout because OPM prints SQL-based catalog
+			// deprecation notice to stderr
+			outBytes, err := cmd.Output()
+			s.Require().NoError(err)
+
+			// remove last trailing newline
+			outString := strings.TrimSuffix(string(outBytes), "\n")
+			outLines := strings.Split(outString, "\n")
+			s.Equal(tc.expectedOutput, outLines)
+		}(tc)
 	}
-}
-
-func expectedCacheValue(indexImageUrl string) string {
-	return strings.Join(
-		[]string{indexImageUrl, utils.AllAddonsIdentifier},
-		"<>",
-	)
-}
-
-func readCacheFile(indexImageUrl string) (string, error) {
-	fileBytes, err := ioutil.ReadFile(filepath.Join(
-		utils.DefaultCacheDir,
-		indexImageUrl,
-		utils.DefaultCacheFileName,
-	))
-	if err != nil {
-		return "", err
-	}
-	return string(fileBytes), nil
+	wg.Wait()
 }
 
 func prepareListBundlesCmd(cliPath string, arg string) *exec.Cmd {

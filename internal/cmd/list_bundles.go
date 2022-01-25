@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
 
 	"github.com/spf13/cobra"
 )
@@ -29,11 +30,14 @@ var (
 )
 
 func listBundlesMain(cmd *cobra.Command, args []string) {
-	indexImageUrl := args[0]
-	allBundles, err := utils.ExtractAndParseAddons(indexImageUrl, utils.AllAddonsIdentifier)
+	indexImage := args[0]
+
+	extractor := extractor.New()
+	allBundles, err := extractor.ExtractAllBundles(indexImage)
 	if err != nil {
 		log.Fatalf("Failed to extract and parse bundles from the given index image: Error: %s \n", err.Error())
 	}
+
 	var operatorVersionedNames []string
 	for _, bundle := range allBundles {
 		csv, err := bundle.ClusterServiceVersion()
@@ -42,5 +46,7 @@ func listBundlesMain(cmd *cobra.Command, args []string) {
 		}
 		operatorVersionedNames = append(operatorVersionedNames, csv.GetName())
 	}
+
+	sort.Strings(operatorVersionedNames)
 	fmt.Println(strings.Join(operatorVersionedNames, "\n"))
 }

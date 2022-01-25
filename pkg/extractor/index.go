@@ -66,11 +66,12 @@ func (e *DefaultIndexExtractor) ExtractAllBundleImages(indexImage string) ([]str
 	return e.extractBundleImages(indexImage, allBundlesKey)
 }
 
-// listBundles - return a list of all bundleImages, sorted
+// listBundles - return a list of all bundleImages. Need to sort bundleImages
+// everytime as order might not be preserved in the cache.
 func (e *DefaultIndexExtractor) extractBundleImages(indexImage string, cacheKey string) ([]string, error) {
 	if bundleImages := e.Cache.GetBundleImages(indexImage, cacheKey); bundleImages != nil {
 		e.Log.Debugf("cache hit for '%s'", indexImage)
-		return bundleImages, nil
+		return sortedBundleImages(bundleImages), nil
 	}
 
 	e.Log.Debugf("cache miss for '%s'", indexImage)
@@ -83,7 +84,7 @@ func (e *DefaultIndexExtractor) extractBundleImages(indexImage string, cacheKey 
 	bundleImages, bundleImagesMap := parseBundles(cacheKey, data.Bundles)
 	e.Cache.SetBundleImages(indexImage, bundleImagesMap)
 
-	return bundleImages, nil
+	return sortedBundleImages(bundleImages), nil
 }
 
 func pkgNameFromCacheKey(cacheKey string) string {
@@ -103,6 +104,10 @@ func parseBundles(cacheKey string, bundles []model.Bundle) ([]string, map[string
 		}
 		bundleImages = append(bundleImages, b.Image)
 	}
-	sort.Strings(bundleImages)
 	return bundleImages, bundleImagesMap
+}
+
+func sortedBundleImages(bundleImages []string) []string {
+	sort.Strings(bundleImages)
+	return bundleImages
 }
