@@ -21,8 +21,24 @@ var AM0007 = types.Validator{
 	Runner:      validateCSVInstallModes,
 }
 
+var validInstallModes = []string{"AllNamespaces", "OwnNamespace"}
+
+func indexOf(element string, data []string) int {
+	for k, v := range data {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found.
+}
+
 func validateCSVInstallModes(mb types.MetaBundle) types.ValidatorResult {
 	installMode := mb.AddonMeta.InstallMode
+
+	// allow only AllNamespaces and OwnNamespace install mode.
+	if indexOf(installMode, validInstallModes) == -1 {
+		return Fail(fmt.Sprintf("unsupported install mode %v", installMode))
+	}
 
 	for _, bundle := range mb.Bundles {
 		bundleName, err := utils.GetBundleNameVersion(bundle)
@@ -31,10 +47,10 @@ func validateCSVInstallModes(mb types.MetaBundle) types.ValidatorResult {
 		}
 		spec, err := extractCSVSpec(bundle)
 		if err != nil {
-			return Error(fmt.Errorf("Can't extract CSV for %v, got %v.", bundleName, err))
+			return Error(fmt.Errorf("can't extract CSV for %v, got %v.", bundleName, err))
 		}
 		if success, failureMsg := isInstallModeSupported(spec.InstallModes, installMode); !success {
-			return Fail(fmt.Sprintf("Bundle %v failed CSV validation: %v.", bundleName, failureMsg))
+			return Fail(fmt.Sprintf("bundle %v failed CSV validation: %v.", bundleName, failureMsg))
 		}
 	}
 	return Success()
