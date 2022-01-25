@@ -25,3 +25,6 @@ testbin/*
 *.swo
 *~
 .vscode
+
+# make sure we ignore opm default tmpDirs
+index_tmp_*/
