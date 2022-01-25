@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/operator-framework/operator-registry/pkg/registry"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 type bundleMemoryCache struct {
@@ -59,10 +58,11 @@ func (c *bundleMemoryCache) Set(bundleImage string, bundle *registry.Bundle) err
 // serialization/deserialization of their bundles.
 // https://github.com/operator-framework/operator-registry/blob/master/pkg/registry/bundle.go#L103
 func hackSetCacheStaleToTrue(b *registry.Bundle) *registry.Bundle {
-	objs := b.Objects
-	b.Objects = []*unstructured.Unstructured{}
-	for _, o := range objs {
-		b.Add(o)
+	if len(b.Objects) == 0 {
+		return b
 	}
+	obj := b.Objects[0]
+	b.Objects = b.Objects[1:]
+	b.Add(obj)
 	return b
 }

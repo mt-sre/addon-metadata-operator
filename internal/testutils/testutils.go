@@ -89,14 +89,14 @@ func DefaultSucceedingCandidates() ([]types.MetaBundle, error) {
 	return res, nil
 }
 
-func NewBundle(name string, yamlFilePaths ...string) (registry.Bundle, error) {
+func NewBundle(name string, yamlFilePaths ...string) (*registry.Bundle, error) {
 	var objs []*unstructured.Unstructured
 	for _, path := range yamlFilePaths {
 		obj, err := YamlToDynamicObj(path)
 		if err != nil {
-			return registry.Bundle{}, fmt.Errorf("could not generate bundle: %v", err)
+			return nil, fmt.Errorf("could not generate bundle: %v", err)
 		}
 		objs = append(objs, &obj)
 	}
-	return *registry.NewBundle(name, &registry.Annotations{}, objs...), nil
+	return registry.NewBundle(name, &registry.Annotations{}, objs...), nil
 }

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
@@ -65,7 +66,8 @@ func validateMain(cmd *cobra.Command, args []string) {
 		fail(1, "unable to load addon metadata from file '%v': %v", addonDir, err)
 	}
 
-	bundles, err := utils.ExtractAndParseAddons(*meta.IndexImage, meta.OperatorName)
+	extractor := extractor.New()
+	bundles, err := extractor.ExtractBundles(*meta.IndexImage, meta.OperatorName)
 	if err != nil {
 		fail(1, "unable to extract and parse bundles from the given index image: %v", err)
 	}

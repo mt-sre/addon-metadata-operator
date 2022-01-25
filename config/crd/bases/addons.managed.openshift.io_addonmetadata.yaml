@@ -302,11 +302,10 @@ spec:
                 pattern: ^quay\.io/osd-addons/[a-z-]+
                 type: string
               installMode:
-                description: 'OLM InstallMode for the addon operator. One of: AllNamespaces,
-                  SingleNamespace or OwnNamespace.'
+                description: 'OLM InstallMode for the addon operator. One of: AllNamespaces
+                  or OwnNamespace.'
                 enum:
                 - AllNamespaces
-                - SingleNamespace
                 - OwnNamespace
                 type: string
               label:

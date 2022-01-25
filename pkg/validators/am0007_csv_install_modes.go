@@ -77,7 +77,7 @@ type CSVSpec struct {
 	InstallModes []operatorsv1alpha1.InstallMode `json:"installModes"`
 }
 
-func extractCSVSpec(b registry.Bundle) (*CSVSpec, error) {
+func extractCSVSpec(b *registry.Bundle) (*CSVSpec, error) {
 	csv, err := b.ClusterServiceVersion()
 	if err != nil {
 		return nil, err

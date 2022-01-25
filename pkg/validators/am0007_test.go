@@ -40,7 +40,7 @@ func (v TestAM0007) SucceedingCandidates() ([]types.MetaBundle, error) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "OwnNamespace",
 			},
-			Bundles: []registry.Bundle{
+			Bundles: []*registry.Bundle{
 				testBundle,
 			},
 		},
@@ -48,7 +48,7 @@ func (v TestAM0007) SucceedingCandidates() ([]types.MetaBundle, error) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "AllNamespaces",
 			},
-			Bundles: []registry.Bundle{
+			Bundles: []*registry.Bundle{
 				testBundle,
 			},
 		},
@@ -67,7 +67,7 @@ func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "something",
 			},
-			Bundles: []registry.Bundle{
+			Bundles: []*registry.Bundle{
 				testBundle,
 			},
 		},
@@ -75,7 +75,7 @@ func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "SingleNamespace",
 			},
-			Bundles: []registry.Bundle{
+			Bundles: []*registry.Bundle{
 				testBundle,
 			},
 		},
@@ -83,7 +83,7 @@ func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "MultiNamespace",
 			},
-			Bundles: []registry.Bundle{
+			Bundles: []*registry.Bundle{
 				testBundle,
 			},
 		},
@@ -91,6 +91,6 @@ func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
 	return res, nil
 }
 
-func loadAM0007TestBundle() (registry.Bundle, error) {
+func loadAM0007TestBundle() (*registry.Bundle, error) {
 	return testutils.NewBundle("random-bundle", path.Join(testutils.TestdataDir(), "assets/am0007/csv.yaml"))
 }

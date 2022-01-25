@@ -52,9 +52,10 @@ func TestExtractorFileBasedAndSQLCatalogs(t *testing.T) {
 			t.Parallel()
 			bundleImages, err := extractor.ExtractBundleImages(tc.indexImage, tc.pkgName)
 			require.NoError(t, err)
-			require.Equal(t, bundleImages, tc.expectedBundleImages)
+			require.ElementsMatch(t, bundleImages, tc.expectedBundleImages)
+
 			cachedBundleImages := cache.GetBundleImages(tc.indexImage, tc.pkgName)
-			require.Equal(t, cachedBundleImages, tc.expectedBundleImages)
+			require.ElementsMatch(t, cachedBundleImages, tc.expectedBundleImages)
 		})
 	}
 }
@@ -74,13 +75,13 @@ func TestIndexExtractorListAllBundles(t *testing.T) {
 			"quay.io/osd-addons/gpu-operator-nfd-operator-bundle:4.8.0-0ddc381",
 		},
 	}
-	expectedBundleImages := map[string]bool{
-		"quay.io/osd-addons/gpu-operator-bundle:1.7.1-0ddc381":              true,
-		"quay.io/osd-addons/gpu-operator-bundle:1.8.0-0ddc381":              true,
-		"quay.io/osd-addons/gpu-operator-bundle:1.8.2-0ddc381":              true,
-		"quay.io/osd-addons/gpu-operator-bundle:1.8.3-0ddc381":              true,
-		"quay.io/osd-addons/gpu-operator-bundle:1.9.0-beta-0ddc381":         true,
-		"quay.io/osd-addons/gpu-operator-nfd-operator-bundle:4.8.0-0ddc381": true,
+	expectedBundleImages := []string{
+		"quay.io/osd-addons/gpu-operator-bundle:1.7.1-0ddc381",
+		"quay.io/osd-addons/gpu-operator-bundle:1.8.0-0ddc381",
+		"quay.io/osd-addons/gpu-operator-bundle:1.8.2-0ddc381",
+		"quay.io/osd-addons/gpu-operator-bundle:1.8.3-0ddc381",
+		"quay.io/osd-addons/gpu-operator-bundle:1.9.0-beta-0ddc381",
+		"quay.io/osd-addons/gpu-operator-nfd-operator-bundle:4.8.0-0ddc381",
 	}
 	cache := NewIndexMemoryCache()
 	extractor := NewIndexExtractor(WithIndexCache(cache))
@@ -88,29 +89,18 @@ func TestIndexExtractorListAllBundles(t *testing.T) {
 	// test bundleImages for all packages are listed
 	bundleImages, err := extractor.ExtractAllBundleImages(indexImage)
 	require.NoError(t, err)
-	require.True(t, allBundleImagesListed(bundleImages, expectedBundleImages))
+	require.ElementsMatch(t, bundleImages, expectedBundleImages)
+
 	cachedBundleImages := cache.GetBundleImages(indexImage, allBundlesKey)
-	require.True(t, allBundleImagesListed(cachedBundleImages, expectedBundleImages))
+	require.ElementsMatch(t, cachedBundleImages, expectedBundleImages)
 
 	// test bundles have been cached per pkgName
 	for pkgName, expectedBundleImages := range bundleImagesMap {
 		bundleImages, err := extractor.ExtractBundleImages(indexImage, pkgName)
 		require.NoError(t, err)
-		require.Equal(t, bundleImages, expectedBundleImages)
-		cachedBundleImages := cache.GetBundleImages(indexImage, pkgName)
-		require.Equal(t, cachedBundleImages, expectedBundleImages)
-	}
-}
+		require.ElementsMatch(t, bundleImages, expectedBundleImages)
 
-// cache or indexImage list bundles in different order, using a map to avoid flakiness
-func allBundleImagesListed(bundleImages []string, expectedBundleImages map[string]bool) bool {
-	if len(bundleImages) != len(expectedBundleImages) {
-		return false
+		cachedBundleImages := cache.GetBundleImages(indexImage, pkgName)
+		require.ElementsMatch(t, cachedBundleImages, expectedBundleImages)
 	}
-	for _, image := range bundleImages {
-		if _, ok := expectedBundleImages[image]; !ok {
-			return false
-		}
-	}
-	return true
 }
