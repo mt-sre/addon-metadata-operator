@@ -39,7 +39,11 @@ func ValidateAddonParameters(mb types.MetaBundle) types.ValidatorResult {
 					return Error(fmt.Errorf("failed parse `validation` as regex: %w", err))
 				}
 				if !r.MatchString(*defaultValue) {
-					return Fail(fmt.Sprintf("defaultValue %s didn't match its validation", *defaultValue))
+					msg := fmt.Sprintf("defaultValue %s didn't match its validation", *defaultValue)
+					if param.ValidationErrMsg != nil {
+						return Fail(fmt.Sprintf("%s: %s", msg, *param.ValidationErrMsg))
+					}
+					return Fail(msg)
 				}
 				return Success()
 			}

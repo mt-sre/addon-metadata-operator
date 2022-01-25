@@ -28,6 +28,11 @@ func (in *AddOnParameter) DeepCopyInto(out *AddOnParameter) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ValidationErrMsg != nil {
+		in, out := &in.ValidationErrMsg, &out.ValidationErrMsg
+		*out = new(string)
+		**out = **in
+	}
 	if in.DefaultValue != nil {
 		in, out := &in.DefaultValue, &out.DefaultValue
 		*out = new(string)

@@ -34,8 +34,12 @@ type AddOnParameter struct {
 
 	// +optional
 	Validation *string `json:"validation"`
+
 	// +kubebuilder:validation:Required
 	Required bool `json:"required" validate:"required"`
+
+	// +optional
+	ValidationErrMsg *string `json:"validation_err_msg"`
 
 	// +kubebuilder:validation:Required
 	Editable bool `json:"editable" validate:"required"`

@@ -95,6 +95,8 @@ spec:
                       type: boolean
                     validation:
                       type: string
+                    validation_err_msg:
+                      type: string
                     value_type:
                       type: string
                   required:
