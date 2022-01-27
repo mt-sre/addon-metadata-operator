@@ -25,6 +25,19 @@ func (v Validator) WithRunner(fn ValidateFunc) Validator {
 	return v
 }
 
+// Run applies validation to the given MetaBundle returning a result
+// indicating whether the validation was successful, failed, or encountered
+// an error.
+func (v Validator) Run(mb MetaBundle) ValidatorResult {
+	res := v.Runner(mb)
+
+	res.ValidatorCode = v.Code
+	res.ValidatorDescription = v.Description
+	res.ValidatorName = v.Name
+
+	return res
+}
+
 // ValidatorList - implements Sort interface to sort validators per Code
 type ValidatorList []Validator
 
@@ -59,20 +72,42 @@ func NewMetaBundle(addonMeta *v1alpha1.AddonMetadataSpec, bundles []registry.Bun
 	}
 }
 
+// ValidatorResultSuccess returns an otherwise empty successful validator result.
+func ValidatorResultSuccess() ValidatorResult {
+	return ValidatorResult{success: true}
+}
+
+// ValidatorResultFailure returns a failed validator result with the given failure messagees.
+func ValidatorResultFailure(msgs ...string) ValidatorResult {
+	return ValidatorResult{FailureMsgs: msgs}
+}
+
+// ValidatorResultError returns an errored validator result with the given error
+// and flag to indicate whether the error may be retried.
+func ValidatorResultError(err error, retryable bool) ValidatorResult {
+	return ValidatorResult{Error: err, RetryableError: retryable}
+}
+
 // ValidatorResult - encompasses validator result information
 type ValidatorResult struct {
 	// true if MetaBundle validation was successful
-	Success bool
+	success bool
 	// "" if validation is successful, else information about why it failed
-	FailureMsg string
-	// retports error that happened in the validation code
+	FailureMsgs []string
+	// reports error that happened in the validation code
 	Error error
 	// if an error occured in the validation code, determines if it was retryable
 	RetryableError bool
+	// ValidatorCode is the code of the Validator which produced the result instance.
+	ValidatorCode string
+	// ValidatorDescription describes the Validator which produced the result instance.
+	ValidatorDescription string
+	// ValidatorName is the name of the Validator which produced the result instance.
+	ValidatorName string
 }
 
 func (vr ValidatorResult) IsSuccess() bool {
-	return vr.Error == nil && vr.FailureMsg == ""
+	return vr.success
 }
 
 func (vr ValidatorResult) IsError() bool {
