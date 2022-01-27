@@ -3,56 +3,41 @@ package types
 import (
 	"fmt"
 	"sort"
+
+	rbac "k8s.io/api/rbac/v1"
 )
 
-type CsvPermissions struct {
-	ClusterPermissions []Permissions `json:"clusterPermissions"`
-	Permissions        []Permissions `json:"permissions"`
+type CSVPermissions struct {
+	ClusterPermissions []Permission `json:"clusterPermissions"`
+	Permissions        []Permission `json:"permissions"`
 }
 
-type Permissions struct {
-	ServiceAccount string `json:"serviceAccount"`
-	Rules          []Rule `json:"rules"`
+type Permission struct {
+	ServiceAccountName string
+	Rules              []Rule
 }
 
 type Rule struct {
-	name            string   // used in tests
-	ApiGroups       []string `json:"apiGroups"`
-	Resources       []string `json:"resources"`
-	Verbs           []string `json:"verbs"`
-	ResourceNames   []string `json:"resourceNames"`
-	NonResourceURLs []string `json:"nonResourceURLs"`
+	rbac.PolicyRule
+	name string // Used in tests
 }
-
-type operator string
-
-type permissionType string
 
 type RuleFilter struct {
-	PermissionType           permissionType
-	ApiGroupFilterObj        *FilterObj
-	ResourcesFilterObj       *FilterObj
-	VerbsFilterObj           *FilterObj
-	ResourceNamesFilterObj   *FilterObj
-	NonResourceURLsFilterObj *FilterObj
+	PermissionType permissionType
+	Filters        []Filter
 }
-
-type FilterObj struct {
+type FilterParams struct {
 	Args         []string
 	OperatorName operator
 }
 
-type filterFunc func(*Rule, RuleFilter) *Rule
+type Filter interface {
+	Filter(*rbac.PolicyRule) *rbac.PolicyRule
+}
+
+type operator string
 
 const (
-	apiGroupFilterType        = "apiGroupFilter"
-	resourcesFilterType       = "resourcesFilter"
-	verbsFilterType           = "verbsFilter"
-	resourceNamesFilterType   = "resourceNamesFilter"
-	nonResourceURLsFilterType = "nonResourceURLsFilter"
-)
-
-var (
 	InOperator           operator = "IN"
 	NotInOperator        operator = "NOT_IN"
 	EqualsOperator       operator = "EQUAL"
@@ -62,105 +47,80 @@ var (
 	AnyOperator          operator = "ANY"
 )
 
-var (
+type permissionType string
+
+const (
 	AllPermissionType        permissionType = "all"
 	NameSpacedPermissionType permissionType = "namespaced"
 	ClusterPermissionType    permissionType = "clusterScoped"
 )
 
-func genFilter(attrFetcher func(*Rule) []string, filterType string) filterFunc {
-	return func(rule *Rule, filter RuleFilter) *Rule {
-		args := attrFetcher(rule)
-		filterObj := func() *FilterObj {
-			switch filterType {
-			case apiGroupFilterType:
-				return filter.ApiGroupFilterObj
-			case resourcesFilterType:
-				return filter.ResourcesFilterObj
-			case verbsFilterType:
-				return filter.VerbsFilterObj
-			case resourceNamesFilterType:
-				return filter.ResourceNamesFilterObj
-			case nonResourceURLsFilterType:
-				return filter.NonResourceURLsFilterObj
-			default:
-				panic("Unsupported filter type")
-			}
-		}()
-		if eval(args, filterObj) {
-			return rule
-		}
-		// Return nil if the rule doesnt match the filtering condition.
-		return nil
-	}
+type APIGroupFilter struct {
+	Params FilterParams
 }
 
-var (
-	apiGroupFilter = genFilter(
-		func(r *Rule) []string {
-			if r != nil {
-				return r.ApiGroups
-			}
-			return []string{}
-		},
-		apiGroupFilterType,
-	)
-	resourcesFilter = genFilter(
-		func(r *Rule) []string {
-			if r != nil {
-				return r.Resources
-			}
-			return []string{}
-		},
-		resourcesFilterType,
-	)
-	verbsFilter = genFilter(
-		func(r *Rule) []string {
-			if r != nil {
-				return r.Verbs
-			}
-			return []string{}
-		},
-		verbsFilterType,
-	)
-	resourceNamesFilter = genFilter(
-		func(r *Rule) []string {
-			if r != nil {
-				return r.ResourceNames
-			}
-			return []string{}
-		},
-		resourceNamesFilterType,
-	)
-	nonResourceURLsFilter = genFilter(
-		func(r *Rule) []string {
-			if r != nil {
-				return r.NonResourceURLs
-			}
-			return []string{}
-		},
-		nonResourceURLsFilterType,
-	)
-)
+func (f *APIGroupFilter) Filter(rule *rbac.PolicyRule) *rbac.PolicyRule {
+	concernedRuleAttrs := rule.APIGroups
+	if eval(concernedRuleAttrs, f.Params) {
+		return rule
+	}
+	return nil
+}
+
+type ResourcesFilter struct {
+	Params FilterParams
+}
+
+func (f *ResourcesFilter) Filter(rule *rbac.PolicyRule) *rbac.PolicyRule {
+	concernedRuleAttrs := rule.Resources
+	if eval(concernedRuleAttrs, f.Params) {
+		return rule
+	}
+	return nil
+}
+
+type ResourceNamesFilter struct {
+	Params FilterParams
+}
+
+func (f *ResourceNamesFilter) Filter(rule *rbac.PolicyRule) *rbac.PolicyRule {
+	concernedRuleAttrs := rule.ResourceNames
+	if eval(concernedRuleAttrs, f.Params) {
+		return rule
+	}
+	return nil
+}
+
+type VerbsFilter struct {
+	Params FilterParams
+}
+
+func (f *VerbsFilter) Filter(rule *rbac.PolicyRule) *rbac.PolicyRule {
+	concernedRuleAttrs := rule.Verbs
+	if eval(concernedRuleAttrs, f.Params) {
+		return rule
+	}
+	return nil
+}
+
+type NonResourceURLsFilter struct {
+	Params FilterParams
+}
+
+func (f *NonResourceURLsFilter) Filter(rule *rbac.PolicyRule) *rbac.PolicyRule {
+	concernedRuleAttrs := rule.NonResourceURLs
+	if eval(concernedRuleAttrs, f.Params) {
+		return rule
+	}
+	return nil
+}
 
 // Returns the list of rules matching the filtering conditions
-func (cp CsvPermissions) FilterRules(ruleMatcher RuleFilter) []Rule {
-	concernedPermissionRules := func() []Permissions {
-		switch ruleMatcher.PermissionType {
-		case AllPermissionType:
-			return append(cp.ClusterPermissions, cp.Permissions...)
-		case NameSpacedPermissionType:
-			return cp.Permissions
-		case ClusterPermissionType:
-			return cp.ClusterPermissions
-		default:
-			return []Permissions{}
-		}
-	}()
+func (cp *CSVPermissions) FilterRules(ruleFilter RuleFilter) []Rule {
 	filteredRules := make([]Rule, 0)
-	for _, permissionRule := range concernedPermissionRules {
+	for _, permissionRule := range ruleFilter.GetRelevantPermissions(cp) {
 		for _, rule := range permissionRule.Rules {
-			res := runFilters(getAllAttributeFilters(), &rule, ruleMatcher)
+			res := ruleFilter.Run(&rule.PolicyRule)
 			if res != nil {
 				filteredRules = append(filteredRules, rule)
 			}
@@ -170,27 +130,35 @@ func (cp CsvPermissions) FilterRules(ruleMatcher RuleFilter) []Rule {
 	return filteredRules
 }
 
-func runFilters(filters []filterFunc, rule *Rule, condition RuleFilter) *Rule {
-	if len(filters) == 0 || rule == nil {
+func (r *RuleFilter) Run(rule *rbac.PolicyRule) *rbac.PolicyRule {
+	if len(r.Filters) == 0 || rule == nil {
 		return rule
 	}
 
-	for _, filter := range filters {
-		res := filter(rule, condition)
-		if res == nil {
-			return nil
+	for _, f := range r.Filters {
+		if res := f.Filter(rule); res != nil {
+			continue
 		}
+
+		return nil
 	}
+
 	return rule
 }
 
-func getAllAttributeFilters() []filterFunc {
-	return []filterFunc{
-		apiGroupFilter,
-		resourcesFilter,
-		verbsFilter,
-		resourceNamesFilter,
-		nonResourceURLsFilter,
+func (r *RuleFilter) GetRelevantPermissions(cp *CSVPermissions) []Permission {
+	switch r.PermissionType {
+	case AllPermissionType:
+		res := make([]Permission, 0)
+		res = append(res, cp.ClusterPermissions...)
+		res = append(res, cp.Permissions...)
+		return res
+	case NameSpacedPermissionType:
+		return cp.Permissions
+	case ClusterPermissionType:
+		return cp.ClusterPermissions
+	default:
+		return []Permission{}
 	}
 }
 
@@ -208,11 +176,16 @@ func equal(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	sort.Strings(a)
-	sort.Strings(b)
+	// Needed for thread safety.
+	copyA := make([]string, len(a))
+	copyB := make([]string, len(b))
+	copy(copyA, a)
+	copy(copyB, b)
+	sort.Strings(copyA)
+	sort.Strings(copyB)
 
-	for index := range a {
-		if a[index] != b[index] {
+	for index := range copyA {
+		if copyA[index] != copyB[index] {
 			return false
 		}
 	}
@@ -238,26 +211,23 @@ func sliceToSet(items []string) map[string]struct{} {
 	return res
 }
 
-func eval(ruleArgs []string, filterObj *FilterObj) bool {
-	if filterObj == nil {
-		return true
-	}
-	switch filterObj.OperatorName {
+func eval(ruleArgs []string, params FilterParams) bool {
+	switch params.OperatorName {
 	case InOperator:
-		return includes(ruleArgs, filterObj.Args)
+		return includes(ruleArgs, params.Args)
 	case NotInOperator:
-		return !includes(ruleArgs, filterObj.Args)
+		return !includes(ruleArgs, params.Args)
 	case EqualsOperator:
-		return equal(ruleArgs, filterObj.Args)
+		return equal(ruleArgs, params.Args)
 	case NotEqualOperator:
-		return !equal(ruleArgs, filterObj.Args)
+		return !equal(ruleArgs, params.Args)
 	case ExistsOperator:
 		return len(ruleArgs) > 0
 	case DoesNotExistOperator:
 		return len(ruleArgs) == 0
 	case AnyOperator:
-		return any(ruleArgs, filterObj.Args)
+		return any(ruleArgs, params.Args)
 	default:
-		panic(fmt.Sprintf("eval: Unsupported operator %s", filterObj.OperatorName))
+		panic(fmt.Sprintf("eval: Unsupported operator %s", params.OperatorName))
 	}
 }

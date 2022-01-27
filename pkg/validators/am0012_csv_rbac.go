@@ -32,10 +32,6 @@ func validateCsvRbac(mb types.MetaBundle) types.ValidatorResult {
 	if err != nil {
 		return Error(err)
 	}
-	if err != nil {
-		return Error(err)
-	}
-
 	apisOwnedByOperator, err := csvutils.GetApisOwned(csv)
 	if err != nil {
 		return Error(err)
@@ -59,6 +55,7 @@ func validateCsvRbac(mb types.MetaBundle) types.ValidatorResult {
 	if err != nil {
 		return Error(err)
 	}
+
 	if len(validationErrors) == 0 {
 		return Success()
 	}
@@ -66,7 +63,7 @@ func validateCsvRbac(mb types.MetaBundle) types.ValidatorResult {
 	return Fail(failureMsg)
 }
 
-func validateApiGroups(permissions *types.CsvPermissions, existingValidationErrs []string) ([]string, error) {
+func validateApiGroups(permissions *types.CSVPermissions, existingValidationErrs []string) ([]string, error) {
 	if csvutils.WildCardApiGroupPresent(permissions) {
 		errorMsg := "Wild card string used under api group/s"
 		return append(existingValidationErrs, errorMsg), nil
@@ -74,7 +71,7 @@ func validateApiGroups(permissions *types.CsvPermissions, existingValidationErrs
 	return existingValidationErrs, nil
 }
 
-func validateWildcardInResources(csvPermissions *types.CsvPermissions,
+func validateWildcardInResources(csvPermissions *types.CSVPermissions,
 	apisOwnedByOperator []string,
 	existingValidationErrs []string) ([]string, error) {
 	if csvutils.WildCardResourcePresent(csvPermissions, apisOwnedByOperator) {
@@ -84,7 +81,7 @@ func validateWildcardInResources(csvPermissions *types.CsvPermissions,
 	return existingValidationErrs, nil
 }
 
-func validateConfidentialObjAccessAtClusterScope(csvPermissions *types.CsvPermissions,
+func validateConfidentialObjAccessAtClusterScope(csvPermissions *types.CSVPermissions,
 	existingValidationErrs []string) ([]string, error) {
 	if csvutils.CheckForConfidentialObjAccessAtClusterScope(csvPermissions) {
 		errorMsg := "config maps/Secrets access rules present at the cluster scope"

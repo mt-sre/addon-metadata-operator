@@ -3,43 +3,51 @@ package types
 import (
 	"testing"
 
+	rbac "k8s.io/api/rbac/v1"
+
 	"github.com/stretchr/testify/require"
 )
 
 func TestFilterRules(t *testing.T) {
-	inputRbacRules := CsvPermissions{
-		ClusterPermissions: []Permissions{
+	inputRbacRules := CSVPermissions{
+		ClusterPermissions: []Permission{
 			{
 				Rules: []Rule{
 					{
-						name:            "rule-1",
-						ApiGroups:       []string{"api_group_1"},
-						Resources:       []string{"resource_1"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample1"},
-						NonResourceURLs: []string{},
+						name: "rule-1",
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_1"},
+							Resources:       []string{"resource_1"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample1"},
+							NonResourceURLs: []string{},
+						},
 					},
 					{
-						name:            "rule-2",
-						ApiGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
-						Resources:       []string{"resource_2", "resource_3", "*"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample2", "sample3"},
-						NonResourceURLs: []string{},
+						name: "rule-2",
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
+							Resources:       []string{"resource_2", "resource_3", "*"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample2", "sample3"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
-		Permissions: []Permissions{
+		Permissions: []Permission{
 			{
 				Rules: []Rule{
 					{
-						name:            "rule-3",
-						ApiGroups:       []string{"api_group_4"},
-						Resources:       []string{"resource_5"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample4"},
-						NonResourceURLs: []string{"port-forward"},
+						name: "rule-3",
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_4"},
+							Resources:       []string{"resource_5"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample4"},
+							NonResourceURLs: []string{"port-forward"},
+						},
 					},
 				},
 			},
@@ -52,9 +60,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1"},
-					OperatorName: InOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1"},
+							OperatorName: InOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-1", "rule-2"},
@@ -62,9 +74,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_10"},
-					OperatorName: InOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_10"},
+							OperatorName: InOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{},
@@ -72,9 +88,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1"},
-					OperatorName: NotInOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1"},
+							OperatorName: NotInOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-3"},
@@ -82,9 +102,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ResourceNamesFilterObj: &FilterObj{
-					Args:         []string{"sample1"},
-					OperatorName: InOperator,
+				Filters: []Filter{
+					&ResourceNamesFilter{
+						Params: FilterParams{
+							Args:         []string{"sample1"},
+							OperatorName: InOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-1"},
@@ -92,9 +116,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1"},
-					OperatorName: NotEqualOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1"},
+							OperatorName: NotEqualOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-2", "rule-3"},
@@ -102,9 +130,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1", "api_group_3", "api_group_2"},
-					OperatorName: EqualsOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1", "api_group_3", "api_group_2"},
+							OperatorName: EqualsOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-2"},
@@ -112,9 +144,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1", "api_group_3", "api_group_2"},
-					OperatorName: EqualsOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1", "api_group_3", "api_group_2"},
+							OperatorName: EqualsOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-2"},
@@ -122,9 +158,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				NonResourceURLsFilterObj: &FilterObj{
-					Args:         []string{},
-					OperatorName: ExistsOperator,
+				Filters: []Filter{
+					&NonResourceURLsFilter{
+						Params: FilterParams{
+							Args:         []string{},
+							OperatorName: ExistsOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-3"},
@@ -132,9 +172,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				NonResourceURLsFilterObj: &FilterObj{
-					Args:         []string{},
-					OperatorName: DoesNotExistOperator,
+				Filters: []Filter{
+					&NonResourceURLsFilter{
+						Params: FilterParams{
+							Args:         []string{},
+							OperatorName: DoesNotExistOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-1", "rule-2"},
@@ -142,9 +186,13 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: NameSpacedPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1"},
-					OperatorName: InOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1"},
+							OperatorName: InOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{},
@@ -152,13 +200,19 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1"},
-					OperatorName: InOperator,
-				},
-				ResourcesFilterObj: &FilterObj{
-					Args:         []string{"*"},
-					OperatorName: InOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1"},
+							OperatorName: InOperator,
+						},
+					},
+					&ResourcesFilter{
+						Params: FilterParams{
+							Args:         []string{"*"},
+							OperatorName: InOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-2"},
@@ -166,25 +220,50 @@ func TestFilterRules(t *testing.T) {
 		{
 			input: RuleFilter{
 				PermissionType: AllPermissionType,
-				ApiGroupFilterObj: &FilterObj{
-					Args:         []string{"api_group_1"},
-					OperatorName: NotEqualOperator,
-				},
-				VerbsFilterObj: &FilterObj{
-					Args:         []string{"*"},
-					OperatorName: InOperator,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_1"},
+							OperatorName: NotEqualOperator,
+						},
+					},
+					&VerbsFilter{
+						Params: FilterParams{
+							Args:         []string{"*"},
+							OperatorName: InOperator,
+						},
+					},
 				},
 			},
 			expectedOutput: []string{"rule-2", "rule-3"},
 		},
+		{
+			input: RuleFilter{
+				PermissionType: AllPermissionType,
+				Filters: []Filter{
+					&APIGroupFilter{
+						Params: FilterParams{
+							Args:         []string{"api_group_3", "api_group_1"},
+							OperatorName: AnyOperator,
+						},
+					},
+				},
+			},
+			expectedOutput: []string{"rule-1", "rule-2"},
+		},
 	}
 
 	for _, testCase := range filterCases {
-		res := inputRbacRules.FilterRules(testCase.input)
-		resRuleNames := make([]string, 0)
-		for _, item := range res {
-			resRuleNames = append(resRuleNames, item.name)
-		}
-		require.Equal(t, testCase.expectedOutput, resRuleNames)
+		tc := testCase
+		t.Run("TestFilterRules",
+			func(t *testing.T) {
+				t.Parallel()
+				res := inputRbacRules.FilterRules(tc.input)
+				resRuleNames := make([]string, 0)
+				for _, item := range res {
+					resRuleNames = append(resRuleNames, item.name)
+				}
+				require.Equal(t, tc.expectedOutput, resRuleNames)
+			})
 	}
 }

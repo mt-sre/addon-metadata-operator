@@ -5,76 +5,87 @@ import (
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/stretchr/testify/require"
+	rbac "k8s.io/api/rbac/v1"
 )
 
 func TestWildCardApiGroupPresent(t *testing.T) {
-	rule1 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule1 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-						ApiGroups:       []string{"api_group_1"},
-						Resources:       []string{"resource_1"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample1"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_1"},
+							Resources:       []string{"resource_1"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample1"},
+							NonResourceURLs: []string{},
+						},
 					},
 					{
-
-						ApiGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
-						Resources:       []string{"resource_2", "resource_3", "*"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample2", "sample3"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
+							Resources:       []string{"resource_2", "resource_3", "*"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample2", "sample3"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
-		Permissions: []types.Permissions{
+		Permissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-						ApiGroups:       []string{"*"},
-						Resources:       []string{"resource_5"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample4"},
-						NonResourceURLs: []string{"port-forward"},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"*"},
+							Resources:       []string{"resource_5"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample4"},
+							NonResourceURLs: []string{"port-forward"},
+						},
 					},
 				},
 			},
 		},
 	}
-	rule2 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule2 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-						ApiGroups:       []string{"api_group_1"},
-						Resources:       []string{"resource_1"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample1"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_1"},
+							Resources:       []string{"resource_1"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample1"},
+							NonResourceURLs: []string{},
+						},
 					},
 					{
-
-						ApiGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
-						Resources:       []string{"resource_2", "resource_3", "*"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample2", "sample3"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
+							Resources:       []string{"resource_2", "resource_3", "*"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample2", "sample3"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
-		Permissions: []types.Permissions{
+		Permissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-						ApiGroups:       []string{"api_group_4"},
-						Resources:       []string{"resource_5"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample4"},
-						NonResourceURLs: []string{"port-forward"},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_4"},
+							Resources:       []string{"resource_5"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample4"},
+							NonResourceURLs: []string{"port-forward"},
+						},
 					},
 				},
 			},
@@ -82,7 +93,7 @@ func TestWildCardApiGroupPresent(t *testing.T) {
 	}
 
 	testCases := []struct {
-		input          types.CsvPermissions
+		input          types.CSVPermissions
 		expectedOutput bool
 	}{
 		{
@@ -96,54 +107,65 @@ func TestWildCardApiGroupPresent(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := WildCardApiGroupPresent(&testCase.input)
-		require.Equal(t, testCase.expectedOutput, res)
+		tc := testCase // pin
+		t.Run(
+			"TestWildCardApiGroupPresent",
+			func(t *testing.T) {
+				t.Parallel()
+				res := WildCardApiGroupPresent(&tc.input)
+				require.Equal(t, tc.expectedOutput, res)
+			},
+		)
 	}
 }
 
 func TestWildCardResourcePresent(t *testing.T) {
-	rule1 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule1 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-						ApiGroups:       []string{"api_group_1"},
-						Resources:       []string{"*"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample1"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_1"},
+							Resources:       []string{"*"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample1"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
 	}
-	rule2 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule2 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-
-						ApiGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
-						Resources:       []string{"*"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample2", "sample3"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{"api_group_2", "api_group_3", "api_group_1"},
+							Resources:       []string{"*"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample2", "sample3"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
 	}
 
-	rule3 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule3 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-
-						ApiGroups:       []string{""},
-						Resources:       []string{"*"},
-						Verbs:           []string{"*"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{""},
+							Resources:       []string{"*"},
+							Verbs:           []string{"*"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
@@ -151,7 +173,7 @@ func TestWildCardResourcePresent(t *testing.T) {
 	}
 
 	testCases := []struct {
-		inputRule      types.CsvPermissions
+		inputRule      types.CSVPermissions
 		ownedApis      []string
 		expectedOutput bool
 	}{
@@ -173,85 +195,98 @@ func TestWildCardResourcePresent(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := WildCardResourcePresent(&testCase.inputRule, testCase.ownedApis)
-		require.Equal(t, testCase.expectedOutput, res)
+		tc := testCase
+		t.Run(
+			"TestWildCardResourcePresent",
+			func(t *testing.T) {
+				t.Parallel()
+				res := WildCardResourcePresent(&tc.inputRule, tc.ownedApis)
+				require.Equal(t, tc.expectedOutput, res)
+			},
+		)
 	}
 }
 
 func TestCheckForConfidentialObjAccessAtClusterScope(t *testing.T) {
-	rule1 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule1 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-						ApiGroups:       []string{""},
-						Resources:       []string{"pods", "secrets", "configmaps"},
-						Verbs:           []string{"*"},
-						ResourceNames:   []string{"sample1"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{""},
+							Resources:       []string{"pods", "secrets", "configmaps"},
+							Verbs:           []string{"*"},
+							ResourceNames:   []string{"sample1"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
 	}
-	rule2 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule2 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-
-						ApiGroups:       []string{""},
-						Resources:       []string{"secrets"},
-						Verbs:           []string{"read"},
-						NonResourceURLs: []string{},
-					},
-				},
-			},
-		},
-	}
-
-	rule3 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
-			{
-				Rules: []types.Rule{
-					{
-
-						ApiGroups:       []string{""},
-						Resources:       []string{"configmaps"},
-						Verbs:           []string{"update"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{""},
+							Resources:       []string{"secrets"},
+							Verbs:           []string{"read"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
 	}
 
-	rule4 := types.CsvPermissions{
-		ClusterPermissions: []types.Permissions{
+	rule3 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
-
-						ApiGroups:       []string{""},
-						Resources:       []string{"configmaps", "secrets"},
-						Verbs:           []string{"update"},
-						NonResourceURLs: []string{},
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{""},
+							Resources:       []string{"configmaps"},
+							Verbs:           []string{"update"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
 		},
 	}
 
-	rule5 := types.CsvPermissions{
-		Permissions: []types.Permissions{
+	rule4 := types.CSVPermissions{
+		ClusterPermissions: []types.Permission{
 			{
 				Rules: []types.Rule{
 					{
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{""},
+							Resources:       []string{"configmaps", "secrets"},
+							Verbs:           []string{"update"},
+							NonResourceURLs: []string{},
+						},
+					},
+				},
+			},
+		},
+	}
 
-						ApiGroups:       []string{""},
-						Resources:       []string{"configmaps", "secrets"},
-						Verbs:           []string{"update"},
-						NonResourceURLs: []string{},
+	rule5 := types.CSVPermissions{
+		Permissions: []types.Permission{
+			{
+				Rules: []types.Rule{
+					{
+						PolicyRule: rbac.PolicyRule{
+							APIGroups:       []string{""},
+							Resources:       []string{"configmaps", "secrets"},
+							Verbs:           []string{"update"},
+							NonResourceURLs: []string{},
+						},
 					},
 				},
 			},
@@ -259,7 +294,7 @@ func TestCheckForConfidentialObjAccessAtClusterScope(t *testing.T) {
 	}
 
 	testCases := []struct {
-		inputRule      types.CsvPermissions
+		inputRule      types.CSVPermissions
 		expectedOutput bool
 	}{
 		{
@@ -285,7 +320,14 @@ func TestCheckForConfidentialObjAccessAtClusterScope(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := CheckForConfidentialObjAccessAtClusterScope(&testCase.inputRule)
-		require.Equal(t, testCase.expectedOutput, res)
+		tc := testCase
+		t.Run(
+			"TestCheckForConfidentialObjAccessAtClusterScope",
+			func(t *testing.T) {
+				t.Parallel()
+				res := CheckForConfidentialObjAccessAtClusterScope(&tc.inputRule)
+				require.Equal(t, tc.expectedOutput, res)
+			},
+		)
 	}
 }
