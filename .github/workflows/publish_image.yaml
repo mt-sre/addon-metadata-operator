@@ -1,0 +1,60 @@
+---
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  release:
+    types:
+    - released
+
+env:
+  REPOSITORY: quay.io/mtsre/mtcli
+
+jobs:
+  publish-image:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log into registry.redhat.io
+      uses: docker/login-action@master
+      with:
+        registry: registry.redhat.io
+        username: ${{secrets.REDHAT_REGISTRY_USERNAME}}
+        password: ${{secrets.REDHAT_REGISTRY_PASSWORD}}
+
+    - name: Build image
+      run: |-
+        docker build -t ${{env.REPOSITORY}}:latest -f Dockerfile.build .
+
+    - name: Log into quay.io
+      uses: docker/login-action@master
+      with:
+        registry: quay.io
+        username: ${{secrets.QUAY_REGISTRY_USERNAME}}
+        password: ${{secrets.QUAY_REGISTRY_PASSWORD}}
+
+    - name: Push the latest image to quay.io
+      run:  |-
+        docker push ${{env.REPOSITORY}}:latest
+        docker tag ${{env.REPOSITORY}}:latest ${{env.REPOSITORY}}:${{github.sha}}
+        docker push ${{env.REPOSITORY}}:${{github.sha}}
+
+    - name: Push the commit-tagged image to quay.io
+      run:  |-
+        docker tag ${{env.REPOSITORY}}:latest ${{env.REPOSITORY}}:${{github.sha}}
+        docker push ${{env.REPOSITORY}}:${{github.sha}}
+
+    - name: Push the latest release image upon release
+      if: ${{github.ref_type == 'tag'}}
+      run: |-
+        docker tag ${{env.REPOSITORY}}:latest ${{env.REPOSITORY}}:stable-latest
+        docker push ${{env.REPOSITORY}}:stable-latest
+        docker tag ${{env.REPOSITORY}}:latest ${{env.REPOSITORY}}:${{github.ref_name}}
+        docker push ${{env.REPOSITORY}}:${{github.ref_name}}
