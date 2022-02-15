@@ -1,5 +1,5 @@
 # vi: set ft=dockerfile:
-FROM registry.redhat.io/rhel8/go-toolset:1.16
+FROM quay.io/app-sre/ubi8-go-toolset:1.16.12-4
 
 USER root
 
