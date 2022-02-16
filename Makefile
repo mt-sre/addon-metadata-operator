@@ -4,7 +4,7 @@ SHELL := /bin/bash
 
 .PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e
 
-REPO := quay.io/app-sre/addon-metadata-operator
+REG_ORG := quay.io/mtsre
 TAG := $(shell git rev-parse --short HEAD)
 
 # Set the GOBIN environment variable so that dependencies will be installed
@@ -54,14 +54,20 @@ tidy:
 	@go mod tidy
 	@go mod verify
 
-docker-build: ## Build docker image with the operator.
-	@docker build -t $(REPO):$(TAG) -f Dockerfile.build .
+docker-build: docker-build-addon-metadata-operator docker-build-mtcli
 
-docker-push: ## Push docker image with the operator.
+docker-build-%: ## Build docker image with the operator.
+	@if [ "addon-metadata-operator" != "$*" ] && [ "mtcli" != "$*" ]; then echo "Only accepted targets: docker-build-mtcli, docker-build-addon-metadata-operator" && exit 1; fi
+	@docker build -t $(REG_ORG)/$*:$(TAG) -f Dockerfile.$*.build .
+
+docker-push: docker-push-addon-metadata-operator docker-push-mtcli
+
+docker-push-%: ## Push docker image with the operator.
+	@if [ "addon-metadata-operator" != "$*" ] && [ "mtcli" != "$*" ]; then echo "Only accepted targets: docker-push-mtcli, docker-push-addon-metadata-operator" && exit 1; fi
 	@if [ -z "$(DOCKER_CONF)" ]; then echo "Please set DOCKER_CONF. Exiting." && exit 1; fi
-	@docker tag $(REPO):$(TAG) $(REPO):latest
-	@docker --config=$(DOCKER_CONF) push $(REPO):$(TAG)
-	@docker --config=$(DOCKER_CONF) push $(REPO):latest
+	@docker tag $(REG_ORG)/$*:$(TAG) $(REG_ORG)/$*:latest
+	@docker --config=$(DOCKER_CONF) push $(REG_ORG)/$*:$(TAG)
+	@docker --config=$(DOCKER_CONF) push $(REG_ORG)/$*:latest
 
 ##@ CRD and K8S
 

@@ -1,6 +1,6 @@
 # vi:set ft=dockerfile:
 # --- stage 1 ---
-FROM registry.redhat.io/rhel8/go-toolset:1.16 as builder
+FROM quay.io/app-sre/ubi8-go-toolset:1.16.12-4 as builder
 
 USER root
 
