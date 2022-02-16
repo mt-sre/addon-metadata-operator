@@ -4,7 +4,7 @@ SHELL := /bin/bash
 
 .PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e
 
-REPO := quay.io/app-sre/addon-metadata-operator
+REPO := quay.io/mtsre/addon-metadata-operator
 TAG := $(shell git rev-parse --short HEAD)
 
 # Set the GOBIN environment variable so that dependencies will be installed
