@@ -154,6 +154,7 @@ spec:
                 pattern: ^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$
                 type: string
               bundleParameters:
+                description: 'Deprecated: Replaced by SubscriptionConfig.'
                 properties:
                   addonParamsSecretName:
                     pattern: ^addon-[0-9A-Za-z-]+-parameters$
@@ -302,11 +303,10 @@ spec:
                 pattern: ^quay\.io/osd-addons/[a-z-]+
                 type: string
               installMode:
-                description: 'OLM InstallMode for the addon operator. One of: AllNamespaces,
-                  SingleNamespace or OwnNamespace.'
+                description: 'OLM InstallMode for the addon operator. One of: AllNamespaces
+                  or OwnNamespace.'
                 enum:
                 - AllNamespaces
-                - SingleNamespace
                 - OwnNamespace
                 type: string
               label:
@@ -343,7 +343,7 @@ spec:
                 type: object
               name:
                 description: Friendly name for the addon, displayed in the UI
-                pattern: ^[0-9A-Z][A-Za-z0-9-_ ()]+$
+                pattern: ^[0-9A-Z\[\]][A-Za-z0-9-_ ()\[\]]+$
                 type: string
               namespaceAnnotations:
                 additionalProperties:

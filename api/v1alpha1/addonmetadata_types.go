@@ -32,7 +32,7 @@ type AddonMetadataSpec struct {
 	ID string `json:"id" validate:"required"`
 
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=`^[0-9A-Z][A-Za-z0-9-_ ()]+$`
+	// +kubebuilder:validation:Pattern=`^[0-9A-Z\[\]][A-Za-z0-9-_ ()\[\]]+$`
 	// Friendly name for the addon, displayed in the UI
 	Name string `json:"name" validate:"required"`
 
