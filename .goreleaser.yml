@@ -5,10 +5,14 @@
 # Tag needs to respect Semver: https://semver.org/
 # Validate config with: $ goreleaser check
 project_name: mtcli
+before:
+  hooks:
+    - make check
 builds:
   - id: linux-amd64
     env:
       - CGO_ENABLED=1
+      - GO111MODULE=on
       # required by opm to extract sql-based catalog
       - CC=gcc
     goos:
