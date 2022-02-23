@@ -11,6 +11,7 @@ builds:
       - CGO_ENABLED=1
       - GO111MODULE=on
       # required by opm to extract sql-based catalog
+      - CGO_CFLAGS=-DSQLITE_ENABLE_JSON1
       - CC=gcc
     goos:
       - linux
@@ -26,6 +27,9 @@ builds:
   - id: darwin-amd64
     env:
       - CGO_ENABLED=1
+      - GO111MODULE=on
+      # required by opm to extract sql-based catalog
+      - GO_CFLAGS=-DSQLITE_ENABLE_JSON1
       - CC=o64-clang
     goos:
       - darwin
