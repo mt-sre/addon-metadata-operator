@@ -7,6 +7,11 @@
 project_name: mtcli
 before:
   hooks:
+    env:
+    goos:
+      - darwin
+    goarch:
+      - amd64
     - make check
 builds:
   - id: linux-amd64
