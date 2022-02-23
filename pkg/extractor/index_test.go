@@ -31,16 +31,10 @@ func TestExtractorFileBasedAndSQLCatalogs(t *testing.T) {
 		},
 		{
 			// file-based catalog image
-			indexImage: "quay.io/sblaisdo/reference-addon-index:test",
+			indexImage: "quay.io/osd-addons/reference-addon-index:file-based-poc",
 			pkgName:    "reference-addon",
 			expectedBundleImages: []string{
-				"quay.io/osd-addons/reference-addon-bundle:0.1.0-bcb6192",
-				"quay.io/osd-addons/reference-addon-bundle:0.1.1-bcb6192",
-				"quay.io/osd-addons/reference-addon-bundle:0.1.2-bcb6192",
-				"quay.io/osd-addons/reference-addon-bundle:0.1.3-bcb6192",
-				"quay.io/osd-addons/reference-addon-bundle:0.1.4-bcb6192",
-				"quay.io/osd-addons/reference-addon-bundle:0.1.5-bcb6192",
-				"quay.io/osd-addons/reference-addon-bundle:0.1.6-bcb6192",
+				"quay.io/osd-addons/reference-addon-bundle:0.1.6-single",
 			},
 		},
 	}

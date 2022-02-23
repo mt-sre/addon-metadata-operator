@@ -363,7 +363,7 @@ spec:
                 type: array
                 uniqueItems: true
               ocmQuotaCost:
-                description: 'TODO: what is this?'
+                description: OCM Quota cost for installing the addon.
                 minimum: 0
                 type: integer
               ocmQuotaName:
@@ -398,12 +398,23 @@ spec:
                 - secretNamespace
                 - snitchNamePostFix
                 type: object
+              policyPermissions:
+                description: List of permissions in an IAM policy that are required
+                  by the addon operator.
+                items:
+                  type: string
+                type: array
               pullSecret:
                 type: string
               quayRepo:
                 description: 'Quay repository for the addon operator. Needs to match:
                   ''quay.io/osd-addons/<my-addon-repo>''.'
                 pattern: ^quay\.io/osd-addons/[a-z-]+$
+                type: string
+              serviceAccount:
+                description: Name of the service account created by the addon operator
+                  to authenticate to the API.
+                pattern: ^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$
                 type: string
               startingCSV:
                 type: string

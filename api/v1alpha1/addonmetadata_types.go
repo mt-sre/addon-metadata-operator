@@ -95,7 +95,7 @@ type AddonMetadataSpec struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=0
-	// TODO: what is this?
+	// OCM Quota cost for installing the addon.
 	OcmQuotaCost int `json:"ocmQuotaCost" validate:"required"`
 
 	// +kubebuilder:validation:Required
@@ -190,6 +190,15 @@ type AddonMetadataSpec struct {
 	// +optional
 	// Configs to be passed to the subscription OLM object.
 	SubscriptionConfig *mtsrev1.SubscriptionConfig `json:"subscriptionConfig"`
+
+	// +optional
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	// Name of the service account created by the addon operator to authenticate to the API.
+	ServiceAccount *string `json:"serviceAccount"`
+
+	// +optional
+	// List of permissions in an IAM policy that are required by the addon operator.
+	PolicyPermissions *[]string `json:"policyPermissions"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata
