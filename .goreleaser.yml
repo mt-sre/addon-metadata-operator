@@ -5,17 +5,29 @@
 # Tag needs to respect Semver: https://semver.org/
 # Validate config with: $ goreleaser check
 project_name: mtcli
-before:
-  hooks:
-    - make check
 builds:
-  - env:
+  - id: linux-amd64
+    env:
       - CGO_ENABLED=1
-      - GO111MODULE=on
       # required by opm to extract sql-based catalog
-      - CGO_CFLAGS=-DSQLITE_ENABLE_JSON1
+      - CC=gcc
     goos:
       - linux
+    goarch:
+      - amd64
+    main: ./cmd/mtcli
+    ldflags:
+      - -s -w
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.version={{.Version}}'
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.commit={{.Commit}}'
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.date={{.Date}}'
+      - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.builtBy=goreleaser'
+  - id: darwin-amd64
+    env:
+      - CGO_ENABLED=1
+      - CC=o64-clang
+    goos:
+      - darwin
     goarch:
       - amd64
     main: ./cmd/mtcli
