@@ -10,10 +10,11 @@ IMAGE_TEST=addon-metadata-operator
 docker build -t ${IMAGE_TEST} -f Dockerfile.ci .
 docker_run_args=(
     --rm
-    # goreleaser version
-    -e "VERSION=v0.184.0"
+    -e CGO_ENABLED=1
     # github API token to post release
     -e "GITHUB_TOKEN=${GITHUB_TOKEN}"
+    # goreleaser version
+    goreleaser/goreleaser-cross:v1.17.6
     --entrypoint=/bin/sh
 )
 docker run "${docker_run_args[@]}" "${IMAGE_TEST}" -c /tmp/goreleaser.sh
