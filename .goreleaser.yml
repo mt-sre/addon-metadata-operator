@@ -5,14 +5,6 @@
 # Tag needs to respect Semver: https://semver.org/
 # Validate config with: $ goreleaser check
 project_name: mtcli
-before:
-  hooks:
-    env:
-    goos:
-      - darwin
-    goarch:
-      - amd64
-    - make check
 builds:
   - id: linux-amd64
     env:
@@ -51,8 +43,13 @@ builds:
       - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.date={{.Date}}'
       - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.builtBy=goreleaser'
 archives:
+  - id: mtcli
+    builds:
+      - linux-amd64
+      - darwin-amd64
   - replacements:
       linux: Linux
+      darwin: macOS
       386: i386
       amd64: x86_64
 checksum:
