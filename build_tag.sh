@@ -17,8 +17,8 @@ docker_run_args=(
     -v /var/run/docker.sock:/var/run/docker.sock
     -v $(pwd):/go/src/github.com/mt-sre/addon-metadata-operator
     -w /go/src/github.com/mt-sre/addon-metadata-operator
-    # goreleaser version
-    goreleaser/goreleaser-cross:v1.17.6
+    # goreleaser-cross version
+    -e "VERSION=v1.17.6
     release --rm-dist
 )
-docker run "${docker_run_args[@]}" "${IMAGE_TEST}" -c /tmp/goreleaser.sh
+docker run "${docker_run_args[@]}" "${IMAGE_TEST}" -c goreleaser-cross.sh
