@@ -6,8 +6,7 @@ set -exvo pipefail -o nounset
 # - sync secrets from app-interface:
 #   -> secrets: /resources/jenkins/global/secrets.yaml
 #   -> for job `gh-build-tag`: /resources/jenkins/global/templates.yaml
-IMAGE_TEST=addon-metadata-operator
-docker build -t ${IMAGE_TEST} -f Dockerfile.ci .
+#   -> doing cross-comiple builds
 docker_run_args=(
     --rm
     --privileged
@@ -18,7 +17,7 @@ docker_run_args=(
     -v $(pwd):/go/src/github.com/mt-sre/addon-metadata-operator
     -w /go/src/github.com/mt-sre/addon-metadata-operator
     # goreleaser-cross version
-    -e "VERSION=v1.17.6"
+    goreleaser/goreleaser-cross:v1.17.6
     release --rm-dist
 )
-docker run "${docker_run_args[@]}" "${IMAGE_TEST}" -c goreleaser-cross.sh
+docker run "${docker_run_args[@]}"
