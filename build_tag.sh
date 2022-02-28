@@ -7,6 +7,7 @@ set -exvo pipefail -o nounset
 #   -> secrets: /resources/jenkins/global/secrets.yaml
 #   -> for job `gh-build-tag`: /resources/jenkins/global/templates.yaml
 #   -> doing cross-comiple builds
+#   -> local run: git tag v0.0.0 and ./build_tag.sh
 docker_run_args=(
     --rm
     --privileged
