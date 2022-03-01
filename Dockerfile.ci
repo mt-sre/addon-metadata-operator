@@ -5,10 +5,6 @@ USER root
 
 WORKDIR /addon-metadata-operator
 
-# setup goreleaser
-RUN curl -sL https://git.io/goreleaser -o /tmp/goreleaser.sh \
-    && chmod +x /tmp/goreleaser.sh
-
 # Cache optimization
 COPY go.mod go.sum Makefile ./
 RUN go mod download
