@@ -17,8 +17,8 @@ docker_run_args=(
     -v /var/run/docker.sock:/var/run/docker.sock
     -v $(pwd):/go/src/github.com/mt-sre/addon-metadata-operator
     -w /go/src/github.com/mt-sre/addon-metadata-operator
-    # goreleaser-cross version
-    goreleaser/goreleaser-cross:v1.17.6
+    # goreleaser-cross version from https://github.com/goreleaser/goreleaser-cross/pkgs/container/goreleaser-cross
+    ghcr.io/goreleaser/goreleaser-cross:v1.17.6-v1.3.1
     release --rm-dist
 )
 docker run "${docker_run_args[@]}"
