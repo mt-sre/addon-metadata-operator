@@ -11,16 +11,16 @@ import (
 )
 
 func init() {
-	mtcli.AddCommand(listValidatorsCmd)
+	listCmd.AddCommand(listValidatorsCmd)
 }
 
 var (
 	listValidatorsExamples = []string{
 		"  # List all the registered validators.",
-		"  mtcli list-validators",
+		"  mtcli list validators",
 	}
 	listValidatorsCmd = &cobra.Command{
-		Use:     "list-validators",
+		Use:     "validators",
 		Short:   "List all the registered validators.",
 		Example: strings.Join(listValidatorsExamples, "\n"),
 		Run:     listValidatorsMain,

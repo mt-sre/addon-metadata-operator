@@ -11,16 +11,16 @@ import (
 )
 
 func init() {
-	mtcli.AddCommand(listBundlesCmd)
+	listCmd.AddCommand(listBundlesCmd)
 }
 
 var (
 	listBundlesExamples = []string{
 		"  #List all the bundles present in an index image.",
-		"  mtcli list-bundles <index_image>",
+		"  mtcli list bundles <index_image>",
 	}
 	listBundlesCmd = &cobra.Command{
-		Use:     "list-bundles",
+		Use:     "bundles",
 		Short:   "List all the bundles present in an index image.",
 		Example: strings.Join(listBundlesExamples, "\n"),
 		Args:    cobra.ExactArgs(1),

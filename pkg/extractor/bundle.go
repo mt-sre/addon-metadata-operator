@@ -142,10 +142,10 @@ func (e *DefaultBundleExtractor) unpackAndValidateBundle(ctx context.Context, bu
 		return err
 	}
 
-	return e.validateBundle(registry, tmpDirs["bundle"])
+	return e.ValidateBundle(registry, tmpDirs["bundle"])
 }
 
-func (e *DefaultBundleExtractor) validateBundle(registry *containerdregistry.Registry, tmpDir string) error {
+func (e *DefaultBundleExtractor) ValidateBundle(registry *containerdregistry.Registry, tmpDir string) error {
 	e.Log.Debugf("validating the unpacked bundle from %s", tmpDir)
 	validator := opmbundle.NewImageValidator(registry, e.Log.(*logrus.Entry))
 	if err := validator.ValidateBundleFormat(tmpDir); err != nil {

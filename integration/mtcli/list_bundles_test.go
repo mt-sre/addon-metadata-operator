@@ -100,5 +100,5 @@ func readCacheFile(indexImageUrl string) (string, error) {
 }
 
 func prepareListBundlesCmd(cliPath string, arg string) *exec.Cmd {
-	return exec.Command(cliPath, "list-bundles", arg)
+	return exec.Command(cliPath, "list", "bundles", arg)
 }
