@@ -49,7 +49,7 @@ archives:
       - darwin-amd64
   - replacements:
       linux: Linux
-      darwin: macOS
+      darwin: Darwin
       386: i386
       amd64: x86_64
 checksum:
