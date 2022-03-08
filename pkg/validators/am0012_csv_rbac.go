@@ -10,9 +10,9 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-// func init() {
-// 	Registry.Add(AM0012)
-// }
+func init() {
+	Registry.Add(AM0012)
+}
 
 var AM0012 = types.Validator{
 	Code:        "AM0012",
