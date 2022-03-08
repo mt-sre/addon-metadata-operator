@@ -99,7 +99,7 @@ type AddonMetadataSpec struct {
 	OcmQuotaCost int `json:"ocmQuotaCost" validate:"required"`
 
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$`
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]$`
 	// Name of the addon operator.
 	OperatorName string `json:"operatorName" validate:"required"`
 
