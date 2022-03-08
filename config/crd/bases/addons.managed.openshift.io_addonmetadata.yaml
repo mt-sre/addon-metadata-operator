@@ -343,7 +343,6 @@ spec:
                 type: object
               name:
                 description: Friendly name for the addon, displayed in the UI
-                pattern: ^[0-9A-Z\[\]][A-Za-z0-9-_ ()\[\]]+$
                 type: string
               namespaceAnnotations:
                 additionalProperties:
