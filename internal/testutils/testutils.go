@@ -37,6 +37,10 @@ func TestdataDir() string {
 	return path.Join(RootDir(), "internal", "testdata")
 }
 
+func TestBundlesDir() string {
+	return filepath.Join(TestdataDir(), "bundles")
+}
+
 func RootDir() string {
 	return rootDir
 }
