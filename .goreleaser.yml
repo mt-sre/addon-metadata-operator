@@ -5,6 +5,7 @@
 # Tag needs to respect Semver: https://semver.org/
 # Validate config with: $ goreleaser check
 project_name: mtcli
+dist: /tmp/dist-amo
 builds:
   - id: linux-amd64
     env:
