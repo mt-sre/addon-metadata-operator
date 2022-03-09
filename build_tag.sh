@@ -10,7 +10,6 @@ set -exvo pipefail -o nounset
 #   -> local run: git tag v0.0.0 and ./build_tag.sh
 docker_run_args=(
     --rm
-    --privileged
     -e CGO_ENABLED=1
     # github API token to post release
     -e "GITHUB_TOKEN=${GITHUB_TOKEN}"
@@ -21,4 +20,5 @@ docker_run_args=(
     ghcr.io/goreleaser/goreleaser-cross:v1.17.6-v1.3.1
     release --rm-dist
 )
+
 docker run "${docker_run_args[@]}"
