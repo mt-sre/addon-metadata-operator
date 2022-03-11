@@ -8,7 +8,7 @@ import (
 )
 
 func TestValidateRootDirContainsGoMod(t *testing.T) {
-	files, err := ioutil.ReadDir(RootDir())
+	files, err := ioutil.ReadDir(string(RootDir()))
 	require.NoError(t, err)
 
 	foundGoMod := false

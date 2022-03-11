@@ -65,7 +65,7 @@ Run tests:
 $ make test
 ```
 
-Regenerate manifests and CRDs (`./config/crd/bases/addons.managed.openshift.io_addonmetadata.yaml` whenever you modify the `AddonMetadata` type:
+Regenerate manifests and CRDs (`./config/crd/bases/addonsflow.redhat.openshift.io_addonmetadata.yaml` whenever you modify the `AddonMetadata` type:
 
 ```bash
 $ make manifest

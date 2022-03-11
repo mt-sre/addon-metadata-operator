@@ -4,7 +4,7 @@ SHELL := /bin/bash
 
 .PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e
 
-REPO := quay.io/app-sre/addon-metadata-operator
+REPO := quay.io/mtsre/addon-metadata-operator
 TAG := $(shell git rev-parse --short HEAD)
 
 # Set the GOBIN environment variable so that dependencies will be installed
@@ -71,38 +71,33 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 generate: controller-gen manifests ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
+install: manifests kustomize ## Install CRDs to kind cluster
 	$(KUSTOMIZE) build config/crd | kubectl apply -f -
 
-uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config.
+uninstall: manifests kustomize ## Uninstall CRDs from kind cluster
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
 
-deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+deploy: manifests kustomize docker-build ## Deploy controller to kind cluster
+	@$(KIND) load docker-image $(REPO):$(TAG) --name $(KIND_CLUSTER_NAME)
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(REPO):$(TAG)
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
-undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
+undeploy: ## Undeploy controller from the kind cluster
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
 
 ##@ Kind
 
-KIND_CLUSTER_NAME := addon-metadata
+KIND_CLUSTER_NAME := addon-metadata-operator
 
 kind-create: kind ## Create a plain kind cluster /w secret to allow pulling from Quay.io
 	@$(KIND) create cluster --name $(KIND_CLUSTER_NAME) --kubeconfig $(KUBECONFIG) || true
 	@echo -e "Ignoring existing cluster error...\n"
 
-kind-create-all: deploy-olm deploy-hive deploy-console ## Create kind cluster /w OLM + Hive + OKD console
-
-deploy-olm: kind-create
-	@./hack/deploy-olm.sh
-
-deploy-console: kind-create
+kind-integration: kind-create install deploy ## Create a kind cluster to run integration tests (deploy CRDS, operator, etc.)
 	@./hack/deploy-console.sh
-
-deploy-hive: kind-create deploy-olm
-	@./hack/deploy-hive.sh
+	#@./hack/deploy-olm.sh - Do we need OLM?
+	#@./hack/deploy-hive.sh - Enable to debug SyncSet/SelectorSyncSet
 
 
 ## Dependencies

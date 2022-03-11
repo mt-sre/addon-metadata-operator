@@ -15,17 +15,17 @@ func (s *e2eTestSuite) TestMtcliValidateBundle() {
 	}{
 		{
 			name:       "reference-addon.0.1.6-valid",
-			bundlePath: filepath.Join(testutils.TestBundlesDir(), "reference-addon", "main", "0.1.6"),
+			bundlePath: filepath.Join(testutils.RootDir().TestData().Bundles(), "reference-addon", "main", "0.1.6"),
 			isValid:    true,
 		},
 		{
 			name:       "addon-operator.0.3.0-valid",
-			bundlePath: filepath.Join(testutils.TestBundlesDir(), "reference-addon", "addon-operator", "0.3.0"),
+			bundlePath: filepath.Join(testutils.RootDir().TestData().Bundles(), "reference-addon", "addon-operator", "0.3.0"),
 			isValid:    true,
 		},
 		{
 			name:       "rhods.1.1.1-57-invalid",
-			bundlePath: filepath.Join(testutils.TestBundlesDir(), "rhods", "main", "1.1.1-57"),
+			bundlePath: filepath.Join(testutils.RootDir().TestData().Bundles(), "rhods", "main", "1.1.1-57"),
 			isValid:    false,
 		},
 	}

@@ -1,7 +1,7 @@
 package validators_test
 
 import (
-	"path"
+	"path/filepath"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
@@ -92,5 +92,5 @@ func (v TestAM0007) FailingCandidates() ([]types.MetaBundle, error) {
 }
 
 func loadAM0007TestBundle() (registry.Bundle, error) {
-	return testutils.NewBundle("random-bundle", path.Join(testutils.TestdataDir(), "assets/am0007/csv.yaml"))
+	return testutils.NewBundle("random-bundle", filepath.Join(testutils.RootDir().TestData().Validators(), "am0007", "csv.yaml"))
 }

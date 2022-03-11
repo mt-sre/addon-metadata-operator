@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
-  name: addonimagesets.addons.managed.openshift.io
+  name: addonimagesets.addonsflow.redhat.openshift.io
 spec:
-  group: addons.managed.openshift.io
+  group: addonsflow.redhat.openshift.io
   names:
     kind: AddonImageSet
     listKind: AddonImageSetList

@@ -3,7 +3,7 @@ package testutils
 import (
 	"fmt"
 	"io/ioutil"
-	"path"
+	"path/filepath"
 	"sync"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
@@ -61,19 +61,19 @@ func GetReferenceAddonStage() (*singleton, error) {
 }
 
 func (r *singleton) ImageSetDir() string {
-	return path.Join(AddonsImagesetDir(), "reference-addon")
+	return filepath.Join(RootDir().TestData().MetadataV1().ImageSets(), "reference-addon")
 }
 
 func (r *singleton) IndexImageDir() string {
-	return path.Join(AddonsIndexImageDir(), "reference-addon")
+	return filepath.Join(RootDir().TestData().MetadataV1().Legacy(), "reference-addon")
 }
 
 func (r *singleton) GetMetadata(useImageSet bool) (*addonsv1alpha1.AddonMetadataSpec, error) {
 	var metaPath string
 	if useImageSet {
-		metaPath = path.Join(r.ImageSetDir(), "metadata", r.Env, "addon.yaml")
+		metaPath = filepath.Join(r.ImageSetDir(), "metadata", r.Env, "addon.yaml")
 	} else {
-		metaPath = path.Join(r.IndexImageDir(), "metadata", r.Env, "addon.yaml")
+		metaPath = filepath.Join(r.IndexImageDir(), "metadata", r.Env, "addon.yaml")
 	}
 	data, err := ioutil.ReadFile(metaPath)
 	if err != nil {
@@ -85,7 +85,7 @@ func (r *singleton) GetMetadata(useImageSet bool) (*addonsv1alpha1.AddonMetadata
 }
 
 func (r *singleton) GetImageSet(version string) (*addonsv1alpha1.AddonImageSetSpec, error) {
-	baseDir := path.Join(r.ImageSetDir(), "addonimagesets", r.Env)
+	baseDir := filepath.Join(r.ImageSetDir(), "addonimagesets", r.Env)
 	target := fmt.Sprintf("reference-addon.v%v.yaml", version)
 	if version == "latest" {
 		latest, err := utils.GetLatestImageSetVersion(baseDir)
@@ -97,7 +97,7 @@ func (r *singleton) GetImageSet(version string) (*addonsv1alpha1.AddonImageSetSp
 		// fallback to default value from addon.yaml metadata
 		target = fmt.Sprintf("reference-addon.v%v.yaml", *r.MetaImageSet.ImageSetVersion)
 	}
-	imageSetPath := path.Join(baseDir, target)
+	imageSetPath := filepath.Join(baseDir, target)
 	data, err := ioutil.ReadFile(imageSetPath)
 	if err != nil {
 		return nil, err
@@ -116,11 +116,13 @@ func (r *singleton) GetMetaBundle(version string) (*types.MetaBundle, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Could not extract reference-addon bundles, got %v.", err)
 	}
-	// patch metadata - deep copy because we don't want to mess up the singleton
+
+	// resolve metadata - deep copy because we don't want to mess up the singleton
 	meta := r.MetaImageSet.DeepCopy()
-	if err := meta.PatchWithImageSet(imageSet); err != nil {
-		return nil, fmt.Errorf("Could not patch metadata with imageset, got %v.", err)
+	combinedMeta, err := meta.CombineWithImageSet(imageSet)
+	if err != nil {
+		return nil, fmt.Errorf("Could not combine metadata with imageset, got %v.", err)
 	}
 
-	return types.NewMetaBundle(meta, bundles), nil
+	return types.NewMetaBundle(combinedMeta, bundles), nil
 }

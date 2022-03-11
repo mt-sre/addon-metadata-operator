@@ -1,6 +1,0 @@
-apiVersion: addons.managed.openshift.io/v1alpha1
-kind: AddonImageSet
-metadata:
-  name: addonimageset-sample
-spec:
-  # TODO(user): Add fields here

@@ -1,7 +1,0 @@
-apiVersion: addons.managed.openshift.io/v1alpha1
-kind: AddonMetadata
-metadata:
-  name: reference-addon
-spec:
-  # Add fields here
-  foo: bar

@@ -32,7 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-	"github.com/mt-sre/addon-metadata-operator/controllers"
+	"github.com/mt-sre/addon-metadata-operator/internal/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -71,17 +71,14 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "05d28f91.managed.openshift.io",
+		LeaderElectionID:       "05d28f91.redhat.openshift.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
-	if err = (&controllers.AddonMetadataReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	if err = controllers.SetupAddonMetadataReconciler(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AddonMetadata")
 		os.Exit(1)
 	}

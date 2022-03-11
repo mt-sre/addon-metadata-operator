@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Deprecated - we do not need to interact with hi
+
 source ${PWD}/hack/_helpers.sh
 
 echo "== Installing hive-operator..."

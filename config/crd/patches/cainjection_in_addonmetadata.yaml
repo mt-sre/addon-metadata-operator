@@ -4,4 +4,4 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: $(CERTIFICATE_NAMESPACE)/$(CERTIFICATE_NAME)
-  name: addontemplates.addons.managed.openshift.io
+  name: addontemplates.addonsflow.redhat.openshift.io

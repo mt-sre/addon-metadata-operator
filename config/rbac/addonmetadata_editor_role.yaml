@@ -5,7 +5,7 @@ metadata:
   name: addontemplate-editor-role
 rules:
 - apiGroups:
-  - addons.managed.openshift.io
+  - addonsflow.redhat.openshift.io
   resources:
   - addontemplates
   verbs:
@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - addons.managed.openshift.io
+  - addonsflow.redhat.openshift.io
   resources:
   - addontemplates/status
   verbs:
