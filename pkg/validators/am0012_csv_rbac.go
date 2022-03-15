@@ -22,6 +22,11 @@ var AM0012 = types.Validator{
 }
 
 func validateCsvRbac(mb types.MetaBundle) types.ValidatorResult {
+	// Guard against addons which do not have bundles yet
+	if len(mb.Bundles) == 0 {
+		return Success()
+	}
+
 	// Only run validations on the latest bundle
 	latestBundle, err := getLatestBundle(mb.Bundles)
 	if err != nil {
