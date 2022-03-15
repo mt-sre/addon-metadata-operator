@@ -5,6 +5,7 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
+	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
 func init() {
@@ -26,6 +27,11 @@ func (val TestAM0012) SucceedingCandidates() ([]types.MetaBundle, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	res = append(res, types.MetaBundle{
+		Bundles: []registry.Bundle{},
+	})
+
 	return res, nil
 }
 
