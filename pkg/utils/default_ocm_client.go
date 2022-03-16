@@ -2,11 +2,11 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 
 	sdk "github.com/openshift-online/ocm-sdk-go"
-	amv1 "github.com/openshift-online/ocm-sdk-go/accountsmgmt/v1"
 )
 
 const (
@@ -76,29 +76,32 @@ func (c *DefaultOCMClient) initConnection() error {
 	return err
 }
 
-func (c *DefaultOCMClient) GetSKURules(ctx context.Context, quotaName string) ([]*amv1.SkuRule, error) {
-	query := fmt.Sprintf("quota_id = '%s'", addonQuotaID(quotaName))
-
-	req := c.conn.AccountsMgmt().V1().SkuRules().List().Search(query)
+func (c *DefaultOCMClient) QuotaRuleExists(ctx context.Context, quotaName string) (bool, error) {
+	req := c.conn.
+		Get().
+		Path("/api/accounts_mgmt/v1/quota_rules").
+		Parameter("search", fmt.Sprintf("name = '%s'", quotaName))
 
 	res, err := req.SendContext(ctx)
 	if err != nil {
-		return nil, err
+		return false, fmt.Errorf("requesting quota rules: %w", err)
 	}
 
 	if isHTTPError(res.Status()) {
-		return nil, OCMResponseError(res.Status())
+		return false, OCMResponseError(res.Status())
 	}
 
-	return res.Items().Slice(), nil
+	list := struct{ Size int }{}
+
+	if err := json.Unmarshal(res.Bytes(), &list); err != nil {
+		return false, fmt.Errorf("unmarshalling quota rules: %w", err)
+	}
+
+	return list.Size > 0, nil
 }
 
 func (c *DefaultOCMClient) CloseConnection() error {
 	return c.conn.Close()
-}
-
-func addonQuotaID(quotaName string) string {
-	return "add-on|" + quotaName
 }
 
 func isHTTPError(code int) bool {

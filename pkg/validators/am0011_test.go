@@ -22,6 +22,7 @@ func (val TestAM0011) Run(mb types.MetaBundle) types.ValidatorResult {
 		testutils.MockOCMClientValidQuotaNames(
 			"addon-reference-addon",
 			"addon-successful-candidate",
+			"addon-zero-quota-candidate",
 		),
 	)
 
