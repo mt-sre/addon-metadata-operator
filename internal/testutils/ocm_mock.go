@@ -28,6 +28,14 @@ func (c *MockOCMClient) Option(opt MockOCMClientOption) {
 	opt(c)
 }
 
+func (m *MockOCMClient) QuotaRuleExists(ctx context.Context, ocmQuotaName string) (bool, error) {
+	if !contains(ocmQuotaName, m.validQuotaNames) {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (m *MockOCMClient) GetSKURules(ctx context.Context, ocmQuotaName string) ([]*amv1.SkuRule, error) {
 	if !contains(ocmQuotaName, m.validQuotaNames) {
 		return []*amv1.SkuRule{}, nil

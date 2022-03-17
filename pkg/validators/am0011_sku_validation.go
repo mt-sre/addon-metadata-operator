@@ -32,17 +32,12 @@ func ValidateOCMSKUExists(mb types.MetaBundle) types.ValidatorResult {
 
 func GenerateOCMSKUValidator(ocm OCMClient) types.ValidateFunc {
 	return func(mb types.MetaBundle) types.ValidatorResult {
-		// addons with '0' quota cost are not processed for SKU validation
-		if mb.AddonMeta.OcmQuotaCost == 0 {
-			return Success()
-		}
-
 		// Will become the caller's responsibility to provide this in the future
 		ctx := context.Background()
 
 		quotaName := mb.AddonMeta.OcmQuotaName
 
-		skuRules, err := ocm.GetSKURules(ctx, quotaName)
+		quotaRuleExists, err := ocm.QuotaRuleExists(ctx, quotaName)
 		if err != nil {
 			if IsOCMServerSideError(err) {
 				return RetryableError(err)
@@ -51,8 +46,8 @@ func GenerateOCMSKUValidator(ocm OCMClient) types.ValidateFunc {
 			return Error(err)
 		}
 
-		if len(skuRules) < 1 {
-			return Fail(fmt.Sprintf("no SKU Rule exists for ocmQuotaName '%s'", quotaName))
+		if !quotaRuleExists {
+			return Fail(fmt.Sprintf("no QuotaRule exists for ocmQuotaName '%s'", quotaName))
 		}
 
 		if err := ocm.CloseConnection(); err != nil {
