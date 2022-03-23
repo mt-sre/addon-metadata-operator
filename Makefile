@@ -2,7 +2,7 @@
 .SHELLFLAGS=-euo pipefail -c
 SHELL := /bin/bash
 
-.PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e
+.PHONY: all test fmt vet clean build tidy docker-build docker-push test-e2e release release-snapshot build-release-container
 
 REPO := quay.io/app-sre/addon-metadata-operator
 TAG := $(shell git rev-parse --short HEAD)
@@ -62,6 +62,19 @@ docker-push: ## Push docker image with the operator.
 	@docker tag $(REPO):$(TAG) $(REPO):latest
 	@docker --config=$(DOCKER_CONF) push $(REPO):$(TAG)
 	@docker --config=$(DOCKER_CONF) push $(REPO):latest
+
+##@ Release
+
+release: build-release-container
+	@$(RELEASE_CMD)
+
+release-snapshot: build-release-container
+	@$(RELEASE_CMD) --snapshot
+
+RELEASE_CMD := docker run --rm -e CGO_ENABLED=1 -e "GITHUB_TOKEN=${GITHUB_TOKEN}" amo-release:$(TAG) release
+
+build-release-container:
+	@docker build -t amo-release:$(TAG) -f Dockerfile.release .
 
 ##@ CRD and K8S
 
