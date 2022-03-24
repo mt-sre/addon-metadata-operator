@@ -1,0 +1,15 @@
+apiVersion: addonsflow.redhat.openshift.io/v1alpha1
+kind: AddonImageSet
+metadata:
+  name: reference-addon.v0.0.2
+  namespace: stage-reference-addon
+  labels:
+    addonsflow.redhat.openshift.io/env: stage
+    addonsflow.redhat.openshift.io/addon_id: reference-addon
+spec:
+  name: reference-addon.v0.0.2
+  indexImage: quay.io/osd-addons/reference-addon-index@sha256:d9f95ecd3cace47d9f34f63354c06d829abd165de90ef3990b6f9feda36233f3
+  relatedImages: []
+  addOnParameters: []
+  addOnRequirements: []
+  subOperators: []

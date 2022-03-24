@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
-  name: addonmetadata.addons.managed.openshift.io
+  name: addonmetadata.addonsflow.redhat.openshift.io
 spec:
-  group: addons.managed.openshift.io
+  group: addonsflow.redhat.openshift.io
   names:
     kind: AddonMetadata
     listKind: AddonMetadataList
@@ -361,7 +361,6 @@ spec:
                 items:
                   type: string
                 type: array
-                uniqueItems: true
               ocmQuotaCost:
                 description: OCM Quota cost for installing the addon.
                 minimum: 0

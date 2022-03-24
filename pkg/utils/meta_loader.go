@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 
 	log "github.com/sirupsen/logrus"
@@ -54,10 +55,13 @@ func (l defaultMetaLoader) Load() (*addonsv1alpha1.AddonMetadataSpec, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Could not read imageSet, got %v.\n", err)
 		}
-		if err := meta.PatchWithImageSet(imageSet); err != nil {
-			return nil, fmt.Errorf("Could not patch metadata with imageset, got %v.", err)
+		combinedMeta, err := meta.CombineWithImageSet(imageSet)
+		if err != nil {
+			return nil, fmt.Errorf("Could not combine metadata and imageset, got %v.", err)
 		}
+		return combinedMeta, nil
 	}
+
 	return meta, nil
 }
 
@@ -73,7 +77,7 @@ func (l defaultMetaLoader) readMeta() (*addonsv1alpha1.AddonMetadataSpec, error)
 }
 
 func (l defaultMetaLoader) getMetadataPath() string {
-	return path.Join(l.AddonDir, "metadata", l.Env, "addon.yaml")
+	return filepath.Join(l.AddonDir, "metadata", l.Env, "addon.yaml")
 }
 
 func (l defaultMetaLoader) readImageSet(defaultVersion string) (*addonsv1alpha1.AddonImageSetSpec, error) {
@@ -102,7 +106,7 @@ func (l defaultMetaLoader) getImageSetVersion(defaultVersion string) string {
 }
 
 func (l defaultMetaLoader) getImagesetPath(version string) (string, error) {
-	baseDir := path.Join(l.AddonDir, "addonimagesets", l.Env)
+	baseDir := filepath.Join(l.AddonDir, "addonimagesets", l.Env)
 	target := fmt.Sprintf("%s.v%s.yaml", l.AddonName, version)
 	if version == "latest" {
 		latest, err := GetLatestImageSetVersion(baseDir)
@@ -111,7 +115,7 @@ func (l defaultMetaLoader) getImagesetPath(version string) (string, error) {
 		}
 		target = latest
 	}
-	return path.Join(baseDir, target), nil
+	return filepath.Join(baseDir, target), nil
 }
 
 func GetLatestImageSetVersion(dir string) (string, error) {

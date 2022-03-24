@@ -84,7 +84,6 @@ type AddonMetadataSpec struct {
 	TargetNamespace string `json:"targetNamespace" validate:"required"`
 
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:UniqueItems=true
 	// Namespaces managed by the addon-operator. Need to include the TargetNamespace.
 	Namespaces []string `json:"namespaces" validate:"required"`
 

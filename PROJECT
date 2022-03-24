@@ -8,9 +8,18 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: managed.openshift.io
-  group: addons
+  domain: redhat.openshift.io
+  group: addonsflow
   kind: AddonMetadata
+  path: github.com/mt-sre/addon-metadata-operator/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: redhat.openshift.io
+  group: addonsflow
+  kind: AddonImageSet
   path: github.com/mt-sre/addon-metadata-operator/api/v1alpha1
   version: v1alpha1
 version: "3"

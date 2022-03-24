@@ -3,7 +3,6 @@ package testutils
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 
@@ -22,27 +21,50 @@ var rootDir string
 
 func init() {
 	_, b, _, _ := runtime.Caller(0)
-	rootDir = path.Join(filepath.Dir(b), "..", "..")
+	rootDir = filepath.Join(filepath.Dir(b), "..", "..")
 }
 
-func AddonsIndexImageDir() string {
-	return path.Join(TestdataDir(), "addons-indeximage")
+/*
+	Implement a chaining directory interface. Examples:
+		RootDir().TestData().MetadataV1().Legacy()
+		RootDir().TestData().MetadataV2()
+		RootDir().Bundles()
+*/
+type Tree string
+type RootTree Tree
+type TestDataTree Tree
+type MetadataV1Tree Tree
+
+func RootDir() RootTree {
+	return RootTree(rootDir)
 }
 
-func AddonsImagesetDir() string {
-	return path.Join(TestdataDir(), "addons-imageset")
+func (t RootTree) TestData() TestDataTree {
+	return TestDataTree(filepath.Join(string(t), "internal", "testdata"))
 }
 
-func TestdataDir() string {
-	return path.Join(RootDir(), "internal", "testdata")
+func (t TestDataTree) MetadataV2() string {
+	return filepath.Join(string(t), "metadata_v2")
 }
 
-func TestBundlesDir() string {
-	return filepath.Join(TestdataDir(), "bundles")
+func (t TestDataTree) Bundles() string {
+	return filepath.Join(string(t), "bundles")
 }
 
-func RootDir() string {
-	return rootDir
+func (t TestDataTree) Validators() string {
+	return filepath.Join(string(t), "validators")
+}
+
+func (t TestDataTree) MetadataV1() MetadataV1Tree {
+	return MetadataV1Tree(filepath.Join(string(t), "metadata_v1"))
+}
+
+func (t MetadataV1Tree) Legacy() string {
+	return filepath.Join(string(t), "legacy")
+}
+
+func (t MetadataV1Tree) ImageSets() string {
+	return filepath.Join(string(t), "imagesets")
 }
 
 func RemoveDir(downloadDir string) {

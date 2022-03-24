@@ -7,6 +7,7 @@ require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/fatih/color v1.13.0
+	github.com/go-logr/logr v0.4.0
 	github.com/golang/snappy v0.0.1
 	github.com/novln/docker-parser v1.0.0
 	github.com/openshift-online/ocm-sdk-go v0.1.235
