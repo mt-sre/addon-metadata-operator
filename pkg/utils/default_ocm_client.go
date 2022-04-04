@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 
@@ -27,6 +28,25 @@ func (e OCMResponseError) ServerSide() bool {
 
 	return code >= 500 && code < 600
 }
+
+func NewOCMClientAuthError(err error) OCMClientError {
+	return OCMClientError{
+		error:       err,
+		authRelated: true,
+	}
+}
+
+type OCMClientError struct {
+	authRelated bool
+	error
+}
+
+func (e OCMClientError) Unwrap() error { return e.error }
+func (e OCMClientError) Error() string {
+	return fmt.Sprintf("unable to setup OCM authentication: %v", e.error)
+}
+
+func (e OCMClientError) IsAuthRelated() bool { return e.authRelated }
 
 // NewDefaultOCMClient takes a variadic slice of options to configure a default
 // OCM client and applies defaults if no appropriate option is given. An error
@@ -65,7 +85,7 @@ type DefaultOCMClient struct {
 func (c *DefaultOCMClient) initConnection() error {
 	token, err := c.tp.ProvideToken()
 	if err != nil {
-		return err
+		return NewOCMClientAuthError(err)
 	}
 
 	c.conn, err = sdk.NewConnectionBuilder().
@@ -77,6 +97,10 @@ func (c *DefaultOCMClient) initConnection() error {
 }
 
 func (c *DefaultOCMClient) QuotaRuleExists(ctx context.Context, quotaName string) (bool, error) {
+	if c.conn == nil {
+		return false, errors.New("no active OCM connection")
+	}
+
 	req := c.conn.
 		Get().
 		Path("/api/accounts_mgmt/v1/quota_rules").
@@ -101,6 +125,10 @@ func (c *DefaultOCMClient) QuotaRuleExists(ctx context.Context, quotaName string
 }
 
 func (c *DefaultOCMClient) CloseConnection() error {
+	if c.conn == nil {
+		return nil
+	}
+
 	return c.conn.Close()
 }
 

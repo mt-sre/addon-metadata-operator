@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/alexeyco/simpletable"
-	"github.com/mt-sre/addon-metadata-operator/pkg/types"
-	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
+	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/register"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +31,14 @@ var (
 func listValidatorsMain(cmd *cobra.Command, args []string) {
 	t := simpletable.New()
 	t.Header = getTableHeaders()
-	for _, v := range validators.Registry.ListSorted() {
+
+	runner, err := validator.NewRunner()
+	if err != nil {
+		fmt.Printf("Unable to list validator: %s\n", err)
+		os.Exit(1)
+	}
+
+	for _, v := range runner.GetValidators() {
 		row := newTableRow(v)
 		t.Body.Cells = append(t.Body.Cells, row)
 	}
@@ -48,10 +56,10 @@ func getTableHeaders() *simpletable.Header {
 	}
 }
 
-func newTableRow(v types.Validator) []*simpletable.Cell {
+func newTableRow(v validator.Validator) []*simpletable.Cell {
 	return []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: v.Code},
-		{Align: simpletable.AlignLeft, Text: v.Name},
-		{Align: simpletable.AlignLeft, Text: v.Description},
+		{Align: simpletable.AlignLeft, Text: v.Code().String()},
+		{Align: simpletable.AlignLeft, Text: v.Name()},
+		{Align: simpletable.AlignLeft, Text: v.Description()},
 	}
 }

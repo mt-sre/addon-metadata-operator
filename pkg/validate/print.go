@@ -2,12 +2,12 @@ package validate
 
 import (
 	"github.com/alexeyco/simpletable"
-	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
 )
 
-func newResultTable() resultTable {
-	var table resultTable
+func NewResultTable() ResultTable {
+	var table ResultTable
 
 	table.Table = simpletable.New()
 	table.Header = &simpletable.Header{
@@ -25,15 +25,15 @@ func newResultTable() resultTable {
 	return table
 }
 
-type resultTable struct {
+type ResultTable struct {
 	*simpletable.Table
 }
 
-func (t resultTable) WriteRow(row []*simpletable.Cell) {
+func (t *ResultTable) WriteRow(row []*simpletable.Cell) {
 	t.Body.Cells = append(t.Body.Cells, row)
 }
 
-func (t resultTable) WriteResult(res types.ValidatorResult) {
+func (t *ResultTable) WriteResult(res validator.Result) {
 	row := resultToRow(res)
 
 	if res.IsSuccess() {
@@ -47,7 +47,7 @@ func (t resultTable) WriteResult(res types.ValidatorResult) {
 	}
 }
 
-func resultToRow(res types.ValidatorResult) []*simpletable.Cell {
+func resultToRow(res validator.Result) []*simpletable.Cell {
 	var status string
 
 	if res.IsSuccess() {
@@ -60,8 +60,8 @@ func resultToRow(res types.ValidatorResult) []*simpletable.Cell {
 
 	return []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: status},
-		{Align: simpletable.AlignLeft, Text: res.ValidatorCode},
-		{Align: simpletable.AlignLeft, Text: res.ValidatorName},
-		{Align: simpletable.AlignLeft, Text: res.ValidatorDescription},
+		{Align: simpletable.AlignLeft, Text: res.Code.String()},
+		{Align: simpletable.AlignLeft, Text: res.Name},
+		{Align: simpletable.AlignLeft, Text: res.Description},
 	}
 }

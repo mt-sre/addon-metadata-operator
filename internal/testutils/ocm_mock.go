@@ -24,9 +24,7 @@ type MockOCMClient struct {
 }
 
 // Option applies the provided MockOCMClientOption to a MockOCMClientInstance
-func (c *MockOCMClient) Option(opt MockOCMClientOption) {
-	opt(c)
-}
+func (c *MockOCMClient) Option(opt MockOCMClientOption) { opt(c) }
 
 func (m *MockOCMClient) QuotaRuleExists(ctx context.Context, ocmQuotaName string) (bool, error) {
 	if !contains(ocmQuotaName, m.validQuotaNames) {
@@ -48,13 +46,13 @@ func (m *MockOCMClient) CloseConnection() error {
 	return nil
 }
 
-type MockOCMClientOption func(c *MockOCMClient)
+type MockOCMClientOption func(m *MockOCMClient)
 
 // MockOCMClientValidQuotaNames populates the MockOCMClient instance with
 // a list of dummy ocmQuotaNames that are guaranteed to return a SKU Rule.
 func MockOCMClientValidQuotaNames(names ...string) MockOCMClientOption {
-	return func(c *MockOCMClient) {
-		c.validQuotaNames = names
+	return func(m *MockOCMClient) {
+		m.validQuotaNames = names
 	}
 }
 

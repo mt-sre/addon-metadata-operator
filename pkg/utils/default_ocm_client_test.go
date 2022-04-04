@@ -1,11 +1,12 @@
 package utils_test
 
 import (
+	"context"
 	"os"
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
-	"github.com/mt-sre/addon-metadata-operator/pkg/validators"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -14,7 +15,7 @@ func TestDefaultOCMClientInterface(t *testing.T) {
 	t.Parallel()
 
 	require.Implements(t,
-		new(validators.OCMClient), new(utils.DefaultOCMClient),
+		new(validator.OCMClient), new(utils.DefaultOCMClient),
 		"utils.DefaultOCMClient must implement the types.OCMClient interface",
 	)
 }
@@ -23,8 +24,8 @@ func TestOCMResponseErrorInterface(t *testing.T) {
 	t.Parallel()
 
 	require.Implements(t,
-		new(validators.OCMError), utils.OCMResponseError(400),
-		"utils.OCMResponseError must implement the validators.OCMError interface",
+		new(validator.OCMError), utils.OCMResponseError(400),
+		"utils.OCMResponseError must implement the validator.OCMError interface",
 	)
 }
 
@@ -116,4 +117,22 @@ func TestEnvOCMTokenProviderProvideToken(t *testing.T) {
 			require.Equal(t, tc.expectedToken, token)
 		})
 	}
+}
+
+func TestDefaultOCMClientQuotaRuleExists(t *testing.T) {
+	t.Parallel()
+
+	var client utils.DefaultOCMClient
+
+	_, err := client.QuotaRuleExists(context.Background(), "")
+	require.Error(t, err)
+}
+
+func TestDefaultOCMClientCloseConnection(t *testing.T) {
+	t.Parallel()
+
+	var client utils.DefaultOCMClient
+
+	err := client.CloseConnection()
+	require.NoError(t, err)
 }

@@ -8,6 +8,7 @@ require (
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/fatih/color v1.13.0
 	github.com/go-logr/logr v0.4.0
+	github.com/go-logr/zapr v0.4.0
 	github.com/golang/snappy v0.0.1
 	github.com/novln/docker-parser v1.0.0
 	github.com/openshift-online/ocm-sdk-go v0.1.235
@@ -16,6 +17,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0
+	go.uber.org/zap v1.19.0
 	golang.org/x/mod v0.4.2
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.4.0

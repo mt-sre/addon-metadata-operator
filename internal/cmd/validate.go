@@ -1,15 +1,19 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
+	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/register"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
 )
@@ -70,18 +74,58 @@ func validateMain(cmd *cobra.Command, args []string) {
 		fail(1, "unable to extract and parse bundles from the given index image: %v", err)
 	}
 
-	filter, err := validate.NewFilter(validateDisabled, validateEnabled)
-	if err != nil {
-		fail(1, "unable to process filter flags: %v", err)
+	if validateDisabled != "" && validateEnabled != "" {
+		fail(1, "'--disabled' and '--enabled' are mutually exclusive options")
 	}
 
-	success, errs := validate.ValidateCLI(*types.NewMetaBundle(meta, bundles), filter)
-	if len(errs) > 0 {
+	filter, err := generateFilter(validateDisabled, validateEnabled)
+	if err != nil {
+		fail(1, "could not filter validators: %v", err)
+	}
+
+	runner, err := validator.NewRunner(
+		validator.WithMiddleware{
+			validator.NewRetryMiddleware(),
+		},
+	)
+	if err != nil {
+		fail(1, "unable to initialize validator: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	mb := types.MetaBundle{
+		AddonMeta: meta,
+		Bundles:   bundles,
+	}
+
+	var results validator.ResultList
+
+	for res := range runner.Run(ctx, mb, filter) {
+		results = append(results, res)
+	}
+
+	sort.Sort(results)
+
+	table := validate.NewResultTable()
+	for _, res := range results {
+		table.WriteResult(res)
+	}
+
+	fmt.Printf("%v\n\n", table.String())
+	fmt.Println("Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
+
+	if err := runner.CleanUp(); err != nil {
+		fail(1, "unable to release resources: %s", err)
+	}
+
+	if errs := results.Errors(); len(errs) > 0 {
 		utils.PrintValidationErrors(errs)
 		os.Exit(1)
 	}
 
-	if !success {
+	if results.HasFailure() {
 		os.Exit(1)
 	}
 }
@@ -139,4 +183,43 @@ func verifyVersion(version string) error {
 		return fmt.Errorf("'%s' is not a valid version; must be one of 'latest' or match 'MAJOR.MINOR.PATCH'", version)
 	}
 	return nil
+}
+
+func generateFilter(disabled, enabled string) (validator.Filter, error) {
+	if disabled == "" && enabled == "" {
+		return nil, nil
+	}
+
+	if disabled != "" {
+		codes, err := parseCodeList(disabled)
+		if err != nil {
+			return nil, fmt.Errorf("unable to process '--disabled' option argument: %w", err)
+		}
+
+		return validator.Not(validator.MatchesCodes(codes...)), nil
+	}
+
+	codes, err := parseCodeList(enabled)
+	if err != nil {
+		return nil, fmt.Errorf("unable to process '--enabled' option argument: %w", err)
+	}
+
+	return validator.MatchesCodes(codes...), nil
+}
+
+func parseCodeList(maybeList string) ([]validator.Code, error) {
+	rawStrings := strings.Split(maybeList, ",")
+
+	res := make([]validator.Code, 0, len(rawStrings))
+
+	for _, s := range rawStrings {
+		c, err := validator.ParseCode(s)
+		if err != nil {
+			return nil, fmt.Errorf("invalid code list '%s': %w", maybeList, err)
+		}
+
+		res = append(res, c)
+	}
+
+	return res, nil
 }
