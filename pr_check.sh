@@ -2,10 +2,14 @@
 
 set -exvo pipefail -o nounset
 
-IMAGE_TEST=addon-metadata-operator
+GO_1_16="/opt/go/1.16.15/bin"
 
-docker build -t ${IMAGE_TEST} -f Dockerfile.ci .
-docker run --rm ${IMAGE_TEST} check test test-e2e build
+if [ -d  "${GO_1_16}" ]; then
+     PATH="${GO_1_16}:${PATH}"
+fi
 
-# build addon-metadata-operator containers
-make docker-build
+# pre-emptively install go-sqlite3 to ensure amalgamated libsqlite3
+# source is present for compilation.
+go install github.com/mattn/go-sqlite3
+
+make check test test-e2e build docker-build
