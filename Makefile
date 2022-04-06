@@ -27,7 +27,7 @@ all: build
 ##@ Development
 
 test: ## Run tests.
-	@go test -count=1 -race $(PKGS)
+	@go test -count=1 -timeout 15m -race $(PKGS)
 
 
 test-e2e: ## Run e2e integration tests
