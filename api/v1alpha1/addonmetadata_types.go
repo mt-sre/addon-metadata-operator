@@ -102,6 +102,11 @@ type AddonMetadataSpec struct {
 	// Name of the addon operator.
 	OperatorName string `json:"operatorName" validate:"required"`
 
+	// +optional
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]$`
+	// Name of the addon OLM package. Defaults to operatorName when not specified.
+	PackageName string `json:"packageName" validate:"required"`
+
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum={alpha,beta,stable,edge,rc}
 	// OLM channel from which to install the addon-operator. One of: alpha, beta, stable, edge or rc.

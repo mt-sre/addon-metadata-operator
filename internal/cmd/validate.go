@@ -69,7 +69,7 @@ func validateMain(cmd *cobra.Command, args []string) {
 		fail(1, "unable to load addon metadata from file '%v': %v", addonDir, err)
 	}
 
-	bundles, err := utils.ExtractAndParseAddons(*meta.IndexImage, meta.OperatorName)
+	bundles, err := utils.ExtractAndParseAddons(*meta.IndexImage, meta.PackageName)
 	if err != nil {
 		fail(1, "unable to extract and parse bundles from the given index image: %v", err)
 	}

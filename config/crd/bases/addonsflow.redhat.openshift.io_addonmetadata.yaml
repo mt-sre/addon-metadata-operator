@@ -373,6 +373,10 @@ spec:
                 description: Name of the addon operator.
                 pattern: ^[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]$
                 type: string
+              packageName:
+                description: Name of the addon OLM package. Defaults to operatorName when not specified.
+                pattern: ^[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]$
+                type: string
               pagerduty:
                 properties:
                   acknowledgeTimeout:

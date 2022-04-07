@@ -13,26 +13,26 @@ func TestExtractAndParseAddons(t *testing.T) {
 	defer testutils.RemoveDir(utils.DefaultDownloadPath)
 	testCases := []struct {
 		indexImage             string
-		operatorName           string
+		packageName            string
 		expectedErrorSubstring *string
 	}{
 		{
 			indexImage:             "quay.io/osd-addons/reference-addon-index@sha256:b9e87a598e7fd6afb4bfedb31e4098435c2105cc8ebe33231c341e515ba9054d",
-			operatorName:           "reference-addon",
+			packageName:            "reference-addon",
 			expectedErrorSubstring: nil,
 		},
 		{
 			indexImage:             "quay.io/osd-addons/reference-addon-index@sha256:b9e87a598e7fd6afb4bfedb31e4098435c2105cc8ebe33231c341e515ba9054d",
-			operatorName:           "lorem-ipsum",
+			packageName:            "lorem-ipsum",
 			expectedErrorSubstring: testutils.GetStringLiteralRef("can't find any bundles for the operator 'lorem-ipsum'"),
 		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc // pin
-		t.Run(tc.operatorName, func(t *testing.T) {
+		t.Run(tc.packageName, func(t *testing.T) {
 			t.Parallel()
-			bundles, err := utils.ExtractAndParseAddons(tc.indexImage, tc.operatorName)
+			bundles, err := utils.ExtractAndParseAddons(tc.indexImage, tc.packageName)
 			if tc.expectedErrorSubstring == nil {
 				require.Greater(t, len(bundles), 0)
 				require.NoError(t, err)
