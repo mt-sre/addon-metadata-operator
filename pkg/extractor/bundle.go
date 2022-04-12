@@ -23,6 +23,7 @@ import (
 type DefaultBundleExtractor struct {
 	Log     logrus.FieldLogger
 	Cache   BundleCache
+	SkipTLS bool
 	Timeout time.Duration
 }
 
@@ -60,6 +61,10 @@ func WithBundleLog(log logrus.FieldLogger) BundleExtractorOpt {
 	return func(e *DefaultBundleExtractor) {
 		e.Log = log
 	}
+}
+
+func WithBundleSkipTLS(e *DefaultBundleExtractor) {
+	e.SkipTLS = true
 }
 
 func WithBundleTimeout(timeout time.Duration) BundleExtractorOpt {
@@ -116,7 +121,7 @@ func (e *DefaultBundleExtractor) unpackAndValidateBundle(ctx context.Context, bu
 	defer cancel()
 
 	registry, err := containerdregistry.NewRegistry(
-		containerdregistry.SkipTLS(false),
+		containerdregistry.SkipTLS(e.SkipTLS),
 		containerdregistry.WithLog(e.Log.(*logrus.Entry)),
 		// need a new cache dir for each registry to avoid data races and
 		// having the default "cache/ingest" dir removed from under our feet
