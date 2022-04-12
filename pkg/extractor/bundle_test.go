@@ -2,15 +2,19 @@ package extractor
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
+	"github.com/mt-sre/regtest"
+	dockerparser "github.com/novln/docker-parser"
 	"github.com/operator-framework/operator-registry/pkg/registry"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
 type testCase struct {
-	bundleImage         string
+	Image               string
+	TarFile             string
 	expectedPackageName string
 	expectedCSVName     string
 	expectedCSVVersion  string
@@ -22,16 +26,16 @@ func TestDefaultBundleExtractorImplements(t *testing.T) {
 
 func TestExtractorInMemoryCacheJSONSnappyEncoder(t *testing.T) {
 	cases := []testCase{
-		// reference-addon:0.1.6
 		{
-			bundleImage:         "quay.io/osd-addons/reference-addon-bundle@sha256:a62fd3f3b55aa58c587f0b7630f5e70b123d036a1a04a1bd5a866b5c576a04f4",
+			Image:               "localhost/reference-addon-bundle:v0.1.6",
+			TarFile:             "./testdata/reference-addon-bundle-v0.1.6.tar.gz",
 			expectedPackageName: "reference-addon",
 			expectedCSVName:     "reference-addon.v0.1.6",
 			expectedCSVVersion:  "0.1.6",
 		},
-		// reference-addon:0.1.5
 		{
-			bundleImage:         "quay.io/osd-addons/reference-addon-bundle@sha256:29879d193bd8da42e7b6500252b4d21bef733666bd893de2a3f9b250e591658e",
+			Image:               "localhost/reference-addon-bundle:v0.1.5",
+			TarFile:             "./testdata/reference-addon-bundle-v0.1.5.tar.gz",
 			expectedPackageName: "reference-addon",
 			expectedCSVName:     "reference-addon.v0.1.5",
 			expectedCSVVersion:  "0.1.5",
@@ -43,18 +47,27 @@ func TestExtractorInMemoryCacheJSONSnappyEncoder(t *testing.T) {
 	// adding extra logging for easier test debugging
 	log := logrus.New()
 	log.SetLevel(logrus.DebugLevel)
-	extractor := NewBundleExtractor(WithBundleCache(cache), WithBundleLog(log))
+	extractor := NewBundleExtractor(WithBundleCache(cache), WithBundleLog(log), WithBundleSkipTLS)
 
 	for _, tc := range cases {
 		tc := tc // pin
-		t.Run(tc.bundleImage, func(t *testing.T) {
+		t.Run(tc.Image, func(t *testing.T) {
 			t.Parallel()
-			bundle, err := extractor.Extract(context.Background(), tc.bundleImage)
+
+			reg := regtest.StartRegistry(t, regtest.WithImage("quay.io/openshifttest/registry:2"))
+
+			defer func() { _ = reg.Stop() }()
+
+			require.NoError(t, reg.Load(tc.Image, tc.TarFile))
+
+			fullRef := fmt.Sprintf("%s/%s", reg.Host(), getImageName(t, tc.Image))
+
+			bundle, err := extractor.Extract(context.Background(), fullRef)
 			require.NoError(t, err)
 			require.NotNil(t, bundle)
 			testBundleFields(t, bundle, tc)
 
-			cachedBundle, err := cache.Get(tc.bundleImage)
+			cachedBundle, err := cache.Get(fullRef)
 			require.NoError(t, err)
 			testBundleFields(t, cachedBundle, tc)
 
@@ -69,17 +82,28 @@ func TestExtractorInMemoryCacheJSONSnappyEncoder(t *testing.T) {
 }
 
 func testBundleFields(t *testing.T, b *registry.Bundle, tc testCase) {
-	require.Equal(t, b.Name, tc.expectedPackageName)
-	require.Equal(t, b.BundleImage, tc.bundleImage)
+	t.Helper()
+
+	require.Equal(t, tc.expectedPackageName, b.Name)
+	require.Equal(t, getImageName(t, tc.Image), getImageName(t, b.BundleImage))
 	require.NotNil(t, b.Annotations)
-	require.Equal(t, b.Annotations.PackageName, tc.expectedPackageName)
+	require.Equal(t, tc.expectedPackageName, b.Annotations.PackageName)
 
 	csv, err := b.ClusterServiceVersion()
 	require.NoError(t, err)
 	require.NotNil(t, csv)
-	require.Equal(t, csv.Name, tc.expectedCSVName)
+	require.Equal(t, tc.expectedCSVName, csv.Name)
 
 	version, err := csv.GetVersion()
 	require.NoError(t, err)
-	require.Equal(t, version, tc.expectedCSVVersion)
+	require.Equal(t, tc.expectedCSVVersion, version)
+}
+
+func getImageName(t *testing.T, ref string) string {
+	t.Helper()
+
+	parsed, err := dockerparser.Parse(ref)
+	require.NoError(t, err)
+
+	return parsed.Name()
 }
