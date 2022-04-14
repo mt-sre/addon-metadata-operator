@@ -2,12 +2,6 @@
 
 set -exvo pipefail -o nounset
 
-function changes_include(){
-     changed_files=$(git diff origin/master..HEAD --name-only | grep -c "$1")
-
-     [ "${changed_files}" -gt 0 ]
-}
-
 GO_1_16="/opt/go/1.16.15/bin"
 
 if [ -d  "${GO_1_16}" ]; then
@@ -18,9 +12,4 @@ fi
 # source is present for compilation.
 go install github.com/mattn/go-sqlite3
 
-make check test test-e2e build
-
-# only build docker image if Dockerfile or Makefile has changed.
-if changes_include "Dockerfile.build" || changes_include "Makefile"; then
-     make docker-build
-fi
+./mage run-hooks && ./mage test
