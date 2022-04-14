@@ -19,6 +19,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const AddonMetadataKind = "AddonMetadata"
+
 // AddonMetadataSpec defines the desired state of AddonMetadata
 // View markers: $ controller-gen -www crd
 // TODO add missing fields from schema, only required fields from jsonschema are present

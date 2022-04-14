@@ -4,17 +4,22 @@ import (
 	"encoding/json"
 
 	ocmv1 "github.com/mt-sre/addon-metadata-operator/pkg/ocm/v1"
-	"k8s.io/apimachinery/pkg/util/yaml"
+	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
+	"sigs.k8s.io/yaml"
 )
 
 // FromYAML - instantiates an AddonMetadataSpec struct from yaml data
 func (a *AddonMetadataSpec) FromYAML(data []byte) error {
-	return yaml.Unmarshal(data, a)
+	return yamlutil.Unmarshal(data, a)
 }
 
 // ToJSON - marshal AddonMetadata to JSON
 func (a *AddonMetadata) ToJSON() ([]byte, error) {
 	return json.Marshal(a)
+}
+
+func (a *AddonMetadata) ToYAML() ([]byte, error) {
+	return yaml.Marshal(a)
 }
 
 // CombineWithImageSet - Returns a new AddonMetadataSpec combined with the
