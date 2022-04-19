@@ -19,8 +19,6 @@ import (
 	"go.uber.org/multierr"
 )
 
-const repository = "quay.io/mtsre/addon-metadata-operator"
-
 var _depBin = filepath.Join(_dependencyDir, "bin")
 
 var _dependencyDir = func() string {
@@ -111,7 +109,7 @@ type Test mg.Namespace
 func (Test) Unit() error {
 	return sh.RunWith(map[string]string{
 		"CGO_CFLAGS": "-DSQLITE_ENABLE_JSON1",
-	}, mg.GoCmd(), "test",
+	}, mg.GoCmd(), "test", "-count=1", "-race", "-timeout", "15m",
 		"./api...",
 		"./cmd...",
 		"./internal...",
@@ -135,35 +133,69 @@ func (Test) Integration() error {
 }
 
 func (Test) Clean() error {
-	var files []string
-
-	if err := filepath.WalkDir(_projectRoot, func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() {
-			return nil
-		}
-
-		matches, err := filepath.Match("index_tmp_*", filepath.Base(path))
-		if err != nil {
-			return err
-		}
-
-		if matches {
-			files = append(files, path)
-		}
-
-		return nil
-	}); err != nil {
+	files, err := find(_projectRoot, fsTypeDir, "index_tmp_*")
+	if err != nil {
 		return err
 	}
 
 	var errCollector error
 
 	for _, f := range files {
-		multierr.AppendInto(&errCollector, fmt.Errorf("removing %s: %w", f, sh.Rm(f)))
+		multierr.AppendInto(&errCollector, sh.Rm(f))
 	}
 
 	return errCollector
 }
+
+type fsType string
+
+const (
+	fsTypeAll  fsType = "all"
+	fsTypeDir  fsType = "dir"
+	fsTypeFile fsType = "file"
+)
+
+func find(root string, fstype fsType, pattern string) ([]string, error) {
+	var result []string
+
+	hasCorrectType := func(fs.DirEntry) bool { return true }
+
+	switch fstype {
+	case fsTypeDir:
+		hasCorrectType = func(d fs.DirEntry) bool {
+			return d.IsDir()
+		}
+	case fsTypeFile:
+		hasCorrectType = func(d fs.DirEntry) bool {
+			return !d.IsDir()
+		}
+	}
+
+	searchFunc := func(path string, d fs.DirEntry, err error) error {
+		if !hasCorrectType(d) {
+			return nil
+		}
+
+		matches, err := filepath.Match(pattern, filepath.Base(path))
+		if err != nil {
+			return fmt.Errorf("matching %q against %q: %w", path, pattern, err)
+		}
+
+		if matches {
+			result = append(result, path)
+		}
+
+		return nil
+	}
+
+	if err := filepath.WalkDir(root, searchFunc); err != nil {
+		return nil, fmt.Errorf("walking directories: %w", err)
+	}
+
+	return result, nil
+}
+
+const repository = "quay.io/mtsre/addon-metadata-operator"
 
 type Build mg.Namespace
 
@@ -171,7 +203,11 @@ func (Build) CLI() error {
 	return sh.RunWith(map[string]string{
 		"CGO_ENABLED": "1",
 		"CGO_CFLAGS":  "-DSQLITE_ENABLE_JSON1",
-	}, mg.GoCmd(), "build", "-a", "-o", filepath.Join(_projectRoot, "bin", "mtcli"), filepath.Join("cmd", "mtcli", "main.go"))
+	}, mg.GoCmd(),
+		"build", "-a",
+		"-o", filepath.Join(_projectRoot, "bin", "mtcli"),
+		filepath.Join("cmd", "mtcli", "main.go"),
+	)
 }
 
 func (Build) CleanCLI() error {
@@ -181,7 +217,10 @@ func (Build) CleanCLI() error {
 func (Build) Operator() error {
 	return sh.RunWith(map[string]string{
 		"CGO_ENABLED": "0",
-	}, mg.GoCmd(), "build", "-a", "-o", filepath.Join(_projectRoot, "bin", "addon-metadata-operator"), filepath.Join("cmd", "addon-metadata-operator", "main.go"))
+	}, mg.GoCmd(), "build", "-a",
+		"-o", filepath.Join(_projectRoot, "bin", "addon-metadata-operator"),
+		filepath.Join("cmd", "addon-metadata-operator", "main.go"),
+	)
 }
 
 func (Build) CleanOperator() error {
@@ -194,7 +233,10 @@ func (Build) OperatorImage() error {
 		return errors.New("could not find container runtime")
 	}
 
-	return sh.Run(runtime, "build", "-t", fmt.Sprintf("%s:%s", repository, _tag), "-f", "Dockerfile.build", _projectRoot)
+	return sh.Run(runtime, "build",
+		"-t", fmt.Sprintf("%s:%s", repository, _tag),
+		"-f", "Dockerfile.build", _projectRoot,
+	)
 }
 
 type Generate mg.Namespace
@@ -261,15 +303,29 @@ func (Release) CLI() error {
 		Release.Container,
 	)
 
+	return runGoreleaser()
+}
+
+func (Release) CLISnapshot() error {
+	mg.Deps(
+		Release.Container,
+	)
+
+	return runGoreleaser("--snapshot")
+}
+
+func runGoreleaser(args ...string) error {
 	runtime := runtime()
 	if runtime == "" {
 		return errors.New("could not find container runtime")
 	}
 
-	return sh.Run(runtime, "run", "--rm",
+	return sh.Run(runtime, append([]string{
+		"run", "--rm",
 		"-e", "CGO_ENABLED=1",
+		"-e", "CGO_CFLAGS=-DSQLITE_ENABLE_JSON1",
 		"-e", fmt.Sprintf("GITHUB_TOKEN=%s", os.Getenv("GITHUB_TOKEN")),
-		fmt.Sprintf("amo-release:%s", _tag), "release",
+		fmt.Sprintf("amo-release:%s", _tag), "release"}, args...)...,
 	)
 }
 
@@ -415,16 +471,13 @@ type Hooks mg.Namespace
 func (Hooks) Enable(ctx context.Context) error {
 	mg.CtxDeps(ctx, Deps.UpdatePreCommit)
 
-	return sh.Run(filepath.Join(_depBin, "pre-commit"), "install",
-		"--hook-type", "pre-commit",
-		"--hook-type", "pre-push",
-	)
+	return sh.Run(filepath.Join(_depBin, "pre-commit"), "install")
 }
 
 func (Hooks) Disable(ctx context.Context) error {
 	mg.CtxDeps(ctx, Deps.UpdatePreCommit)
 
-	return sh.Run(filepath.Join(_depBin, "pre-commit"), "install")
+	return sh.Run(filepath.Join(_depBin, "pre-commit"), "uninstall")
 }
 
 func (Hooks) Run(ctx context.Context) error {
