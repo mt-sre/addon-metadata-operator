@@ -1,40 +1,62 @@
-# Supported hooks: https://pre-commit.com/hooks.html
-#
-# Install hooks:
-#   $ pre-commit install
-# Update hooks:
-#   $ pre-commit autoupdate
 ---
 exclude: ".*.deepcopy.go"
 repos:
-  - repo: local
-    hooks:
-      - id: tidy
-        name: tidy
-        language: system
-        entry: make tidy
-        pass_filenames: false
+# Fixers
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.1.0
+  hooks:
+  - id: end-of-file-fixer
+  - id: pretty-format-json
+    args:
+      - --autofix
+  - id: trailing-whitespace
 
-  # vet + fmt + golangci-lint + goimports
-  - repo: local
-    hooks:
-      - id: check
-        name: check
-        language: system
-        entry: make check
-        pass_filenames: false
+- repo: https://github.com/dnephin/pre-commit-golang
+  rev: v0.5.0
+  hooks:
+  - id: go-fmt
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
-    hooks:
-      - id: check-added-large-files
-      - id: check-case-conflict
-      - id: check-json
-      - id: check-merge-conflict
-      - id: check-symlinks
-      - id: detect-private-key
-      - id: end-of-file-fixer
-      - id: pretty-format-json
-        args:
-          - --autofix
-      - id: trailing-whitespace
+- repo: local
+  hooks:
+  - id: go-mod-tidy
+    name: go-mod-tidy
+    language: system
+    entry: ./mage check:tidy
+    pass_filenames: false
+    always_run: true
+    require_serial: true
+  - id: go-mod-verify
+    name: go-mod-verify
+    language: system
+    entry: ./mage check:verify
+    pass_filenames: false
+    always_run: true
+    require_serial: true
+
+# Checkers
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.1.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-case-conflict
+  - id: check-json
+  - id: check-merge-conflict
+  - id: check-symlinks
+  - id: detect-private-key
+
+- repo: local
+  hooks:
+  - id: golangci-lint
+    name: golangci-lint
+    language: system
+    entry: ./mage check:lint
+    pass_filenames: false
+    types: [go]
+    require_serial: true
+  - id: build-operator-image
+    name: build-operator-image
+    language: system
+    entry: ./mage build:operatorimage
+    pass_filenames: false
+    files: 'Dockerfile\.build$'
+    require_serial: true
