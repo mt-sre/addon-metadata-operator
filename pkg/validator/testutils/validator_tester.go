@@ -47,7 +47,7 @@ type ValidatorTester struct {
 
 type stringKey string
 
-var TestEnvKey = stringKey("TEST_AM0014")
+var TestEnvKey = stringKey("TEST")
 
 func (v *ValidatorTester) TestSingleBundle(mb types.MetaBundle) validator.Result {
 	return v.Val.Run(context.Background(), mb)
