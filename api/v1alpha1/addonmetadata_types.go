@@ -1,12 +1,9 @@
 /*
 Copyright 2021.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -198,6 +195,14 @@ type AddonMetadataSpec struct {
 	// +optional
 	// List of permissions in an IAM policy that are required by the addon operator.
 	PolicyPermissions *[]string `json:"policyPermissions"`
+
+	// +optional
+	// Name of the secret under secrets which is supposed to be used for pulling Catalog Image under CatalogSource.
+	PullSecretName string `json:"pullSecretName"`
+
+	// +optional
+	// List of secrets that are required by the addon.
+	Secrets []*mtsrev1.Secret `json:"secrets"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata
