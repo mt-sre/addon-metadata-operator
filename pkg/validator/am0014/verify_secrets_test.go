@@ -20,8 +20,24 @@ func TestVerifySecretParamsValid(t *testing.T) {
 	for name, bundle := range map[string]types.MetaBundle{
 		"valid secrets defined": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
-				ID:      "random-operator-1",
-				Secrets: []*mtsrev1.Secret{},
+				ID: "random-operator-1",
+				Secrets: &[]mtsrev1.Secret{
+					{
+						Name:      "secret-one",
+						Type:      "kubernetes.io/dockerconfigjson",
+						VaultPath: "mtsre/quay/osd-addons/secrets/random-operator-1/secret-one",
+					},
+					{
+						Name:      "secret-two",
+						Type:      "bootstrap.kubernetes.io/token",
+						VaultPath: "mtsre/quay/osd-addons/secrets/random-operator-1/secret-two",
+					},
+				},
+			},
+		},
+		"no secrets defined": {
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				ID: "random-operator-2",
 			},
 		},
 	} {
@@ -40,7 +56,7 @@ func TestVerifySecretParamsInvalid(t *testing.T) {
 		"secrets not present in deploy.yaml": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				ID: "random-operator-1",
-				Secrets: []*mtsrev1.Secret{
+				Secrets: &[]mtsrev1.Secret{
 					{
 						Name:      "secretsss-1",
 						Type:      "kubernetes.io/dockerconfigjson",

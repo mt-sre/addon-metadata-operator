@@ -202,7 +202,7 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// List of secrets that are required by the addon.
-	Secrets []*mtsrev1.Secret `json:"secrets"`
+	Secrets *[]mtsrev1.Secret `json:"secrets"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata
