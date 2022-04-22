@@ -45,6 +45,10 @@ type ValidatorTester struct {
 	ocm validator.OCMClient
 }
 
+type stringKey string
+
+var TestEnvKey = stringKey("TEST")
+
 func (v *ValidatorTester) TestSingleBundle(mb types.MetaBundle) validator.Result {
 	return v.Val.Run(context.Background(), mb)
 }
@@ -70,7 +74,9 @@ func (v *ValidatorTester) testBundles(bundles map[string]types.MetaBundle, asser
 		v.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			res := v.Val.Run(context.Background(), bundle)
+			ctx := context.WithValue(context.Background(), TestEnvKey, true)
+
+			res := v.Val.Run(ctx, bundle)
 			require.False(t, res.IsError())
 			assert(t, res.IsSuccess(), "Actual Result: %+v", res)
 		})
