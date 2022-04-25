@@ -8,17 +8,18 @@ require (
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/fatih/color v1.13.0
 	github.com/go-logr/logr v0.4.0
-	github.com/golang/snappy v0.0.1
+	github.com/golang/snappy v0.0.3
 	github.com/magefile/mage v1.13.0
+	github.com/mt-sre/go-ci v0.3.1
 	github.com/novln/docker-parser v1.0.0
 	github.com/openshift-online/ocm-sdk-go v0.1.235
 	github.com/operator-framework/api v0.10.5
 	github.com/operator-framework/operator-registry v1.19.5
 	github.com/sirupsen/logrus v1.8.1
-	github.com/spf13/cobra v1.1.3
-	github.com/stretchr/testify v1.7.0
+	github.com/spf13/cobra v1.3.0
+	github.com/stretchr/testify v1.7.1
 	go.uber.org/multierr v1.6.0
-	golang.org/x/mod v0.4.2
+	golang.org/x/mod v0.5.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
