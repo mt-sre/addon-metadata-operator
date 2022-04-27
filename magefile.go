@@ -170,11 +170,8 @@ func (Test) Unit(ctx context.Context) error {
 			"CGO_CFLAGS": "-DSQLITE_ENABLE_JSON1",
 		},
 		command.WithArgs{
-			"test", "-count=1", "-race", "-timeout", "15m",
-			"./api...",
-			"./cmd...",
-			"./internal...",
-			"./pkg...",
+			"test", "-v", "-tags=unit",
+			"-cover", "-count=1", "-race", "-timeout", "15m", "./...",
 		},
 		command.WithConsoleOut(mg.Verbose()),
 		command.WithContext{Context: ctx},
@@ -219,7 +216,7 @@ func (Test) Integration(ctx context.Context) error {
 			"E2E_MTCLI_PATH": e2eBin,
 		},
 		command.WithArgs{
-			"test", "-count=1", "-race", "./integration...",
+			"test", "-v", "-count=1", "-race", "./integration/...",
 		},
 		command.WithConsoleOut(mg.Verbose()),
 		command.WithContext{Context: ctx},
