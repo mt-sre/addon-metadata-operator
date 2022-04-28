@@ -402,16 +402,15 @@ func (Release) PushOperatorImage(ctx context.Context) {
 	mg.SerialCtxDeps(
 		ctx,
 		Build.OperatorImage,
-		mg.F(Release.tagImage, fmt.Sprintf("%s:%s", repository, _tag)),
+		mg.F(Release.tagImage, fmt.Sprintf("%s:%s", repository, _tag), fmt.Sprintf("%s:%s", repository, "latest")),
 		mg.F(Release.pushImage, fmt.Sprintf("%s:%s", repository, _tag)),
-		mg.F(Release.tagImage, fmt.Sprintf("%s:%s", repository, "latest")),
 		mg.F(Release.pushImage, fmt.Sprintf("%s:%s", repository, "latest")),
 	)
 }
 
-func (Release) tagImage(ctx context.Context, ref string) error {
+func (Release) tagImage(ctx context.Context, local, ref string) error {
 	tag := command.NewCommand("docker",
-		command.WithArgs{"tag", ref},
+		command.WithArgs{"tag", local, ref},
 		command.WithConsoleOut(mg.Verbose()),
 		command.WithContext{Context: ctx},
 	)
