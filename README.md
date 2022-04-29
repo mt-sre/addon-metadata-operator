@@ -77,6 +77,10 @@ You can also use the `Dockerfile.test` for a more stable environment:
 $ ./pr_check.sh
 ```
 
+### Adding validators
+
+See this [doc](docs/adding_validators.md) for more information on adding new validators.
+
 ## Release
 
 ### mtcli
