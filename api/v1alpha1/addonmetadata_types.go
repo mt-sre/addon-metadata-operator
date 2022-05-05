@@ -198,6 +198,14 @@ type AddonMetadataSpec struct {
 	// +optional
 	// List of permissions in an IAM policy that are required by the addon operator.
 	PolicyPermissions *[]string `json:"policyPermissions"`
+
+	// +optional
+	// Name of the secret under secrets which is supposed to be used for pulling Catalog Image under CatalogSource.
+	PullSecretName string `json:"pullSecretName"`
+
+	// +optional
+	// List of secrets that are required by the addon.
+	Secrets *[]mtsrev1.Secret `json:"secrets"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata
