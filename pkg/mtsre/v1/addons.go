@@ -133,7 +133,4 @@ type Secret struct {
 
 	// +kubebuilder:validation:Required
 	VaultPath string `json:"vaultPath" validate:"required"`
-
-	// +optional
-	DestinationSecretName *string `json:"destinationSecretName"`
 }
