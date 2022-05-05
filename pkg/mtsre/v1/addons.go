@@ -122,15 +122,3 @@ type EnvItem struct {
 	// +kubebuilder:validation:Required
 	Value string `json:"value" validate:"required"`
 }
-
-//+kubebuilder:object:generate=true
-type Secret struct {
-	// +kubebuilder:validation:Required
-	Name string `json:"name" validate:"required"`
-
-	// +kubebuilder:validation:Required
-	Type string `json:"type" validate:"required"`
-
-	// +kubebuilder:validation:Required
-	VaultPath string `json:"vaultPath" validate:"required"`
-}
