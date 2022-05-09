@@ -1,19 +1,28 @@
 package am0011
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
-	utils "github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSKURuleExistsValid(t *testing.T) {
 	t.Parallel()
 
-	bundles, err := utils.DefaultValidBundleMap()
+	ocm := testutils.NewMockOCMClient()
+	ocm.
+		On("QuotaRuleExists", context.Background(), "addon-reference-addon").
+		Return(true, nil).
+		On("QuotaRuleExists", context.Background(), "addon-successful-candidate").
+		Return(true, nil).
+		On("QuotaRuleExists", context.Background(), "addon-zero-quota-candidate").
+		Return(true, nil)
+
+	bundles, err := testutils.DefaultValidBundleMap()
 	require.NoError(t, err)
 
 	for name, bundle := range map[string]types.MetaBundle{
@@ -33,15 +42,9 @@ func TestSKURuleExistsValid(t *testing.T) {
 		bundles[name] = bundle
 	}
 
-	tester := utils.NewValidatorTester(
+	tester := testutils.NewValidatorTester(
 		t, NewOCMSKURuleExists,
-		utils.ValidatorTesterOCMClient(testutils.NewMockOCMClient(
-			testutils.MockOCMClientValidQuotaNames(
-				"addon-reference-addon",
-				"addon-successful-candidate",
-				"addon-zero-quota-candidate",
-			),
-		)),
+		testutils.ValidatorTesterOCMClient(ocm),
 	)
 	tester.TestValidBundles(bundles)
 }
@@ -49,15 +52,14 @@ func TestSKURuleExistsValid(t *testing.T) {
 func TestSKURuleExistsInvalid(t *testing.T) {
 	t.Parallel()
 
-	tester := utils.NewValidatorTester(
+	ocm := testutils.NewMockOCMClient()
+	ocm.
+		On("QuotaRuleExists", context.Background(), "addon-failing-candidate").
+		Return(false, nil)
+
+	tester := testutils.NewValidatorTester(
 		t, NewOCMSKURuleExists,
-		utils.ValidatorTesterOCMClient(testutils.NewMockOCMClient(
-			testutils.MockOCMClientValidQuotaNames(
-				"addon-reference-addon",
-				"addon-successful-candidate",
-				"addon-zero-quota-candidate",
-			),
-		)),
+		testutils.ValidatorTesterOCMClient(ocm),
 	)
 
 	tester.TestInvalidBundles(map[string]types.MetaBundle{
