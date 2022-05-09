@@ -2,10 +2,7 @@ package am0005
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
@@ -13,10 +10,9 @@ import (
 )
 
 const (
-	code            = 5
-	name            = "test_harness"
-	description     = "Ensure that an addon has a valid testharness image"
-	quayRegistryApi = "https://quay.io/v2"
+	code        = 5
+	name        = "test_harness"
+	description = "Ensure that an addon has a valid testharness image"
 )
 
 func init() {
@@ -35,46 +31,33 @@ func NewTestHarnessExists(deps validator.Dependencies) (validator.Validator, err
 
 	return &TestHarnessExists{
 		Base: base,
+		quay: deps.QuayClient,
 	}, nil
 }
 
 type TestHarnessExists struct {
 	*validator.Base
+	quay validator.QuayClient
 }
 
 func (t *TestHarnessExists) Run(ctx context.Context, mb types.MetaBundle) validator.Result {
-	res, err := imageparser.Parse(mb.AddonMeta.TestHarness)
+	ref, err := imageparser.Parse(mb.AddonMeta.TestHarness)
 	if err != nil {
 		return t.Fail("Failed to parse testharness url")
 	}
-	if res.Registry() != "quay.io" {
+
+	if ref.Registry() != "quay.io" {
 		return t.Fail("Testharness image is not in the quay.io registry")
 	}
-	return t.checkImageExists(res)
-}
 
-func (t *TestHarnessExists) checkImageExists(imageUri *imageparser.Reference) validator.Result {
-	apiUrl := fmt.Sprintf("%s/%s/manifests/%s", quayRegistryApi, imageUri.ShortName(), imageUri.Tag())
-	resp, err := http.Get(apiUrl)
+	ok, err := t.quay.HasReference(ctx, ref)
 	if err != nil {
-		if isRetryable(err) {
-			return t.RetryableError(err)
-		}
 		return t.Error(err)
 	}
 
-	// Retry on 5xx responses
-	if resp.StatusCode >= 500 {
-		return t.RetryableError(errors.New("received 5XX response from quay.io"))
+	if !ok {
+		return t.Fail(fmt.Sprintf("The testharness image %q does not exist", ref.Name()))
 	}
 
-	if resp.StatusCode == 200 {
-		return t.Success()
-	}
-	return t.Fail(fmt.Sprintf("Test harness image doesn't exist. Received non 200 response code from quay: '%v'.", resp.StatusCode))
-}
-
-func isRetryable(err error) bool {
-	urlErr, ok := err.(*url.Error)
-	return ok && urlErr.Timeout()
+	return t.Success()
 }

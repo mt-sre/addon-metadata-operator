@@ -30,8 +30,9 @@ func NewValidatorTester(t *testing.T, init validator.Initializer, opts ...Valida
 
 	// This also ensures that a validator implements the validator.Validator interface
 	vt.Val, err = init(validator.Dependencies{
-		Logger:    vt.log,
-		OCMClient: vt.ocm,
+		Logger:     vt.log,
+		OCMClient:  vt.ocm,
+		QuayClient: vt.quay,
 	})
 	require.NoError(t, err)
 
@@ -40,9 +41,10 @@ func NewValidatorTester(t *testing.T, init validator.Initializer, opts ...Valida
 
 type ValidatorTester struct {
 	*testing.T
-	Val validator.Validator
-	log logr.Logger
-	ocm validator.OCMClient
+	Val  validator.Validator
+	log  logr.Logger
+	ocm  validator.OCMClient
+	quay validator.QuayClient
 }
 
 func (v *ValidatorTester) TestSingleBundle(mb types.MetaBundle) validator.Result {
@@ -90,6 +92,12 @@ func ValidatorTesterLogger(l logr.Logger) ValidatorTesterOption {
 func ValidatorTesterOCMClient(ocm validator.OCMClient) ValidatorTesterOption {
 	return func(v *ValidatorTester) {
 		v.ocm = ocm
+	}
+}
+
+func ValidatorTesterQuayClient(quay validator.QuayClient) ValidatorTesterOption {
+	return func(v *ValidatorTester) {
+		v.quay = quay
 	}
 }
 

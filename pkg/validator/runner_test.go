@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -86,9 +85,7 @@ func TestRunnerRegistration(t *testing.T) {
 		),
 	)
 
-	runner, err := NewRunner(
-		WithOCMClient{testutils.NewMockOCMClient()},
-	)
+	runner, err := NewRunner()
 	require.NoError(t, err)
 
 	vals := runner.GetValidators(MatchesCodes(code))
@@ -115,7 +112,6 @@ func TestRunnerMiddleware(t *testing.T) {
 	var actualCount int
 
 	runner, err := NewRunner(
-		WithOCMClient{testutils.NewMockOCMClient()},
 		WithInitializers{
 			NewValidatorMock(
 				code,

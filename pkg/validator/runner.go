@@ -26,8 +26,9 @@ type Initializer func(Dependencies) (Validator, error)
 
 // Dependencies abstracts common dependencies for Validators.
 type Dependencies struct {
-	Logger    logr.Logger
-	OCMClient OCMClient
+	Logger     logr.Logger
+	OCMClient  OCMClient
+	QuayClient QuayClient
 }
 
 // NewRunner returns a Runner configured with a variadic
@@ -42,8 +43,9 @@ func NewRunner(opts ...RunnerOption) (*Runner, error) {
 	}
 
 	deps := Dependencies{
-		Logger:    cfg.Logger,
-		OCMClient: cfg.OCMClient,
+		Logger:     cfg.Logger,
+		OCMClient:  cfg.OCMClient,
+		QuayClient: cfg.QuayClient,
 	}
 
 	entries := make(map[Code]validatorEntry)
@@ -143,6 +145,7 @@ type RunnerConfig struct {
 	Logger       logr.Logger
 	Middleware   []Middleware
 	OCMClient    OCMClient
+	QuayClient   QuayClient
 }
 
 func (c *RunnerConfig) Option(opts ...RunnerOption) {
@@ -173,6 +176,10 @@ func (c *RunnerConfig) Default() error {
 		c.OCMClient = o
 	}
 
+	if c.QuayClient == nil {
+		c.QuayClient = NewQuayClient()
+	}
+
 	return nil
 }
 
@@ -195,6 +202,10 @@ func (m WithMiddleware) ApplyToRunnerConfig(c *RunnerConfig) { c.Middleware = m 
 type WithOCMClient struct{ OCMClient }
 
 func (o WithOCMClient) ApplyToRunnerConfig(c *RunnerConfig) { c.OCMClient = o }
+
+type WithQuayClient struct{ QuayClient }
+
+func (q WithQuayClient) ApplyToRunnerConfig(c *RunnerConfig) { c.QuayClient = q }
 
 type validatorEntry struct {
 	Validator
