@@ -1,9 +1,17 @@
-package validate
+package cli
 
 import (
+	"fmt"
+
 	"github.com/alexeyco/simpletable"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
+	"github.com/fatih/color"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
+)
+
+var (
+	green            = color.New(color.FgGreen).SprintFunc()
+	red              = color.New(color.FgRed).SprintFunc()
+	intenselyBoldRed = color.New(color.Bold, color.FgHiRed).SprintFunc()
 )
 
 func NewResultTable() ResultTable {
@@ -51,11 +59,11 @@ func resultToRow(res validator.Result) []*simpletable.Cell {
 	var status string
 
 	if res.IsSuccess() {
-		status = utils.Green("Success")
+		status = green("Success")
 	} else if res.IsError() {
-		status = utils.IntenselyBoldRed("Error")
+		status = intenselyBoldRed("Error")
 	} else {
-		status = utils.Red("Failed")
+		status = red("Failed")
 	}
 
 	return []*simpletable.Cell{
@@ -63,5 +71,13 @@ func resultToRow(res validator.Result) []*simpletable.Cell {
 		{Align: simpletable.AlignLeft, Text: res.Code.String()},
 		{Align: simpletable.AlignLeft, Text: res.Name},
 		{Align: simpletable.AlignLeft, Text: res.Description},
+	}
+}
+
+// PrintValidationErrors - helper to pretty print validationErrors
+func PrintValidationErrors(errs []error) {
+	fmt.Printf("\n%s\n", red("Failed with the following errors:"))
+	for _, err := range errs {
+		fmt.Printf("%s\n", err.Error())
 	}
 }

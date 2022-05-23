@@ -9,9 +9,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/internal/cli"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
-	"github.com/mt-sre/addon-metadata-operator/pkg/validate"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/register"
 	"github.com/spf13/cobra"
@@ -108,7 +108,7 @@ func validateMain(cmd *cobra.Command, args []string) {
 
 	sort.Sort(results)
 
-	table := validate.NewResultTable()
+	table := cli.NewResultTable()
 	for _, res := range results {
 		table.WriteResult(res)
 	}
@@ -121,7 +121,7 @@ func validateMain(cmd *cobra.Command, args []string) {
 	}
 
 	if errs := results.Errors(); len(errs) > 0 {
-		utils.PrintValidationErrors(errs)
+		cli.PrintValidationErrors(errs)
 		os.Exit(1)
 	}
 
