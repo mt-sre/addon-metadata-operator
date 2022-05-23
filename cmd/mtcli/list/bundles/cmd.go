@@ -2,6 +2,7 @@ package bundles
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
@@ -43,7 +44,7 @@ func run(cmd *cobra.Command, args []string) error {
 		operatorVersionedNames = append(operatorVersionedNames, csv.GetName())
 	}
 
-	fmt.Println(strings.Join(operatorVersionedNames, "\n"))
+	fmt.Fprintln(os.Stdout, strings.Join(operatorVersionedNames, "\n"))
 
 	return nil
 }

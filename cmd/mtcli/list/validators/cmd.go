@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/alexeyco/simpletable"
+	"github.com/mt-sre/addon-metadata-operator/internal/cli"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/register"
 	"github.com/spf13/cobra"
@@ -33,34 +33,23 @@ func run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("listing validators: %s\n", err)
 	}
 
-	t := simpletable.New()
-	t.Header = getTableHeaders()
-	t.SetStyle(simpletable.StyleCompactLite)
+	table, err := cli.NewTable(
+		cli.WithHeaders{"CODE", "NAME", "DESCRIPTION"},
+	)
+	if err != nil {
+		return fmt.Errorf("initializing table: %w", err)
+	}
 
 	for _, v := range runner.GetValidators() {
-		row := newTableRow(v)
-		t.Body.Cells = append(t.Body.Cells, row)
+		table.WriteRow(cli.TableRow{
+			cli.Field{Value: v.Code().String()},
+			cli.Field{Value: v.Name()},
+			cli.Field{Value: v.Description()},
+		})
 	}
 
-	fmt.Fprintf(os.Stdout, "%v\n\n", t.String())
+	fmt.Fprintln(os.Stdout, table.String())
+	fmt.Fprintln(os.Stdout)
 
 	return nil
-}
-
-func getTableHeaders() *simpletable.Header {
-	return &simpletable.Header{
-		Cells: []*simpletable.Cell{
-			{Align: simpletable.AlignCenter, Text: "CODE"},
-			{Align: simpletable.AlignCenter, Text: "NAME"},
-			{Align: simpletable.AlignCenter, Text: "DESCRIPTION"},
-		},
-	}
-}
-
-func newTableRow(v validator.Validator) []*simpletable.Cell {
-	return []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: v.Code().String()},
-		{Align: simpletable.AlignLeft, Text: v.Name()},
-		{Align: simpletable.AlignLeft, Text: v.Description()},
-	}
 }

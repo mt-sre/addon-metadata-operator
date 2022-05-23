@@ -1,11 +1,119 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/alexeyco/simpletable"
 	"github.com/fatih/color"
-	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
+)
+
+var ErrInvalidTableStyle = errors.New("invalid table style")
+
+type TableStyle string
+
+func (ts TableStyle) ToSimpleTableStyle() (*simpletable.Style, error) {
+	switch ts {
+	case TableStyleCompactLite:
+		return simpletable.StyleCompactLite, nil
+	default:
+		return nil, ErrInvalidTableStyle
+	}
+}
+
+const (
+	TableStyleCompactLite TableStyle = "compactLite"
+)
+
+type TableHeader []string
+
+func (th TableHeader) ToSimpleTableHeader() *simpletable.Header {
+	var res simpletable.Header
+
+	for _, col := range th {
+		res.Cells = append(res.Cells,
+			&simpletable.Cell{Align: simpletable.AlignCenter, Text: col},
+		)
+	}
+
+	return &res
+}
+
+func NewTable(opts ...TableOption) (*Table, error) {
+	var cfg TableConfig
+
+	if err := cfg.Option(opts...); err != nil {
+		return nil, fmt.Errorf("applying options: %w", err)
+	}
+
+	cfg.Default()
+
+	table := simpletable.New()
+	table.SetStyle(cfg.Style)
+	table.Header = cfg.Header
+
+	return &Table{
+		cfg: cfg,
+		t:   table,
+	}, nil
+}
+
+type Table struct {
+	cfg TableConfig
+	t   *simpletable.Table
+}
+
+func (t *Table) String() string {
+	return t.t.String()
+}
+
+func (t *Table) WriteRow(row TableRow) {
+	t.t.Body.Cells = append(t.t.Body.Cells, row.ToCells())
+}
+
+type TableRow []Field
+
+func (r TableRow) ToCells() []*simpletable.Cell {
+	res := make([]*simpletable.Cell, 0, len(r))
+
+	for _, f := range r {
+		res = append(res, f.ToCell())
+	}
+
+	return res
+}
+
+type Field struct {
+	Value string
+	Color FieldColor
+}
+
+func (f Field) ToCell() *simpletable.Cell {
+	return &simpletable.Cell{
+		Align: simpletable.AlignLeft,
+		Text:  f.Color.Apply(f.Value),
+	}
+}
+
+type FieldColor string
+
+func (fc FieldColor) Apply(s string) string {
+	switch fc {
+	case FieldColorGreen:
+		return green(s)
+	case FieldColorRed:
+		return red(s)
+	case FieldColorIntenselyBoldRed:
+		return intenselyBoldRed(s)
+	default:
+		return s
+	}
+}
+
+const (
+	FieldColorGreen            FieldColor = "green"
+	FieldColorRed              FieldColor = "red"
+	FieldColorIntenselyBoldRed FieldColor = "intenselyBoldRed"
 )
 
 var (
@@ -14,64 +122,50 @@ var (
 	intenselyBoldRed = color.New(color.Bold, color.FgHiRed).SprintFunc()
 )
 
-func NewResultTable() ResultTable {
-	var table ResultTable
-
-	table.Table = simpletable.New()
-	table.Header = &simpletable.Header{
-		Cells: []*simpletable.Cell{
-			{Align: simpletable.AlignCenter, Text: "STATUS"},
-			{Align: simpletable.AlignCenter, Text: "CODE"},
-			{Align: simpletable.AlignCenter, Text: "NAME"},
-			{Align: simpletable.AlignCenter, Text: "DESCRIPTION"},
-			{Align: simpletable.AlignCenter, Text: "FAILURE MESSAGE"},
-		},
-	}
-
-	table.SetStyle(simpletable.StyleCompactLite)
-
-	return table
+type TableConfig struct {
+	Header *simpletable.Header
+	Style  *simpletable.Style
 }
 
-type ResultTable struct {
-	*simpletable.Table
-}
-
-func (t *ResultTable) WriteRow(row []*simpletable.Cell) {
-	t.Body.Cells = append(t.Body.Cells, row)
-}
-
-func (t *ResultTable) WriteResult(res validator.Result) {
-	row := resultToRow(res)
-
-	if res.IsSuccess() {
-		t.WriteRow(append(row, &simpletable.Cell{Align: simpletable.AlignLeft, Text: "None"}))
-	} else if res.IsError() {
-		t.WriteRow(append(row, &simpletable.Cell{Align: simpletable.AlignLeft, Text: res.Error.Error()}))
-	} else {
-		for _, msg := range res.FailureMsgs {
-			t.WriteRow(append(row, &simpletable.Cell{Align: simpletable.AlignLeft, Text: msg}))
+func (c *TableConfig) Option(opts ...TableOption) error {
+	for _, opt := range opts {
+		if err := opt.ConfigureTable(c); err != nil {
+			return fmt.Errorf("configuring table: %w", err)
 		}
 	}
+
+	return nil
 }
 
-func resultToRow(res validator.Result) []*simpletable.Cell {
-	var status string
+func (c *TableConfig) Default() {
+	if c.Style == nil {
+		c.Style = simpletable.StyleCompactLite
+	}
+}
 
-	if res.IsSuccess() {
-		status = green("Success")
-	} else if res.IsError() {
-		status = intenselyBoldRed("Error")
-	} else {
-		status = red("Failed")
+type TableOption interface {
+	ConfigureTable(*TableConfig) error
+}
+
+type WithHeaders TableHeader
+
+func (h WithHeaders) ConfigureTable(c *TableConfig) error {
+	c.Header = TableHeader(h).ToSimpleTableHeader()
+
+	return nil
+}
+
+type WithStyle TableStyle
+
+func (s WithStyle) ConfigureTable(c *TableConfig) error {
+	style, err := TableStyle(s).ToSimpleTableStyle()
+	if err != nil {
+		return fmt.Errorf("parsing table style %q: %w", s, err)
 	}
 
-	return []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: status},
-		{Align: simpletable.AlignLeft, Text: res.Code.String()},
-		{Align: simpletable.AlignLeft, Text: res.Name},
-		{Align: simpletable.AlignLeft, Text: res.Description},
-	}
+	c.Style = style
+
+	return nil
 }
 
 // PrintValidationErrors - helper to pretty print validationErrors

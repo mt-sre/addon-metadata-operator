@@ -119,13 +119,19 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 
 		sort.Sort(results)
 
-		table := cli.NewResultTable()
+		table, err := cli.NewTable(
+			cli.WithHeaders{"STATUS", "CODE", "NAME", "DESCRIPTION", "FAILURE MESSAGE"},
+		)
+		if err != nil {
+			return fmt.Errorf("initializing table: %w", err)
+		}
 		for _, res := range results {
-			table.WriteResult(res)
+			writeResult(table, res)
 		}
 
-		fmt.Printf("%v\n\n", table.String())
-		fmt.Println("Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
+		fmt.Fprintln(os.Stdout, table.String())
+		fmt.Fprintln(os.Stdout)
+		fmt.Fprintln(os.Stdout, "Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
 
 		if err := runner.CleanUp(); err != nil {
 			return fmt.Errorf("cleaning up validators: %w", err)
@@ -203,4 +209,46 @@ func parseCodeList(maybeList string) ([]validator.Code, error) {
 	}
 
 	return res, nil
+}
+
+func writeResult(t *cli.Table, res validator.Result) {
+	row := resultToRow(res)
+
+	if res.IsSuccess() {
+		t.WriteRow(append(row, cli.Field{Value: "None"}))
+	} else if res.IsError() {
+		t.WriteRow(append(row, cli.Field{Value: res.Error.Error()}))
+	} else {
+		for _, msg := range res.FailureMsgs {
+			t.WriteRow(append(row, cli.Field{Value: msg}))
+		}
+	}
+}
+
+func resultToRow(res validator.Result) cli.TableRow {
+	var status cli.Field
+
+	if res.IsSuccess() {
+		status = cli.Field{
+			Value: "Success",
+			Color: cli.FieldColorGreen,
+		}
+	} else if res.IsError() {
+		status = cli.Field{
+			Value: "Error",
+			Color: cli.FieldColorIntenselyBoldRed,
+		}
+	} else {
+		status = cli.Field{
+			Value: "Failed",
+			Color: cli.FieldColorRed,
+		}
+	}
+
+	return cli.TableRow{
+		status,
+		cli.Field{Value: res.Code.String()},
+		cli.Field{Value: res.Name},
+		cli.Field{Value: res.Description},
+	}
 }
