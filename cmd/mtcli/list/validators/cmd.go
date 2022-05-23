@@ -1,4 +1,4 @@
-package cmd
+package validators
 
 import (
 	"fmt"
@@ -11,39 +11,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	listCmd.AddCommand(listValidatorsCmd)
-}
-
-var (
-	listValidatorsExamples = []string{
+func examples() string {
+	return strings.Join([]string{
 		"  # List all the registered validators.",
 		"  mtcli list validators",
-	}
-	listValidatorsCmd = &cobra.Command{
+	}, "\n")
+}
+
+func Cmd() *cobra.Command {
+	return &cobra.Command{
 		Use:     "validators",
 		Short:   "List all the registered validators.",
-		Example: strings.Join(listValidatorsExamples, "\n"),
-		Run:     listValidatorsMain,
+		Example: examples(),
+		RunE:    run,
 	}
-)
+}
 
-func listValidatorsMain(cmd *cobra.Command, args []string) {
-	t := simpletable.New()
-	t.Header = getTableHeaders()
-
+func run(cmd *cobra.Command, args []string) error {
 	runner, err := validator.NewRunner()
 	if err != nil {
-		fmt.Printf("Unable to list validator: %s\n", err)
-		os.Exit(1)
+		return fmt.Errorf("listing validators: %s\n", err)
 	}
+
+	t := simpletable.New()
+	t.Header = getTableHeaders()
+	t.SetStyle(simpletable.StyleCompactLite)
 
 	for _, v := range runner.GetValidators() {
 		row := newTableRow(v)
 		t.Body.Cells = append(t.Body.Cells, row)
 	}
-	t.SetStyle(simpletable.StyleCompactLite)
-	fmt.Printf("%v\n\n", t.String())
+
+	fmt.Fprintf(os.Stdout, "%v\n\n", t.String())
+
+	return nil
 }
 
 func getTableHeaders() *simpletable.Header {
