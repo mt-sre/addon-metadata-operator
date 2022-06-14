@@ -41,12 +41,14 @@ func Cmd() *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:     "validate",
-		Short:   "Validate addon metadata, bundles and imagesets.",
-		Long:    long,
-		Example: examples(),
-		Args:    cobra.ExactArgs(1),
-		RunE:    run(opts),
+		Use:           "validate",
+		Short:         "Validate addon metadata, bundles and imagesets.",
+		Long:          long,
+		Example:       examples(),
+		Args:          cobra.ExactArgs(1),
+		RunE:          run(opts),
+		SilenceErrors: true,
+		SilenceUsage:  true,
 	}
 
 	flags := cmd.PersistentFlags()
