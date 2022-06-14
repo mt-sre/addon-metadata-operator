@@ -1,12 +1,10 @@
-package utils_test
+package validator
 
 import (
 	"context"
 	"os"
 	"testing"
 
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
-	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +13,7 @@ func TestDefaultOCMClientInterface(t *testing.T) {
 	t.Parallel()
 
 	require.Implements(t,
-		new(validator.OCMClient), new(utils.DefaultOCMClient),
+		new(OCMClient), new(DefaultOCMClient),
 		"utils.DefaultOCMClient must implement the types.OCMClient interface",
 	)
 }
@@ -24,7 +22,7 @@ func TestOCMResponseErrorInterface(t *testing.T) {
 	t.Parallel()
 
 	require.Implements(t,
-		new(validator.OCMError), utils.OCMResponseError(400),
+		new(OCMError), OCMResponseError(400),
 		"utils.OCMResponseError must implement the validator.OCMError interface",
 	)
 }
@@ -69,7 +67,7 @@ func TestOCMResponseErrorServerSide(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			assert.Equal(t, utils.OCMResponseError(tc.code).ServerSide(), tc.result)
+			assert.Equal(t, OCMResponseError(tc.code).ServerSide(), tc.result)
 		})
 	}
 }
@@ -77,7 +75,7 @@ func TestOCMResponseErrorServerSide(t *testing.T) {
 func TestEnvOCMTokenProviderInterface(t *testing.T) {
 	t.Parallel()
 
-	require.Implements(t, new(utils.OCMTokenProvider), utils.EnvOCMTokenProvider{})
+	require.Implements(t, new(OCMTokenProvider), EnvOCMTokenProvider{})
 }
 
 func TestEnvOCMTokenProviderProvideToken(t *testing.T) {
@@ -112,7 +110,7 @@ func TestEnvOCMTokenProviderProvideToken(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			token, err := utils.NewEnvOCMTokenProvider(tc.envVar).ProvideToken()
+			token, err := NewEnvOCMTokenProvider(tc.envVar).ProvideToken()
 			tc.assertFunc(t, err)
 			require.Equal(t, tc.expectedToken, token)
 		})
@@ -122,7 +120,7 @@ func TestEnvOCMTokenProviderProvideToken(t *testing.T) {
 func TestDefaultOCMClientQuotaRuleExists(t *testing.T) {
 	t.Parallel()
 
-	var client utils.DefaultOCMClient
+	var client DefaultOCMClient
 
 	_, err := client.QuotaRuleExists(context.Background(), "")
 	require.Error(t, err)
@@ -131,7 +129,7 @@ func TestDefaultOCMClientQuotaRuleExists(t *testing.T) {
 func TestDefaultOCMClientCloseConnection(t *testing.T) {
 	t.Parallel()
 
-	var client utils.DefaultOCMClient
+	var client DefaultOCMClient
 
 	err := client.CloseConnection()
 	require.NoError(t, err)

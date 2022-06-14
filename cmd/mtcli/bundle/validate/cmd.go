@@ -1,7 +1,7 @@
-package cmd
+package validate
 
 import (
-	"log"
+	"fmt"
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
@@ -9,29 +9,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	bundleCmd.AddCommand(validateBundleCmd)
-}
-
-var (
-	validateBundleExamples = []string{
+func examples() string {
+	return strings.Join([]string{
 		"  # Validate a bundle given it's directory.",
 		"  mtcli bundle validate <bundle_path>",
-	}
-	validateBundleCmd = &cobra.Command{
+	}, "\n")
+}
+
+func Cmd() *cobra.Command {
+	return &cobra.Command{
 		Use:     "validate",
 		Short:   "Validate a bundle given it's directory.",
 		Long:    "Same as `$ opm alpha bundle validate <image>` but works locally.",
-		Example: strings.Join(validateBundleExamples, "\n"),
+		Example: examples(),
 		Args:    cobra.ExactArgs(1),
-		Run:     validateBundleMain,
+		RunE:    run,
 	}
-)
+}
 
-func validateBundleMain(cmd *cobra.Command, args []string) {
+func run(cmd *cobra.Command, args []string) error {
 	path := args[0]
 	bundleExtractor := extractor.NewBundleExtractor()
+
 	if err := bundleExtractor.ValidateBundle(nil, path); err != nil {
-		log.Fatalf("Failed to validate bundle %s: %s.", path, err)
+		return fmt.Errorf("validating bundle %s: %w", path, err)
 	}
+
+	return nil
 }

@@ -1,16 +1,12 @@
-package cmd
+package completion
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
-
-func init() {
-	mtcli.AddCommand(completionCmd)
-}
 
 var (
 	completionExample = []string{
@@ -30,33 +26,36 @@ var (
 		"  # Load the mtcli completion code for zsh into the current shell",
 		"  source <(mtcli completion zsh)",
 		"  # Set the mtcli completion code for zsh to autoload on startup",
-		"  mtcli completion zsh > ${fpath[1]}/_archsugar",
-	}
-	completionCmd = &cobra.Command{
-		Use:       "completion SHELL",
-		Short:     "Output shell completion code for the specified shell (bash or zsh)",
-		Example:   strings.Join(completionExample, "\n"),
-		Run:       completionMain,
-		ValidArgs: []string{"zsh", "bash"},
+		"  mtcli completion zsh > ${fpath[1]}/_mtcli",
 	}
 )
 
-func completionMain(cmd *cobra.Command, args []string) {
-	err := cobra.OnlyValidArgs(cmd, args)
-	if err != nil {
-		log.Fatal(err)
+func Cmd() *cobra.Command {
+	return &cobra.Command{
+		Use:       "completion SHELL",
+		Short:     "Output shell completion code for the specified shell (bash or zsh)",
+		Example:   strings.Join(completionExample, "\n"),
+		RunE:      run,
+		ValidArgs: []string{"zsh", "bash"},
+	}
+}
+
+func run(cmd *cobra.Command, args []string) error {
+	if err := cobra.OnlyValidArgs(cmd, args); err != nil {
+		return fmt.Errorf("parsing arguments: %w", err)
 	}
 
 	shell := args[0]
 	switch shell {
 	case "bash":
-		err = mtcli.GenBashCompletion(os.Stdout)
+		if err := cmd.Root().GenBashCompletion(os.Stdout); err != nil {
+			return fmt.Errorf("generating bash completions: %w", err)
+		}
 	case "zsh":
-		err = mtcli.GenZshCompletion(os.Stdout)
+		if err := cmd.Root().GenZshCompletion(os.Stdout); err != nil {
+			return fmt.Errorf("generating zsh completions: %w", err)
+		}
 	}
 
-	if err != nil {
-		log.Fatalf("Can't generate completion code for shell %v, got %v.\n", shell, err)
-	}
-
+	return nil
 }

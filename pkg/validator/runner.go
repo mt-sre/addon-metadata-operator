@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
 
 var initializers []Initializer
@@ -164,7 +163,7 @@ func (c *RunnerConfig) Default() error {
 	}
 
 	if c.OCMClient == nil {
-		o, err := utils.NewDefaultOCMClient()
+		o, err := NewDefaultOCMClient()
 		if err != nil {
 			if !IsOCMClientAuthError(err) {
 				return err

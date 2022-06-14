@@ -20,10 +20,10 @@ builds:
   main: &main ./cmd/mtcli
   ldflags: &flags
   - -s -w
-  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.version={{.Version}}'
-  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.commit={{.Commit}}'
-  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.date={{.Date}}'
-  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cmd.builtBy=goreleaser'
+  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cli.version={{.Version}}'
+  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cli.commit={{.Commit}}'
+  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cli.date={{.Date}}'
+  - -X 'github.com/mt-sre/addon-metadata-operator/internal/cli.builtBy=goreleaser'
 - id: mtcli-o64-clang
   env:
   - CGO_ENABLED=1
