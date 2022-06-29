@@ -135,7 +135,7 @@ func (c *DefaultOCMClient) initConnection() error {
 }
 
 func (c *DefaultOCMClient) QuotaRuleExists(ctx context.Context, quotaName string) (bool, error) {
-	if c.conn == nil {
+	if c == nil || c.conn == nil {
 		return false, errors.New("no active OCM connection")
 	}
 
@@ -163,7 +163,7 @@ func (c *DefaultOCMClient) QuotaRuleExists(ctx context.Context, quotaName string
 }
 
 func (c *DefaultOCMClient) CloseConnection() error {
-	if c.conn == nil {
+	if c == nil || c.conn == nil {
 		return nil
 	}
 
