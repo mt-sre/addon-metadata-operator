@@ -22,7 +22,7 @@ func NewValidatorTester(t *testing.T, init validator.Initializer, opts ...Valida
 		opt(&vt)
 	}
 
-	if vt.log == nil {
+	if vt.log.GetSink() == nil {
 		vt.log = logr.Discard()
 	}
 
