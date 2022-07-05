@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/fatih/color v1.13.0
-	github.com/go-logr/logr v1.2.0
+	github.com/go-logr/logr v1.2.3
 	github.com/golang/snappy v0.0.3
 	github.com/magefile/mage v1.13.0
 	github.com/mt-sre/client v0.1.3
