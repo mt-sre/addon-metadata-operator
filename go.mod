@@ -9,11 +9,12 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/go-logr/logr v0.4.0
 	github.com/golang/snappy v0.0.3
+	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/magefile/mage v1.13.0
 	github.com/mt-sre/client v0.0.0-20220509145342-c2779435f494
 	github.com/mt-sre/go-ci v0.3.3
 	github.com/novln/docker-parser v1.0.0
-	github.com/openshift-online/ocm-sdk-go v0.1.235
+	github.com/openshift-online/ocm-sdk-go v0.1.275
 	github.com/operator-framework/api v0.10.5
 	github.com/operator-framework/operator-registry v1.19.5
 	github.com/sirupsen/logrus v1.8.1
@@ -21,7 +22,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/multierr v1.6.0
-	golang.org/x/mod v0.5.1
+	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.22.2
