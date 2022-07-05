@@ -158,7 +158,7 @@ func (c *RunnerConfig) Default() error {
 		c.Initializers = initializers
 	}
 
-	if c.Logger == nil {
+	if c.Logger.GetSink() == nil {
 		c.Logger = logr.Discard()
 	}
 
