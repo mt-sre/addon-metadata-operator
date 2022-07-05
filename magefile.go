@@ -324,6 +324,8 @@ func (Build) OperatorImage(ctx context.Context) error {
 		return errors.New("could not find container runtime")
 	}
 
+	fmt.Fprintf(os.Stdout, "Using container runtime %q\n", runtime)
+
 	build := command.NewCommand(runtime,
 		command.WithArgs{
 			"build",
