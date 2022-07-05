@@ -1,10 +1,9 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.7.0
+    controller-gen.kubebuilder.io/version: v0.8.0
   creationTimestamp: null
   name: addonmetadata.addonsflow.redhat.openshift.io
 spec:
@@ -405,11 +404,33 @@ spec:
                 type: array
               pullSecret:
                 type: string
+              pullSecretName:
+                description: Name of the secret under secrets which is supposed to
+                  be used for pulling Catalog Image under CatalogSource.
+                type: string
               quayRepo:
                 description: 'Quay repository for the addon operator. Needs to match:
                   ''quay.io/osd-addons/<my-addon-repo>''.'
                 pattern: ^quay\.io/osd-addons/[a-z-]+$
                 type: string
+              secrets:
+                description: List of secrets that are required by the addon.
+                items:
+                  properties:
+                    destinationSecretName:
+                      type: string
+                    name:
+                      type: string
+                    type:
+                      type: string
+                    vaultPath:
+                      type: string
+                  required:
+                  - name
+                  - type
+                  - vaultPath
+                  type: object
+                type: array
               serviceAccount:
                 description: Name of the service account created by the addon operator
                   to authenticate to the API.

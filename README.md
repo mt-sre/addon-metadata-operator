@@ -1,9 +1,6 @@
 # addon-metadata-operator
 
 - [addon-metadata-operator](#addon-metadata-operator)
-  - [Developer Guide](#developer-guide)
-    - [Getting Started](#getting-started)
-    - [`.envrc`](#envrc)
   - [Develop](#develop)
     - [Useful make commands](#useful-make-commands)
   - [Release](#release)
@@ -12,36 +9,6 @@
   - [License](#license)
 
 Operator responsible for managing AddOn resources in OSD
-
-## Developer Guide
-
-### Getting Started
-
-The initial scaffolding is done using [kubebuilder](https://github.com/kubernetes-sigs/kubebuilder) which doesn't work with go1.17. Here is how to download and setup go1.16 for this project:
-
-```bash
-# https://golang.org/doc/manage-install#installing-multiple
-$ go install golang.org/dl/go1.16.7@latest
-$ go1.16.7 download
-
-$ cat <<EOF > .envrc
-export GOROOT=$(go1.16.7 env GOROOT)
-export PATH=${GOROOT}/bin:${PATH}
-EOF
-
-$ direnv allow .
-```
-
-### `.envrc`
-
-Use `.envrc` with [direnv](https://github.com/direnv/direnv) to make sure your environment is set properly:
-
-```bash
-export GOROOT=$(go1.16.7 env GOROOT)
-export GOBIN=${PWD}/.cache/bin
-export PATH=${GOROOT}/bin:${GOBIN}:${PATH}
-export KUBECONFIG=${PWD}/.cache/kubeconfig
-```
 
 ## Develop
 
