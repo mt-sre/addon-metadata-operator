@@ -116,7 +116,7 @@ func (e *DefaultBundleExtractor) unpackAndValidateBundle(ctx context.Context, bu
 	defer cancel()
 
 	registry, err := containerdregistry.NewRegistry(
-		containerdregistry.SkipTLS(false),
+		containerdregistry.SkipTLSVerify(false),
 		containerdregistry.WithLog(e.Log.(*logrus.Entry)),
 		// need a new cache dir for each registry to avoid data races and
 		// having the default "cache/ingest" dir removed from under our feet

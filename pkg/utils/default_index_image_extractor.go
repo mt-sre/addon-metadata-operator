@@ -38,7 +38,7 @@ func (obj DefaultIndexImageExtractor) ExtractBundlesFromImage(indexImage, extrac
 		Packages:      []string{},
 		DownloadPath:  extractTo,
 		ContainerTool: containertools.NewContainerTool("", containertools.NoneTool),
-		SkipTLS:       false,
+		SkipTLSVerify: false,
 	}
 	return indexExporter.ExportFromIndex(request)
 }
