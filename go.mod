@@ -11,7 +11,7 @@ require (
 	github.com/golang/snappy v0.0.3
 	github.com/magefile/mage v1.13.0
 	github.com/mt-sre/client v0.0.0-20220509145342-c2779435f494
-	github.com/mt-sre/go-ci v0.3.1
+	github.com/mt-sre/go-ci v0.3.3
 	github.com/novln/docker-parser v1.0.0
 	github.com/openshift-online/ocm-sdk-go v0.1.235
 	github.com/operator-framework/api v0.10.5
