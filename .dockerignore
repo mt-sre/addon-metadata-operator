@@ -26,3 +26,6 @@ testbin/*
 
 # Ignore pre-commit hooks for CI builds
 .git/hooks/
+
+# make sure we ignore opm default tmpDirs
+index_tmp_*/

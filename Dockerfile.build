@@ -1,28 +1,27 @@
 # vi:set ft=dockerfile:
 # --- stage 1 ---
-FROM registry.redhat.io/rhel8/go-toolset:1.16 as builder
+FROM registry.redhat.io/ubi9/go-toolset:1.17.7 as builder
 
-USER root
-
-WORKDIR /build
-
-RUN echo "noroot:x:10001:10001:noroot:/:/sbin/nologin" | tee -a /etc/passwd
+WORKDIR /opt/app-root/src
 
 # Cache optimization
-COPY go.mod go.sum Makefile ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . ./
-RUN make build
+
+# Ensure build artifacts have correct owner
+# when building with 'docker'
+USER root
+RUN chown -R default:root .
+USER default
+
+RUN ./mage build:operator
 
 # --- stage 2 ---
-FROM scratch
-
+FROM registry.redhat.io/ubi9/ubi-micro
 
 WORKDIR /
-COPY --from=builder /build/bin/addon-metadata-operator /
-COPY --from=builder /etc/passwd /etc/passwd
-
-USER "noroot"
+COPY --from=builder /opt/app-root/src/bin/addon-metadata-operator /
 
 ENTRYPOINT ["/addon-metadata-operator"]
