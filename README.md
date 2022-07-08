@@ -3,6 +3,7 @@
 - [addon-metadata-operator](#addon-metadata-operator)
   - [Develop](#develop)
     - [Useful make commands](#useful-make-commands)
+    - [Adding validators](#adding-validators)
   - [Release](#release)
     - [mtcli](#mtcli)
     - [addon-metadata-operator image](#addon-metadata-operator-image)
@@ -32,7 +33,7 @@ Run tests:
 $ make test
 ```
 
-Regenerate manifests and CRDs (`./config/crd/bases/addonsflow.redhat.openshift.io_addonmetadata.yaml` whenever you modify the `AddonMetadata` type:
+Regenerate manifests and CRDs (`./config/crd/bases/addonsflow.redhat.openshift.io_addonmetadata.yaml`) whenever you modify the `AddonMetadata` type:
 
 ```bash
 $ make manifest
