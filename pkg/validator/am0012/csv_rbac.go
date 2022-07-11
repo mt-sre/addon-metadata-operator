@@ -115,18 +115,18 @@ func validateConfidentialObjAccessAtClusterScope(csvPermissions *types.CSVPermis
 	return existingValidationErrs, nil
 }
 
-func getLatestBundle(bundles []registry.Bundle) (*registry.Bundle, error) {
+func getLatestBundle(bundles []*registry.Bundle) (*registry.Bundle, error) {
 	if len(bundles) == 1 {
-		return &bundles[0], nil
+		return bundles[0], nil
 	}
 
 	latest := bundles[0]
 	for _, bundle := range bundles[1:] {
-		currVersion, err := getVersion(&bundle)
+		currVersion, err := getVersion(bundle)
 		if err != nil {
 			return nil, err
 		}
-		currLatestVersion, err := getVersion(&latest)
+		currLatestVersion, err := getVersion(latest)
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +137,7 @@ func getLatestBundle(bundles []registry.Bundle) (*registry.Bundle, error) {
 			latest = bundle
 		}
 	}
-	return &latest, nil
+	return latest, nil
 }
 
 func getVersion(bundle *registry.Bundle) (string, error) {

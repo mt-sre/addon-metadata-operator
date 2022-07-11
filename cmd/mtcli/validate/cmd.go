@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/internal/cli"
+	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
@@ -86,7 +87,8 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("loading addon metadata from '%s': %w", addonDir, err)
 		}
 
-		bundles, err := utils.ExtractAndParseAddons(*meta.IndexImage, meta.OperatorName)
+		extractor := extractor.New()
+		bundles, err := extractor.ExtractBundles(*meta.IndexImage, meta.OperatorName)
 		if err != nil {
 			return fmt.Errorf("extracting and parsing addon bundles: %w", err)
 		}

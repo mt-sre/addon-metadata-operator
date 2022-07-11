@@ -4,19 +4,18 @@ import (
 	"sync"
 
 	"github.com/operator-framework/operator-registry/pkg/registry"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 type bundleMemoryCache struct {
-	lock    sync.RWMutex
 	encoder BundleEncoder
-	store   map[string][]byte
+
+	lock  sync.RWMutex
+	store map[string][]byte
 }
 
 // NewBundleMemoryCache - in-memory cache for bundle, using an encoder
 func NewBundleMemoryCache(encoder BundleEncoder) BundleCache {
 	return &bundleMemoryCache{
-		lock:    sync.RWMutex{},
 		encoder: encoder,
 		store:   make(map[string][]byte),
 	}
@@ -31,9 +30,27 @@ func (c *bundleMemoryCache) Get(bundleImage string) (*registry.Bundle, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		return hackSetCacheStaleToTrue(bundle), nil
 	}
+
 	return nil, nil
+}
+
+// hack to set b.cacheStale to true otherwise we can't access the csv of the
+// underlying bundle. This is a bug on OPM's side, which does not support
+// serialization/deserialization of their bundles.
+// https://github.com/operator-framework/operator-registry/blob/master/pkg/registry/bundle.go#L103
+func hackSetCacheStaleToTrue(b *registry.Bundle) *registry.Bundle {
+	if len(b.Objects) == 0 {
+		return b
+	}
+
+	obj := b.Objects[0]
+	b.Objects = b.Objects[1:]
+	b.Add(obj)
+
+	return b
 }
 
 func (c *bundleMemoryCache) Set(bundleImage string, bundle *registry.Bundle) error {
@@ -50,19 +67,8 @@ func (c *bundleMemoryCache) Set(bundleImage string, bundle *registry.Bundle) err
 	if err != nil {
 		return err
 	}
-	c.store[bundleImage] = data
-	return nil
-}
 
-// hack to set b.cacheStale to true otherwise we can't access the csv of the
-// underlying bundle. This is a bug on OPM's side, which does not support
-// serialization/deserialization of their bundles.
-// https://github.com/operator-framework/operator-registry/blob/master/pkg/registry/bundle.go#L103
-func hackSetCacheStaleToTrue(b *registry.Bundle) *registry.Bundle {
-	objs := b.Objects
-	b.Objects = []*unstructured.Unstructured{}
-	for _, o := range objs {
-		b.Add(o)
-	}
-	return b
+	c.store[bundleImage] = data
+
+	return nil
 }

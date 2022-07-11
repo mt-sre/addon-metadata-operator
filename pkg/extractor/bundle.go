@@ -147,14 +147,26 @@ func (e *DefaultBundleExtractor) unpackAndValidateBundle(ctx context.Context, bu
 
 func (e *DefaultBundleExtractor) ValidateBundle(registry *containerdregistry.Registry, tmpDir string) error {
 	e.Log.Debugf("validating the unpacked bundle from %s", tmpDir)
+
 	validator := opmbundle.NewImageValidator(registry, e.Log.(*logrus.Entry))
 	if err := validator.ValidateBundleFormat(tmpDir); err != nil {
 		return fmt.Errorf("bundle format validation failed: %w", err)
 	}
+
 	if err := validator.ValidateBundleContent(filepath.Join(tmpDir, opmbundle.ManifestsDir)); err != nil {
-		return fmt.Errorf("bundle content validation failed: %w", err)
+		// TODO: remove once all bundles are compliant with use of `spec.preserveUnknownFields`
+		if !matchesErrorMessage(err, "spec.preserveUnknownFields: Invalid value: true") {
+			return fmt.Errorf("bundle content validation failed: %w", err)
+		}
+
+		e.Log.Debug("ignoring bundle content validation error: %v", err)
 	}
+
 	return nil
+}
+
+func matchesErrorMessage(err error, msg string) bool {
+	return strings.Contains(err.Error(), msg)
 }
 
 func (e *DefaultBundleExtractor) loadBundle(tmpDir string) (*registry.Bundle, error) {

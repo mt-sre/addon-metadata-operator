@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	addonsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 )
@@ -28,6 +29,7 @@ type singleton struct {
 	MetaIndexImage *addonsv1alpha1.AddonMetadataSpec
 	MetaImageSet   *addonsv1alpha1.AddonMetadataSpec
 	Env            string
+	Extractor      extractor.Extractor
 }
 
 var (
@@ -46,7 +48,10 @@ func GetReferenceAddonStage() (*singleton, error) {
 	if instance != nil {
 		return instance, nil
 	}
-	instance = &singleton{Env: "stage"}
+	instance = &singleton{
+		Env:       "stage",
+		Extractor: extractor.New(),
+	}
 	metaIndexImage, err := instance.GetMetadata(false)
 	if err != nil {
 		return nil, fmt.Errorf("Could not load indexImage metadata for reference-addon, got %v.", err)
@@ -112,7 +117,7 @@ func (r *singleton) GetMetaBundle(version string) (*types.MetaBundle, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Could not get reference-addon imageset got %v.", err)
 	}
-	bundles, err := utils.ExtractAndParseAddons(imageSet.IndexImage, "reference-addon")
+	bundles, err := r.Extractor.ExtractBundles(imageSet.IndexImage, "reference-addon")
 	if err != nil {
 		return nil, fmt.Errorf("Could not extract reference-addon bundles, got %v.", err)
 	}
