@@ -3,6 +3,7 @@ package register
 import (
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0001"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0002"
+	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0003"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0004"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0005"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0006"
