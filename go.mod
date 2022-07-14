@@ -7,7 +7,6 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/fatih/color v1.13.0
 	github.com/go-logr/logr v1.2.3
-	github.com/golang/snappy v0.0.4
 	github.com/magefile/mage v1.13.0
 	github.com/mt-sre/client v0.1.3
 	github.com/mt-sre/go-ci v0.3.3
