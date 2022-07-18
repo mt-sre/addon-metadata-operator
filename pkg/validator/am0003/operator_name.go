@@ -111,7 +111,7 @@ func validateBundleIdentifier(id, operatorName string) string {
 		return fmt.Sprintf("invalid operatorName for %q; expected %q", id, operatorName)
 	}
 
-	if _, err := semver.Parse(bundleVersion); err != nil {
+	if _, err := semver.ParseTolerant(bundleVersion); err != nil {
 		return fmt.Sprintf("invalid semver %q: %v", id, err)
 	}
 
