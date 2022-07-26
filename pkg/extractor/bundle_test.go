@@ -6,80 +6,83 @@ import (
 
 	"github.com/operator-framework/operator-registry/pkg/registry"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-type testCase struct {
-	bundleImage         string
-	expectedPackageName string
-	expectedCSVName     string
-	expectedCSVVersion  string
-}
-
 func TestDefaultBundleExtractorImplements(t *testing.T) {
+	t.Parallel()
+
 	require.Implements(t, new(BundleExtractor), &DefaultBundleExtractor{})
 }
 
-func TestExtractorInMemoryCacheJSONSnappyEncoder(t *testing.T) {
-	cases := []testCase{
-		// reference-addon:0.1.6
-		{
-			bundleImage:         "quay.io/osd-addons/reference-addon-bundle@sha256:a62fd3f3b55aa58c587f0b7630f5e70b123d036a1a04a1bd5a866b5c576a04f4",
-			expectedPackageName: "reference-addon",
-			expectedCSVName:     "reference-addon.v0.1.6",
-			expectedCSVVersion:  "0.1.6",
-		},
-		// reference-addon:0.1.5
-		{
-			bundleImage:         "quay.io/osd-addons/reference-addon-bundle@sha256:29879d193bd8da42e7b6500252b4d21bef733666bd893de2a3f9b250e591658e",
-			expectedPackageName: "reference-addon",
-			expectedCSVName:     "reference-addon.v0.1.5",
-			expectedCSVVersion:  "0.1.5",
-		},
-	}
-	encoder := NewJSONSnappyEncoder()
-	cache := NewBundleMemoryCache(encoder)
+func TestDefaultBundleExtractor(t *testing.T) {
+	t.Parallel()
+
+	cache := NewBundleCacheImpl()
 
 	// adding extra logging for easier test debugging
 	log := logrus.New()
 	log.SetLevel(logrus.DebugLevel)
+
 	extractor := NewBundleExtractor(WithBundleCache(cache), WithBundleLog(log))
 
-	for _, tc := range cases {
+	for name, tc := range map[string]testCase{
+		"reference-addon:0.1.6": {
+			BundleImage:         "quay.io/osd-addons/reference-addon-bundle@sha256:a62fd3f3b55aa58c587f0b7630f5e70b123d036a1a04a1bd5a866b5c576a04f4",
+			ExpectedPackageName: "reference-addon",
+			ExpectedCSVName:     "reference-addon.v0.1.6",
+			ExpectedCSVVersion:  "0.1.6",
+		},
+		"reference-addon:0.1.5": {
+			BundleImage:         "quay.io/osd-addons/reference-addon-bundle@sha256:29879d193bd8da42e7b6500252b4d21bef733666bd893de2a3f9b250e591658e",
+			ExpectedPackageName: "reference-addon",
+			ExpectedCSVName:     "reference-addon.v0.1.5",
+			ExpectedCSVVersion:  "0.1.5",
+		},
+	} {
 		tc := tc // pin
-		t.Run(tc.bundleImage, func(t *testing.T) {
+
+		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			bundle, err := extractor.Extract(context.Background(), tc.bundleImage)
+
+			bundle, err := extractor.Extract(context.Background(), tc.BundleImage)
 			require.NoError(t, err)
+
 			require.NotNil(t, bundle)
-			testBundleFields(t, bundle, tc)
+			tc.AssertExpectations(t, bundle)
 
-			cachedBundle, err := cache.Get(tc.bundleImage)
+			cachedBundle, err := cache.GetBundle(tc.BundleImage)
 			require.NoError(t, err)
-			testBundleFields(t, cachedBundle, tc)
 
-			// make sure we encode to same length as an equality check
-			n1, err := encoder.Encode(bundle)
-			require.NoError(t, err)
-			n2, err := encoder.Encode(cachedBundle)
-			require.NoError(t, err)
-			require.Equal(t, len(n1), len(n2))
+			tc.AssertExpectations(t, cachedBundle)
 		})
 	}
 }
 
-func testBundleFields(t *testing.T, b *registry.Bundle, tc testCase) {
-	require.Equal(t, b.Name, tc.expectedPackageName)
-	require.Equal(t, b.BundleImage, tc.bundleImage)
-	require.NotNil(t, b.Annotations)
-	require.Equal(t, b.Annotations.PackageName, tc.expectedPackageName)
+type testCase struct {
+	BundleImage         string
+	ExpectedPackageName string
+	ExpectedCSVName     string
+	ExpectedCSVVersion  string
+}
+
+func (tc testCase) AssertExpectations(t *testing.T, b *registry.Bundle) {
+	t.Helper()
+
+	assert.Equal(t, b.Name, tc.ExpectedPackageName)
+	assert.Equal(t, b.BundleImage, tc.BundleImage)
+	assert.NotNil(t, b.Annotations)
+	assert.Equal(t, b.Annotations.PackageName, tc.ExpectedPackageName)
 
 	csv, err := b.ClusterServiceVersion()
 	require.NoError(t, err)
 	require.NotNil(t, csv)
-	require.Equal(t, csv.Name, tc.expectedCSVName)
+
+	assert.Equal(t, csv.Name, tc.ExpectedCSVName)
 
 	version, err := csv.GetVersion()
 	require.NoError(t, err)
-	require.Equal(t, version, tc.expectedCSVVersion)
+
+	assert.Equal(t, version, tc.ExpectedCSVVersion)
 }

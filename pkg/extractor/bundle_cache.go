@@ -1,74 +1,70 @@
 package extractor
 
 import (
-	"sync"
+	"errors"
+	"fmt"
 
 	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
-type bundleMemoryCache struct {
-	encoder BundleEncoder
+// NewBundleCacheImpl returns an initialized BundleCacheImpl. A
+// variadic slice of options can be used to alter the behavior
+// of the cache.
+func NewBundleCacheImpl(opts ...BundleCacheImplOption) *BundleCacheImpl {
+	var cfg BundleCacheImplConfig
 
-	lock  sync.RWMutex
-	store map[string][]byte
-}
+	cfg.Option(opts...)
+	cfg.Default()
 
-// NewBundleMemoryCache - in-memory cache for bundle, using an encoder
-func NewBundleMemoryCache(encoder BundleEncoder) BundleCache {
-	return &bundleMemoryCache{
-		encoder: encoder,
-		store:   make(map[string][]byte),
+	return &BundleCacheImpl{
+		cfg: cfg,
 	}
 }
 
-func (c *bundleMemoryCache) Get(bundleImage string) (*registry.Bundle, error) {
-	c.lock.RLock()
-	defer c.lock.RUnlock()
-
-	if data, ok := c.store[bundleImage]; ok {
-		bundle, err := c.encoder.Decode(data)
-		if err != nil {
-			return nil, err
-		}
-
-		return hackSetCacheStaleToTrue(bundle), nil
-	}
-
-	return nil, nil
+type BundleCacheImpl struct {
+	cfg BundleCacheImplConfig
 }
 
-// hack to set b.cacheStale to true otherwise we can't access the csv of the
-// underlying bundle. This is a bug on OPM's side, which does not support
-// serialization/deserialization of their bundles.
-// https://github.com/operator-framework/operator-registry/blob/master/pkg/registry/bundle.go#L103
-func hackSetCacheStaleToTrue(b *registry.Bundle) *registry.Bundle {
-	if len(b.Objects) == 0 {
-		return b
+var ErrInvalidBundleData = errors.New("invalid bundle data")
+
+func (c *BundleCacheImpl) GetBundle(img string) (*registry.Bundle, error) {
+	data, ok := c.cfg.Store.Read(img)
+	if !ok {
+		return nil, nil
 	}
 
-	obj := b.Objects[0]
-	b.Objects = b.Objects[1:]
-	b.Add(obj)
+	bundle, ok := data.(registry.Bundle)
+	if !ok {
+		return nil, ErrInvalidBundleData
+	}
 
-	return b
+	return &bundle, nil
 }
 
-func (c *bundleMemoryCache) Set(bundleImage string, bundle *registry.Bundle) error {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	// bundles are supposed to be immutable, so we can save a few CPU cycles by
-	// avoiding re-encoding bundles and unnecessarily overwriting the cache
-	if _, ok := c.store[bundleImage]; ok {
-		return nil
+func (c *BundleCacheImpl) SetBundle(img string, bundle registry.Bundle) error {
+	if err := c.cfg.Store.Write(img, bundle); err != nil {
+		return fmt.Errorf("writing bundle data: %w", err)
 	}
-
-	data, err := c.encoder.Encode(bundle)
-	if err != nil {
-		return err
-	}
-
-	c.store[bundleImage] = data
 
 	return nil
+}
+
+type BundleCacheImplConfig struct {
+	Store Store
+}
+
+func (c *BundleCacheImplConfig) Option(opts ...BundleCacheImplOption) {
+	for _, opt := range opts {
+		opt.ConfigureBundleCacheImpl(c)
+	}
+}
+
+func (c *BundleCacheImplConfig) Default() {
+	if c.Store == nil {
+		c.Store = NewThreadSafeStore()
+	}
+}
+
+type BundleCacheImplOption interface {
+	ConfigureBundleCacheImpl(*BundleCacheImplConfig)
 }

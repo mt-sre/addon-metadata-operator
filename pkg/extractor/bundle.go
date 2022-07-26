@@ -20,6 +20,18 @@ import (
 	k8syaml "k8s.io/apimachinery/pkg/util/yaml"
 )
 
+// BundleCache provides a cache of OPM bundles which are referenced by
+// bundleImage name.
+type BundleCache interface {
+	// GetBundle returns a bundle for the given image. An error is
+	// returned if the bundle cannot be retrieved or the data is
+	// corrupted.
+	GetBundle(img string) (*registry.Bundle, error)
+	// SetBundle caches a bundle for the given image. An error
+	// is returned if the bundle cannot be cached.
+	SetBundle(img string, bundle registry.Bundle) error
+}
+
 type DefaultBundleExtractor struct {
 	Log     logrus.FieldLogger
 	Cache   BundleCache
@@ -41,7 +53,7 @@ func NewBundleExtractor(opts ...BundleExtractorOpt) *DefaultBundleExtractor {
 	}
 
 	if extractor.Cache == nil {
-		extractor.Cache = NewBundleMemoryCache(NewJSONSnappyEncoder())
+		extractor.Cache = NewBundleCacheImpl()
 	}
 
 	extractor.Log = extractor.Log.WithField("source", "bundleExtractor")
@@ -69,10 +81,11 @@ func WithBundleTimeout(timeout time.Duration) BundleExtractorOpt {
 }
 
 func (e *DefaultBundleExtractor) Extract(ctx context.Context, bundleImage string) (*registry.Bundle, error) {
-	bundle, err := e.Cache.Get(bundleImage)
+	bundle, err := e.Cache.GetBundle(bundleImage)
 	if err != nil {
-		return nil, fmt.Errorf("cache error: %w", err)
+		e.Log.Warnf("retrieving bundle %q from cache: %w", bundleImage, err)
 	}
+
 	if bundle != nil {
 		e.Log.Debugf("cache hit for '%s'", bundleImage)
 		return bundle, nil
@@ -99,8 +112,8 @@ func (e *DefaultBundleExtractor) Extract(ctx context.Context, bundleImage string
 	}
 	bundle.BundleImage = bundleImage // not set by OPM
 
-	if err := e.Cache.Set(bundleImage, bundle); err != nil {
-		return nil, fmt.Errorf("unable to cache bundle: %w", err)
+	if err := e.Cache.SetBundle(bundleImage, *bundle); err != nil {
+		e.Log.Warnf("caching bundle %q: %w", bundleImage, err)
 	}
 
 	return bundle, nil

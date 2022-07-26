@@ -10,6 +10,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// IndexCache provides a cache of index images which store related bundles
+// by package name.
+type IndexCache interface {
+	// GetBundleImages retrieves bundles image names for a particular
+	// indexImage and package combination.
+	GetBundleImages(indexImage string, pkgName string) ([]string, error)
+	// SetBundleImages stores a map from package name to bundle images
+	// for a particular indexImage. An error is returned if the data
+	// cannot be written.
+	SetBundleImages(indexImage string, bundleImagesMap map[string][]string) error
+}
+
 // allBundlesKey - special cacheKey that means "list all bundles for all packages in the indexImage"
 const allBundlesKey = "__ALL__"
 
@@ -32,7 +44,7 @@ func NewIndexExtractor(opts ...IndexExtractorOpt) *DefaultIndexExtractor {
 	}
 
 	if extractor.Cache == nil {
-		extractor.Cache = NewIndexMemoryCache()
+		extractor.Cache = NewIndexCacheImpl()
 	}
 
 	extractor.Log = extractor.Log.WithField("source", "indexExtractor")
@@ -69,7 +81,12 @@ func (e *DefaultIndexExtractor) ExtractAllBundleImages(indexImage string) ([]str
 // listBundles - return a list of all bundleImages. Need to sort bundleImages
 // everytime as order might not be preserved in the cache.
 func (e *DefaultIndexExtractor) extractBundleImages(indexImage string, cacheKey string) ([]string, error) {
-	if bundleImages := e.Cache.GetBundleImages(indexImage, cacheKey); bundleImages != nil {
+	bundleImages, err := e.Cache.GetBundleImages(indexImage, cacheKey)
+	if err != nil {
+		e.Log.Warnf("getting bundle images from cache: %w", err)
+	}
+
+	if bundleImages != nil {
 		e.Log.Debugf("cache hit for '%s'", indexImage)
 		return sortedBundleImages(bundleImages), nil
 	}
@@ -82,7 +99,10 @@ func (e *DefaultIndexExtractor) extractBundleImages(indexImage string, cacheKey 
 	}
 
 	bundleImages, bundleImagesMap := parseBundles(cacheKey, data.Bundles)
-	e.Cache.SetBundleImages(indexImage, bundleImagesMap)
+
+	if err := e.Cache.SetBundleImages(indexImage, bundleImagesMap); err != nil {
+		e.Log.Warnf("caching bundle images: %w", err)
+	}
 
 	return sortedBundleImages(bundleImages), nil
 }
