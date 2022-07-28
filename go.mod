@@ -12,7 +12,7 @@ require (
 	github.com/mt-sre/client v0.1.3
 	github.com/mt-sre/go-ci v0.3.3
 	github.com/novln/docker-parser v1.0.0
-	github.com/openshift-online/ocm-sdk-go v0.1.277
+	github.com/openshift-online/ocm-sdk-go v0.1.278
 	github.com/operator-framework/api v0.15.0
 	github.com/operator-framework/operator-registry v1.23.2
 	github.com/sirupsen/logrus v1.9.0
