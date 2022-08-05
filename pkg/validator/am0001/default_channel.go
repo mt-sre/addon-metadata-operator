@@ -3,10 +3,12 @@ package am0001
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
+	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
 func init() {
@@ -50,6 +52,10 @@ func (d *DefaultChannel) Run(ctx context.Context, mb types.MetaBundle) validator
 		return res
 	}
 
+	if res := d.matchesBundleChannelAnnotations(defaultChannel, mb.Bundles); !res.IsSuccess() {
+		return res
+	}
+
 	return d.Success()
 }
 
@@ -83,4 +89,47 @@ func (d *DefaultChannel) isListedInChannels(channels *[]v1alpha1.Channel, defaul
 	}
 	msg := fmt.Sprintf("The defaultChannel '%v' is not part of the listed channelNames: %v.", defaultChannel, channelNames)
 	return d.Fail(msg)
+}
+
+func (d *DefaultChannel) matchesBundleChannelAnnotations(defaultChannel string, bundles []*registry.Bundle) validator.Result {
+	var message []string
+	bundle, err := validator.GetLatestBundle(bundles)
+	if err != nil {
+		return d.Fail("Error while checking bundles")
+	}
+
+	if bundle.Annotations.DefaultChannelName == "" && defaultChannel != "alpha" {
+		msg := fmt.Sprintf("operators.operatorframework.io.bundle.channel.default.v1 is not defined so defaultChannel should be 'alpha' instead of '%v'", defaultChannel)
+		message = append(message, msg)
+	}
+
+	if bundle.Annotations.DefaultChannelName != defaultChannel && bundle.Annotations.DefaultChannelName != "" {
+		msg := fmt.Sprintf("The defaultChannel '%v' does not match annotation operators.operatorframework.io.bundle.channel.default.v1 '%v'.",
+			defaultChannel, bundle.Annotations.DefaultChannelName,
+		)
+		message = append(message, msg)
+	}
+
+	channels := strings.Split(bundle.Annotations.Channels, ",")
+
+	if !isPresentInBundleChannels(defaultChannel, channels) {
+		msg := fmt.Sprintf("The defaultChannel '%v' is not present in annotation operators.operatorframework.io.bundle.channels.v1 '%v'.",
+			defaultChannel, channels,
+		)
+		message = append(message, msg)
+	}
+
+	if len(message) > 0 {
+		return d.Fail(message...)
+	}
+	return d.Success()
+}
+
+func isPresentInBundleChannels(defaultChannel string, channels []string) bool {
+	for _, channel := range channels {
+		if channel == defaultChannel {
+			return true
+		}
+	}
+	return false
 }
