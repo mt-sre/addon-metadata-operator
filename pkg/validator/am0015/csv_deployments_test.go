@@ -5,15 +5,16 @@ import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-	utils "github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
 	"github.com/operator-framework/operator-registry/pkg/registry"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCSVDeploymentValid(t *testing.T) {
 	t.Parallel()
+
+	loader := testutils.NewBundlerLoader(t)
+
 	tester := testutils.NewValidatorTester(t, NewCSVDeployment)
 	tester.TestValidBundles(map[string]types.MetaBundle{
 		"valid CSV Deployment": {
@@ -21,7 +22,9 @@ func TestCSVDeploymentValid(t *testing.T) {
 				OperatorName: "reference-addon",
 			},
 			Bundles: []*registry.Bundle{
-				newTestBundle(t, "csv_valid.yaml", "reference-addon"),
+				loader.LoadFromCSV(
+					filepath.Join("test_csvs", "csv_valid.yaml"),
+				),
 			},
 		},
 	})
@@ -29,6 +32,9 @@ func TestCSVDeploymentValid(t *testing.T) {
 
 func TestCSVDeploymentInvalid(t *testing.T) {
 	t.Parallel()
+
+	loader := testutils.NewBundlerLoader(t)
+
 	tester := testutils.NewValidatorTester(t, NewCSVDeployment)
 	tester.TestInvalidBundles(map[string]types.MetaBundle{
 		"invalid csv livenessprobe": {
@@ -36,7 +42,9 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 				OperatorName: "reference-addon",
 			},
 			Bundles: []*registry.Bundle{
-				newTestBundle(t, "csv_invalid_livenessprobe.yaml", "reference-addon"),
+				loader.LoadFromCSV(
+					filepath.Join("test_csvs", "csv_invalid_livenessprobe.yaml"),
+				),
 			},
 		},
 		"invalid csv readinessprobe": {
@@ -44,7 +52,9 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 				OperatorName: "reference-addon",
 			},
 			Bundles: []*registry.Bundle{
-				newTestBundle(t, "csv_invalid_readinessprobe.yaml", "reference-addon"),
+				loader.LoadFromCSV(
+					filepath.Join("test_csvs", "csv_invalid_readinessprobe.yaml"),
+				),
 			},
 		},
 		"invalid csv memory requirement": {
@@ -52,7 +62,9 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 				OperatorName: "reference-addon",
 			},
 			Bundles: []*registry.Bundle{
-				newTestBundle(t, "csv_invalid_memory_requirement.yaml", "reference-addon"),
+				loader.LoadFromCSV(
+					filepath.Join("test_csvs", "csv_invalid_memory_requirement.yaml"),
+				),
 			},
 		},
 		"invalid csv cpu requirements": {
@@ -60,19 +72,10 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 				OperatorName: "reference-addon",
 			},
 			Bundles: []*registry.Bundle{
-				newTestBundle(t, "csv_invalid_cpu_requirement.yaml", "reference-addon"),
+				loader.LoadFromCSV(
+					filepath.Join("test_csvs", "csv_invalid_cpu_requirement.yaml"),
+				),
 			},
 		},
 	})
-}
-
-func newTestBundle(t *testing.T, csvName, packageName string) *registry.Bundle {
-	t.Helper()
-
-	res, err := utils.NewBundle("am0015", filepath.Join(utils.RootDir().TestData().Validators(), "am0015", csvName))
-	require.NoError(t, err)
-
-	res.Annotations.PackageName = packageName
-
-	return res
 }
