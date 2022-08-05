@@ -2,14 +2,11 @@ package am0012
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils/csvutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
-	"github.com/operator-framework/operator-registry/pkg/registry"
-	"golang.org/x/mod/semver"
 )
 
 func init() {
@@ -19,7 +16,7 @@ func init() {
 const (
 	code = 12
 	name = "csv_permissions"
-	desc = "validates the permissions specified in the csv"
+	desc = "Validates the permissions specified in the csv"
 )
 
 func NewCSVRBAC(opt validator.Dependencies) (validator.Validator, error) {
@@ -48,7 +45,7 @@ func (v *CSVRBAC) Run(ctx context.Context, mb types.MetaBundle) validator.Result
 	}
 
 	// Only run validations on the latest bundle
-	latestBundle, err := getLatestBundle(mb.Bundles)
+	latestBundle, err := validator.GetLatestBundle(mb.Bundles)
 	if err != nil {
 		return v.Error(err)
 	}
@@ -113,43 +110,4 @@ func validateConfidentialObjAccessAtClusterScope(csvPermissions *types.CSVPermis
 		return append(existingValidationErrs, errorMsg), nil
 	}
 	return existingValidationErrs, nil
-}
-
-func getLatestBundle(bundles []*registry.Bundle) (*registry.Bundle, error) {
-	if len(bundles) == 1 {
-		return bundles[0], nil
-	}
-
-	latest := bundles[0]
-	for _, bundle := range bundles[1:] {
-		currVersion, err := getVersion(bundle)
-		if err != nil {
-			return nil, err
-		}
-		currLatestVersion, err := getVersion(latest)
-		if err != nil {
-			return nil, err
-		}
-
-		res := semver.Compare(currVersion, currLatestVersion)
-		// If currVersion is greater than currLatestVersion
-		if res == 1 {
-			latest = bundle
-		}
-	}
-	return latest, nil
-}
-
-func getVersion(bundle *registry.Bundle) (string, error) {
-	csv, err := bundle.ClusterServiceVersion()
-	if err != nil {
-		return "", err
-	}
-	version, err := csv.GetVersion()
-	if err != nil {
-		return "", err
-	}
-	// Prefix a `v` infront of the version
-	// so that semver package can parse it.
-	return fmt.Sprintf("v%s", version), nil
 }
