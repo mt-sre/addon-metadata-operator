@@ -5,9 +5,8 @@ import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
-	utils "github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
+	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
 	"github.com/operator-framework/operator-registry/pkg/registry"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +14,9 @@ import (
 func TestCSVInstallModeValid(t *testing.T) {
 	t.Parallel()
 
-	bundles, err := utils.DefaultValidBundleMap()
+	loader := testutils.NewBundlerLoader(t)
+
+	bundles, err := testutils.DefaultValidBundleMap()
 	require.NoError(t, err)
 
 	for name, bundle := range map[string]types.MetaBundle{
@@ -24,7 +25,7 @@ func TestCSVInstallModeValid(t *testing.T) {
 				InstallMode: "OwnNamespace",
 			},
 			Bundles: []*registry.Bundle{
-				getTestBundle(t),
+				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
 		"AllNamespaces": {
@@ -32,28 +33,30 @@ func TestCSVInstallModeValid(t *testing.T) {
 				InstallMode: "AllNamespaces",
 			},
 			Bundles: []*registry.Bundle{
-				getTestBundle(t),
+				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
 	} {
 		bundles[name] = bundle
 	}
 
-	tester := utils.NewValidatorTester(t, NewCSVInstallModes)
+	tester := testutils.NewValidatorTester(t, NewCSVInstallModes)
 	tester.TestValidBundles(bundles)
 }
 
 func TestCSVInstallModeInvalid(t *testing.T) {
 	t.Parallel()
 
-	tester := utils.NewValidatorTester(t, NewCSVInstallModes)
+	loader := testutils.NewBundlerLoader(t)
+
+	tester := testutils.NewValidatorTester(t, NewCSVInstallModes)
 	tester.TestInvalidBundles(map[string]types.MetaBundle{
 		"invalid install mode": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "something",
 			},
 			Bundles: []*registry.Bundle{
-				getTestBundle(t),
+				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
 		"invalid install mode/SingleNamespace": {
@@ -61,7 +64,7 @@ func TestCSVInstallModeInvalid(t *testing.T) {
 				InstallMode: "SingleNamespace",
 			},
 			Bundles: []*registry.Bundle{
-				getTestBundle(t),
+				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
 		"invalid install mode/MultiNamespace": {
@@ -69,17 +72,8 @@ func TestCSVInstallModeInvalid(t *testing.T) {
 				InstallMode: "MultiNamespace",
 			},
 			Bundles: []*registry.Bundle{
-				getTestBundle(t),
+				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
 	})
-}
-
-func getTestBundle(t *testing.T) *registry.Bundle {
-	t.Helper()
-
-	res, err := testutils.NewBundle("random-bundle", filepath.Join(testutils.RootDir().TestData().Validators(), "am0007", "csv.yaml"))
-	require.NoError(t, err)
-
-	return res
 }
