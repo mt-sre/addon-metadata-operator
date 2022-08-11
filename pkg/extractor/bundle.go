@@ -154,19 +154,10 @@ func (e *DefaultBundleExtractor) ValidateBundle(registry *containerdregistry.Reg
 	}
 
 	if err := validator.ValidateBundleContent(filepath.Join(tmpDir, opmbundle.ManifestsDir)); err != nil {
-		// TODO: remove once all bundles are compliant with use of `spec.preserveUnknownFields`
-		if !matchesErrorMessage(err, "spec.preserveUnknownFields: Invalid value: true") {
-			return fmt.Errorf("bundle content validation failed: %w", err)
-		}
-
-		e.Log.Debug("ignoring bundle content validation error: %v", err)
+		return fmt.Errorf("bundle content validation failed: %w", err)
 	}
 
 	return nil
-}
-
-func matchesErrorMessage(err error, msg string) bool {
-	return strings.Contains(err.Error(), msg)
 }
 
 func (e *DefaultBundleExtractor) loadBundle(tmpDir string) (*registry.Bundle, error) {

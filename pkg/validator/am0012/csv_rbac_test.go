@@ -20,7 +20,7 @@ func TestCSVRBAC(t *testing.T) {
 func TestCSVRBACInvalid(t *testing.T) {
 	extractor := extractor.New()
 	invalidBundles, err := extractor.ExtractBundles(
-		"quay.io/osd-addons/rhods-index@sha256:94c934b33096b057c07a4ffb5ae59a6f0c7641fe45d71fc1283182f6c01a8ef3",
+		"quay.io/osd-addons/rhods-index@sha256:cd579e328ecce9141793c8df4dcb6675fac93a61035003a2f0820e37db616f74",
 		"rhods-operator",
 	)
 	require.NoError(t, err)
