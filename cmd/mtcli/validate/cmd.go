@@ -98,10 +98,18 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("generating validator filter: %w", err)
 		}
 
+		ocm, err := validator.NewDefaultOCMClient(
+			validator.DefaultOCMClientAPIURL(envToOCMURL(opts.Env)),
+		)
+		if err != nil {
+			return fmt.Errorf("initializing ocm client: %w", err)
+		}
+
 		runner, err := validator.NewRunner(
 			validator.WithMiddleware{
 				validator.NewRetryMiddleware(),
 			},
+			validator.WithOCMClient{OCMClient: ocm},
 		)
 		if err != nil {
 			return fmt.Errorf("initializing validators: %w", err)
@@ -213,6 +221,16 @@ func parseCodeList(maybeList string) ([]validator.Code, error) {
 	}
 
 	return res, nil
+}
+
+func envToOCMURL(env string) string {
+	envToUrl := map[string]string{
+		"stage":       "https://api.stage.openshift.com",
+		"integration": "https://api.integration.openshift.com",
+		"production":  "https://api.openshift.com",
+	}
+
+	return envToUrl[env]
 }
 
 func writeResult(t *cli.Table, res validator.Result) {
