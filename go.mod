@@ -14,7 +14,7 @@ require (
 	github.com/novln/docker-parser v1.0.0
 	github.com/openshift-online/ocm-sdk-go v0.1.286
 	github.com/operator-framework/api v0.16.0
-	github.com/operator-framework/operator-registry v1.24.0
+	github.com/operator-framework/operator-registry v1.26.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
@@ -107,7 +107,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.10 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.18 // indirect
-	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/moby/locker v1.0.1 // indirect
 	github.com/moby/sys/mountinfo v0.4.1 // indirect
