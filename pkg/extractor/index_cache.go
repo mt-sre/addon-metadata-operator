@@ -1,48 +1,84 @@
 package extractor
 
 import (
-	"sync"
+	"errors"
+	"fmt"
 )
 
-type indexMemoryCache struct {
-	sync.RWMutex
-	store map[string]map[string][]string
+type IndexCacheImpl struct {
+	cfg IndexCacheImplConfig
 }
 
-// NewIndexMemoryCache - in-memory cache for bundleImages. Indexes first by indexImage,
-// then by pkgName.
-func NewIndexMemoryCache() IndexCache {
-	return &indexMemoryCache{store: make(map[string]map[string][]string)}
+// NewIndexCacheImpl returns an initialized IndexImage cache which stores
+// the package names and related bundle images for an IndexImage.
+// A variadic slice of options may be provided to alter the cache behavior.
+func NewIndexCacheImpl(opts ...IndexCacheImplOption) *IndexCacheImpl {
+	var cfg IndexCacheImplConfig
+
+	cfg.Option(opts...)
+	cfg.Default()
+
+	return &IndexCacheImpl{
+		cfg: cfg,
+	}
 }
 
-func (c *indexMemoryCache) GetBundleImages(indexImage string, cacheKey string) []string {
-	c.RLock()
-	defer c.RUnlock()
+var ErrInvalidIndexData = errors.New("invalid index data")
+
+func (c *IndexCacheImpl) GetBundleImages(indexImage string, cacheKey string) ([]string, error) {
+	data, ok := c.cfg.Store.Read(indexImage)
+	if !ok {
+		return nil, nil
+	}
+
+	pkgs, ok := data.(map[string][]string)
+	if !ok {
+		return nil, ErrInvalidIndexData
+	}
 
 	var res []string
-	if data, ok := c.store[indexImage]; ok {
-		for pkgName, bundles := range data {
-			if cacheKey == allBundlesKey || pkgName == cacheKey {
-				res = append(res, bundles...)
-			}
+
+	for pkgName, bundles := range pkgs {
+		if cacheKey != allBundlesKey && pkgName != cacheKey {
+			continue
 		}
+
+		res = append(res, bundles...)
 	}
-	if len(res) == 0 {
-		return nil
-	}
-	return res
+
+	return res, nil
 }
 
-// SetBundleImages - indexImages are mutable, so we always need to update the cache
-func (c *indexMemoryCache) SetBundleImages(indexImage string, pkgBundlesMap map[string][]string) {
-	c.Lock()
-	defer c.Unlock()
+func (c *IndexCacheImpl) SetBundleImages(indexImage string, pkgBundlesMap map[string][]string) error {
+	data := make(map[string][]string, len(pkgBundlesMap))
 
-	if _, ok := c.store[indexImage]; ok {
-		for pkgName, bundles := range pkgBundlesMap {
-			c.store[indexImage][pkgName] = bundles
-		}
-	} else {
-		c.store[indexImage] = pkgBundlesMap
+	for pkg, bundles := range pkgBundlesMap {
+		data[pkg] = bundles
 	}
+
+	if err := c.cfg.Store.Write(indexImage, data); err != nil {
+		return fmt.Errorf("writing data: %w", err)
+	}
+
+	return nil
+}
+
+type IndexCacheImplConfig struct {
+	Store Store
+}
+
+func (c *IndexCacheImplConfig) Option(opts ...IndexCacheImplOption) {
+	for _, opt := range opts {
+		opt.ConfigureIndexCacheImpl(c)
+	}
+}
+
+func (c *IndexCacheImplConfig) Default() {
+	if c.Store == nil {
+		c.Store = NewThreadSafeStore()
+	}
+}
+
+type IndexCacheImplOption interface {
+	ConfigureIndexCacheImpl(*IndexCacheImplConfig)
 }
