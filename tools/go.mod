@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/golangci/golangci-lint v1.49.0
 	sigs.k8s.io/controller-tools v0.10.0
-	sigs.k8s.io/kind v0.12.0
+	sigs.k8s.io/kind v0.16.0
 	sigs.k8s.io/kustomize/kustomize/v4 v4.5.4
 )
 
