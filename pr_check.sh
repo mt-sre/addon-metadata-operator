@@ -2,10 +2,10 @@
 
 set -exvo pipefail -o nounset
 
-GO_1_17="/opt/go/1.17.8/bin"
+GO_1_18="/opt/go/1.18.1/bin"
 
-if [ -d  "${GO_1_17}" ]; then
-     PATH="${GO_1_17}:${PATH}"
+if [ -d  "${GO_1_18}" ]; then
+     PATH="${GO_1_18}:${PATH}"
 fi
 
 # pre-emptively install go-sqlite3 to ensure amalgamated libsqlite3
