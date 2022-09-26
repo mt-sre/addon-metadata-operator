@@ -82,7 +82,6 @@ func (All) Clean(ctx context.Context) {
 	mg.CtxDeps(
 		ctx,
 		Build.CleanCLI,
-		Build.CleanOperator,
 		Test.Clean,
 	)
 }
@@ -286,92 +285,9 @@ func (Build) CleanCLI() error {
 	return sh.Rm(filepath.Join(_projectRoot, "bin", "mtcli"))
 }
 
-func (Build) Operator(ctx context.Context) error {
-	build := gocmd(
-		command.WithCurrentEnv(true),
-		command.WithEnv{
-			"CGO_ENABLED": "0",
-		},
-		command.WithArgs{
-			"build", "-a",
-			"-o", filepath.Join(_projectRoot, "bin", "addon-metadata-operator"),
-			filepath.Join("cmd", "addon-metadata-operator", "main.go"),
-		},
-		command.WithConsoleOut(mg.Verbose()),
-		command.WithContext{Context: ctx},
-	)
-
-	if err := build.Run(); err != nil {
-		return fmt.Errorf("starting to build amo: %w", err)
-	}
-
-	if build.Success() {
-		return nil
-	}
-
-	return fmt.Errorf("building amo: %w", build.Error())
-}
-
 var gocmd = command.NewCommandAlias(mg.GoCmd())
 
-func (Build) CleanOperator() error {
-	return sh.Rm(filepath.Join(_projectRoot, "bin", "addon-metadata-operator"))
-}
-
-func (Build) OperatorImage(ctx context.Context) error {
-	runtime, ok := container.Runtime()
-	if !ok {
-		return errors.New("could not find container runtime")
-	}
-
-	fmt.Fprintf(os.Stdout, "Using container runtime %q\n", runtime)
-
-	build := command.NewCommand(runtime,
-		command.WithArgs{
-			"build",
-			"-t", fmt.Sprintf("%s:%s", repository, _tag),
-			"-f", "Dockerfile.build", _projectRoot,
-		},
-		command.WithConsoleOut(mg.Verbose()),
-		command.WithContext{Context: ctx},
-	)
-
-	if err := build.Run(); err != nil {
-		return fmt.Errorf("starting to build amo image: %w", err)
-	}
-
-	if build.Success() {
-		return nil
-	}
-
-	return fmt.Errorf("building amo image: %w", build.Error())
-}
-
 type Generate mg.Namespace
-
-func (Generate) Manifests(ctx context.Context) error {
-	mg.CtxDeps(ctx, Deps.UpdateControllerGen)
-
-	generate := controllergen(
-		command.WithArgs{
-			"crd", "rbac:roleName=manager-role",
-			"webhook", `paths="./..."`,
-			"output:crd:artifacts:config=config/crd/bases",
-		},
-		command.WithConsoleOut(mg.Verbose()),
-		command.WithContext{Context: ctx},
-	)
-
-	if err := generate.Run(); err != nil {
-		return fmt.Errorf("starting to generate manifests: %w", err)
-	}
-
-	if generate.Success() {
-		return nil
-	}
-
-	return fmt.Errorf("generating manifests: %w", generate.Error())
-}
 
 func (Generate) Boilerplate(ctx context.Context) error {
 	mg.CtxDeps(ctx, Deps.UpdateControllerGen)
@@ -379,7 +295,8 @@ func (Generate) Boilerplate(ctx context.Context) error {
 	generate := controllergen(
 		command.WithArgs{
 			`object:headerFile="hack/boilerplate.go.txt"`,
-			`paths="./..."`,
+			`paths="./api/..."`,
+			`paths="./pkg/..."`,
 		},
 		command.WithConsoleOut(mg.Verbose()),
 		command.WithContext{Context: ctx},
@@ -399,62 +316,6 @@ func (Generate) Boilerplate(ctx context.Context) error {
 var controllergen = command.NewCommandAlias(filepath.Join(_depBin, "controller-gen"))
 
 type Release mg.Namespace
-
-func (Release) PushOperatorImage(ctx context.Context) {
-	mg.SerialCtxDeps(
-		ctx,
-		Build.OperatorImage,
-		mg.F(Release.tagImage, fmt.Sprintf("%s:%s", repository, _tag), fmt.Sprintf("%s:%s", repository, "latest")),
-		mg.F(Release.pushImage, fmt.Sprintf("%s:%s", repository, _tag)),
-		mg.F(Release.pushImage, fmt.Sprintf("%s:%s", repository, "latest")),
-	)
-}
-
-func (Release) tagImage(ctx context.Context, local, ref string) error {
-	tag := command.NewCommand("docker",
-		command.WithArgs{"tag", local, ref},
-		command.WithConsoleOut(mg.Verbose()),
-		command.WithContext{Context: ctx},
-	)
-
-	if err := tag.Run(); err != nil {
-		return fmt.Errorf("starting to tag image %q: %w", ref, err)
-	}
-
-	if tag.Success() {
-		return nil
-	}
-
-	return fmt.Errorf("tagging image %q: %w", ref, tag.Error())
-}
-
-func (Release) pushImage(ctx context.Context, ref string) error {
-	const creds_var = "DOCKER_CONF"
-
-	creds, ok := os.LookupEnv(creds_var)
-	if !ok {
-		return fmt.Errorf("%q must be defined", creds_var)
-	}
-
-	push := command.NewCommand("docker",
-		command.WithArgs{
-			fmt.Sprintf("--config=%s", creds),
-			"push", ref,
-		},
-		command.WithConsoleOut(mg.Verbose()),
-		command.WithContext{Context: ctx},
-	)
-
-	if err := push.Run(); err != nil {
-		return fmt.Errorf("starting to push image %q: %w", ref, err)
-	}
-
-	if push.Success() {
-		return nil
-	}
-
-	return fmt.Errorf("pushing image %q: %w", ref, push.Error())
-}
 
 func (Release) CLI(ctx context.Context) error {
 	return runGoreleaser(ctx)
@@ -534,18 +395,6 @@ func (Deps) UpdateControllerGen(ctx context.Context) {
 
 func (Deps) UpdateGolangCILint(ctx context.Context) {
 	mg.CtxDeps(ctx, mg.F(Deps.updateGoDependency, "github.com/golangci/golangci-lint/cmd/golangci-lint"))
-}
-
-func (Deps) UpdateGoImports(ctx context.Context) {
-	mg.CtxDeps(ctx, mg.F(Deps.updateGoDependency, "golang.org/x/tools/cmd/goimports"))
-}
-
-func (Deps) UpdateKind(ctx context.Context) {
-	mg.CtxDeps(ctx, mg.F(Deps.updateGoDependency, "sigs.k8s.io/kind"))
-}
-
-func (Deps) UpdateKustomize(ctx context.Context) {
-	mg.CtxDeps(ctx, mg.F(Deps.updateGoDependency, "sigs.k8s.io/kustomize/kustomize/v4"))
 }
 
 func (Deps) updateGoDependency(ctx context.Context, src string) error {
