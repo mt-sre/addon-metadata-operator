@@ -188,50 +188,40 @@ func (Test) Unit(ctx context.Context) error {
 	return fmt.Errorf("running unit tests: %w", test.Error())
 }
 
+// Runs integration tests.
 func (Test) Integration(ctx context.Context) error {
-	e2eBin := filepath.Join(_projectRoot, ".cache/mtcli")
-
-	build := gocmd(
-		command.WithCurrentEnv(true),
-		command.WithEnv{
-			"CGO_ENABLED": "1",
-			"CGO_CFLAGS":  "-DSQLITE_ENABLE_JSON1",
-		},
-		command.WithArgs{"build", "-a", "-o", e2eBin, "./cmd/mtcli"},
-		command.WithConsoleOut(mg.Verbose()),
-		command.WithContext{Context: ctx},
+	mg.CtxDeps(
+		ctx,
+		Deps.UpdateGinkgo,
 	)
 
-	if err := build.Run(); err != nil || !build.Success() {
-		if build.Error() != nil {
-			err = build.Error()
-		}
-
-		return fmt.Errorf("building mtcli binary: %w", err)
-	}
-
-	integration := gocmd(
-		command.WithCurrentEnv(true),
-		command.WithEnv{
-			"E2E_MTCLI_PATH": e2eBin,
-		},
+	test := ginkgo(
 		command.WithArgs{
-			"test", "-v", "-count=1", "-race", "./integration/...",
+			"-r",
+			"--randomize-all",
+			"--randomize-suites",
+			"--fail-on-pending",
+			"--keep-going",
+			"--race",
+			"--trace",
 		},
+		command.WithArgs{"-v", "integration"},
 		command.WithConsoleOut(mg.Verbose()),
 		command.WithContext{Context: ctx},
 	)
 
-	if err := integration.Run(); err != nil {
+	if err := test.Run(); err != nil {
 		return fmt.Errorf("starting integration tests: %w", err)
 	}
 
-	if integration.Success() {
+	if test.Success() {
 		return nil
 	}
 
-	return fmt.Errorf("running integration tests: %w", integration.Error())
+	return fmt.Errorf("running integration tests: %w", test.Error())
 }
+
+var ginkgo = command.NewCommandAlias(filepath.Join(_depBin, "ginkgo"))
 
 func (Test) Benchmark(ctx context.Context) error {
 	benchmark := gocmd(
@@ -418,6 +408,10 @@ func (Deps) UpdateControllerGen(ctx context.Context) {
 
 func (Deps) UpdateGolangCILint(ctx context.Context) {
 	mg.CtxDeps(ctx, mg.F(Deps.updateGoDependency, "github.com/golangci/golangci-lint/cmd/golangci-lint"))
+}
+
+func (Deps) UpdateGinkgo(ctx context.Context) {
+	mg.CtxDeps(ctx, mg.F(Deps.updateGoDependency, "github.com/onsi/ginkgo/v2/ginkgo"))
 }
 
 func (Deps) updateGoDependency(ctx context.Context, src string) error {
