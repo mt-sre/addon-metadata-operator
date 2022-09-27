@@ -20,7 +20,10 @@ const (
 	nBundles            = 10
 )
 
-var bundlePath = path.Join(testutils.RootDir().TestData().Validators(), "am0007", "csv.yaml")
+var bundlePath = path.Join(
+	testutils.RootDir().TestData().Bundles(), "reference-addon",
+	"main", "0.1.6", "manifests", "reference-addon.csv.yaml",
+)
 
 type metaBundleByReference struct {
 	Bundles []*registry.Bundle

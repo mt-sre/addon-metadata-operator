@@ -53,10 +53,3 @@ repos:
     pass_filenames: false
     types: [go]
     require_serial: true
-  - id: build-operator-image
-    name: build-operator-image
-    language: system
-    entry: ./mage build:operatorimage
-    pass_filenames: false
-    files: 'Dockerfile\.build$'
-    require_serial: true
