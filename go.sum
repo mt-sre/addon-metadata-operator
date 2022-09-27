@@ -561,8 +561,8 @@ github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417 h1:3
 github.com/openshift-online/ocm-sdk-go v0.1.286 h1:PoSFXqRJ4nlpbVbZK77+WiLx9i31oLPQ/3LAtVEu0xw=
 github.com/openshift-online/ocm-sdk-go v0.1.286/go.mod h1:KYOw8kAKAHyPrJcQoVR82CneQ4ofC02Na4cXXaTq4Nw=
 github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJc5AZX7/PBEpw=
-github.com/operator-framework/api v0.16.0 h1:swUOhVv7QDszxBTwYM8QAtyeqI4EQHNVAiKMS+xjakY=
-github.com/operator-framework/api v0.16.0/go.mod h1:kk8xJahHJR3bKqrA+A+1VIrhOTmyV76k+ARv+iV+u1Q=
+github.com/operator-framework/api v0.17.1 h1:J/6+Xj4IEV8C7hcirqUFwOiZAU3PbnJhWvB0/bB51c4=
+github.com/operator-framework/api v0.17.1/go.mod h1:kk8xJahHJR3bKqrA+A+1VIrhOTmyV76k+ARv+iV+u1Q=
 github.com/operator-framework/operator-registry v1.26.2 h1:kQToR/hPqdivljaRXM0olPllNIcc/GUk1VBoGwagJmk=
 github.com/operator-framework/operator-registry v1.26.2/go.mod h1:Z7XIb/3ZkhBQCvMD/rJphyuY4LmU/eWpZS+o0Mm1WAk=
 github.com/otiai10/copy v1.2.0 h1:HvG945u96iNadPoG2/Ja2+AUJeW5YuFQMixq9yirC+k=
