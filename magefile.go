@@ -63,6 +63,7 @@ var git = command.NewCommandAlias("git")
 var Aliases = map[string]interface{}{
 	"check":     All.Check,
 	"clean":     All.Clean,
+	"release":   Release.CLI,
 	"run-hooks": Hooks.Run,
 	"test":      All.Test,
 }
@@ -230,6 +231,28 @@ func (Test) Integration(ctx context.Context) error {
 	}
 
 	return fmt.Errorf("running integration tests: %w", integration.Error())
+}
+
+func (Test) Benchmark(ctx context.Context) error {
+	benchmark := gocmd(
+		command.WithCurrentEnv(true),
+		command.WithArgs{
+			"test", "-bench=.", "-count=5",
+			"-run", `"Benchmark*"`, "./...",
+		},
+		command.WithConsoleOut(mg.Verbose()),
+		command.WithContext{Context: ctx},
+	)
+
+	if err := benchmark.Run(); err != nil {
+		return fmt.Errorf("starting benchmark tests: %w", err)
+	}
+
+	if benchmark.Success() {
+		return nil
+	}
+
+	return fmt.Errorf("running benchmark tests: %w", benchmark.Error())
 }
 
 func (Test) Clean() error {

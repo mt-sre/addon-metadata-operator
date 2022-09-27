@@ -2,4 +2,4 @@
 
 set -exvo pipefail -o nounset
 
-make release
+./mage release:cli
