@@ -14,7 +14,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.1.6
 	github.com/onsi/gomega v1.20.1
 	github.com/openshift-online/ocm-sdk-go v0.1.286
-	github.com/operator-framework/api v0.16.0
+	github.com/operator-framework/api v0.17.1
 	github.com/operator-framework/operator-registry v1.26.2
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
