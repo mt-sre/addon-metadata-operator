@@ -518,8 +518,8 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c h1:nXxl5PrvVm2L/wCy8dQu6DMTwH4oIuGN8GJDAlqDdVE=
 github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c/go.mod h1:BbKIizmSmc5MMPqRYbxO4ZU0S0+P200+tUnFx7PXmsc=
-github.com/mt-sre/client v0.1.3 h1:GsjHrh7LTD5xoj6kqYt1T3ymarPudjpCUC33mxHtFSQ=
-github.com/mt-sre/client v0.1.3/go.mod h1:08PWgWcW1ZJg7XgZvqcdGnfG7A0p7mssdF7itxSLkAo=
+github.com/mt-sre/client v0.2.0 h1:nF6ei3aZ2BHyi+EB/rQBuCIlR0z1QvaYNjZ7RVNsSak=
+github.com/mt-sre/client v0.2.0/go.mod h1:wiYCEamk92vOM1eKkgQDaxYj7ON+m1R/aceSZ+1UDTI=
 github.com/mt-sre/go-ci v0.3.3 h1:2MfPA/2cN7N78xTymfk8LHj47a8pjxt9U5KI11Cgq4Y=
 github.com/mt-sre/go-ci v0.3.3/go.mod h1:wBs/GWtYipDviiYfmIIj1a0pSO1B+pEWBUKBkmqVPRA=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=
