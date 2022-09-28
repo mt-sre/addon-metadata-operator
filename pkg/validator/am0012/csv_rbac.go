@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/utils/csvutils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
@@ -39,21 +40,13 @@ type CSVRBAC struct {
 }
 
 func (v *CSVRBAC) Run(ctx context.Context, mb types.MetaBundle) validator.Result {
-	// Guard against addons which do not have bundles yet
-	if len(mb.Bundles) == 0 {
+	bundle, ok := operator.HeadBundle(mb.Bundles...)
+	if !ok {
 		return v.Success()
 	}
 
-	// Only run validations on the latest bundle
-	latestBundle, err := validator.GetLatestBundle(mb.Bundles)
-	if err != nil {
-		return v.Error(err)
-	}
+	csv := bundle.ClusterServiceVersion
 
-	csv, err := latestBundle.ClusterServiceVersion()
-	if err != nil {
-		return v.Error(err)
-	}
 	apisOwnedByOperator, err := csvutils.GetApisOwned(csv)
 	if err != nil {
 		return v.Error(err)

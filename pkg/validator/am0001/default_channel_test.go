@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 	"github.com/stretchr/testify/require"
 )
 
@@ -69,11 +69,11 @@ func TestDefaultChannelInvalid(t *testing.T) {
 					},
 				},
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				{
-					Annotations: &registry.Annotations{
+					Annotations: operator.Annotations{
 						DefaultChannelName: "alpha",
-						Channels:           "beta,stable,rc",
+						Channels:           []string{"beta", "stable", "rc"},
 					},
 				},
 			},
@@ -88,11 +88,11 @@ func TestDefaultChannelInvalid(t *testing.T) {
 					},
 				},
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				{
-					Annotations: &registry.Annotations{
+					Annotations: operator.Annotations{
 						DefaultChannelName: "beta",
-						Channels:           "beta,stable,rc,alpha",
+						Channels:           []string{"beta", "stable", "rc", "alpha"},
 					},
 				},
 			},
@@ -107,11 +107,11 @@ func TestDefaultChannelInvalid(t *testing.T) {
 					},
 				},
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				{
-					Annotations: &registry.Annotations{
+					Annotations: operator.Annotations{
 						DefaultChannelName: "",
-						Channels:           "stable,beta",
+						Channels:           []string{"stable", "beta"},
 					},
 				},
 			},

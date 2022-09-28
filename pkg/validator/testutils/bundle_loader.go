@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/internal/testutils"
-	"github.com/operator-framework/operator-registry/pkg/registry"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,7 +18,7 @@ type BundleLoader struct {
 	t *testing.T
 }
 
-func (l *BundleLoader) LoadFromCSV(path string, opts ...LoadOption) *registry.Bundle {
+func (l *BundleLoader) LoadFromCSV(path string, opts ...LoadOption) operator.Bundle {
 	l.t.Helper()
 
 	var cfg loadConfig
@@ -26,12 +26,15 @@ func (l *BundleLoader) LoadFromCSV(path string, opts ...LoadOption) *registry.Bu
 	cfg.Option(opts...)
 	cfg.Default()
 
-	bundle, err := testutils.NewBundle(cfg.BundleName, path)
+	regBundle, err := testutils.NewBundle(cfg.BundleName, path)
 	require.NoError(l.t, err)
 
 	if cfg.PackageName != "" {
-		bundle.Annotations.PackageName = cfg.PackageName
+		regBundle.Annotations.PackageName = cfg.PackageName
 	}
+
+	bundle, err := operator.NewBundleFromRegistryBundle(*regBundle)
+	require.NoError(l.t, err)
 
 	return bundle
 }

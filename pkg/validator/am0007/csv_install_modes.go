@@ -2,14 +2,11 @@ package am0007
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
 	operatorsv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
 func init() {
@@ -50,15 +47,12 @@ func (c *CSVInstallModes) Run(ctx context.Context, mb types.MetaBundle) validato
 	}
 
 	for _, bundle := range mb.Bundles {
-		bundleName, err := utils.GetBundleNameVersion(bundle)
-		if err != nil {
-			return c.Error(err)
-		}
-		spec, err := extractCSVSpec(bundle)
-		if err != nil {
-			return c.Error(fmt.Errorf("unable to extract CSV for %v: %w", bundleName, err))
-		}
-		if success, failureMsg := isInstallModeSupported(spec.InstallModes, installMode); !success {
+		var (
+			bundleName = bundle.GetNameVersion()
+			modes      = bundle.ClusterServiceVersion.Spec.InstallModes
+		)
+
+		if success, failureMsg := isInstallModeSupported(modes, installMode); !success {
 			return c.Fail(fmt.Sprintf("Bundle %v failed CSV validation: %v.", bundleName, failureMsg))
 		}
 	}
@@ -84,19 +78,6 @@ func isInstallModeSupported(installModes []operatorsv1alpha1.InstallMode, target
 
 type CSVSpec struct {
 	InstallModes []operatorsv1alpha1.InstallMode `json:"installModes"`
-}
-
-func extractCSVSpec(b *registry.Bundle) (*CSVSpec, error) {
-	csv, err := b.ClusterServiceVersion()
-	if err != nil {
-		return nil, err
-	}
-	var res CSVSpec
-	if err := json.Unmarshal(csv.Spec, &res); err != nil {
-		return nil, err
-	}
-
-	return &res, nil
 }
 
 var validInstallModes = []string{"AllNamespaces", "OwnNamespace"}

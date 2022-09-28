@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
 func TestOperatorNameValid(t *testing.T) {
@@ -21,7 +21,7 @@ func TestOperatorNameValid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_valid.yaml"),
 					testutils.WithPackageName("reference-addon"),
@@ -42,7 +42,7 @@ func TestOperatornameInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_valid.yaml"),
 					testutils.WithPackageName("invalid"),
@@ -53,7 +53,7 @@ func TestOperatornameInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_name_invalid.yaml"),
 					testutils.WithPackageName("reference-addon"),
@@ -64,7 +64,7 @@ func TestOperatornameInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_replaces_invalid.yaml"),
 					testutils.WithPackageName("reference-addon"),
@@ -75,7 +75,7 @@ func TestOperatornameInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_semver_invalid.yaml"),
 					testutils.WithPackageName("reference-addon"),

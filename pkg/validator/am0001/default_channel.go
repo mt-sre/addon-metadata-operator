@@ -3,12 +3,11 @@ package am0001
 import (
 	"context"
 	"fmt"
-	"strings"
 
-	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	opsv1alpha1 "github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
 func init() {
@@ -75,7 +74,7 @@ func (d *DefaultChannel) isPartOfEnum(defaultChannel string) validator.Result {
 }
 
 // TODO - deprecate this when we remove legacy builds
-func (d *DefaultChannel) isListedInChannels(channels *[]v1alpha1.Channel, defaultChannel string) validator.Result {
+func (d *DefaultChannel) isListedInChannels(channels *[]opsv1alpha1.Channel, defaultChannel string) validator.Result {
 	// as the Channels field is deprecated, it can be omitted
 	if channels == nil {
 		return d.Success()
@@ -91,11 +90,12 @@ func (d *DefaultChannel) isListedInChannels(channels *[]v1alpha1.Channel, defaul
 	return d.Fail(msg)
 }
 
-func (d *DefaultChannel) matchesBundleChannelAnnotations(defaultChannel string, bundles []*registry.Bundle) validator.Result {
+func (d *DefaultChannel) matchesBundleChannelAnnotations(defaultChannel string, bundles []operator.Bundle) validator.Result {
 	var message []string
-	bundle, err := validator.GetLatestBundle(bundles)
-	if err != nil {
-		return d.Fail("Error while checking bundles")
+
+	bundle, ok := operator.HeadBundle(bundles...)
+	if !ok {
+		return d.Success()
 	}
 
 	if bundle.Annotations.DefaultChannelName == "" && defaultChannel != "alpha" {
@@ -110,7 +110,7 @@ func (d *DefaultChannel) matchesBundleChannelAnnotations(defaultChannel string, 
 		message = append(message, msg)
 	}
 
-	channels := strings.Split(bundle.Annotations.Channels, ",")
+	channels := bundle.Annotations.Channels
 
 	if !isPresentInBundleChannels(defaultChannel, channels) {
 		msg := fmt.Sprintf("The defaultChannel '%v' is not present in annotation operators.operatorframework.io.bundle.channels.v1 '%v'.",

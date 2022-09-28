@@ -38,11 +38,9 @@ func run(cmd *cobra.Command, args []string) error {
 
 	var operatorVersionedNames []string
 	for _, bundle := range allBundles {
-		csv, err := bundle.ClusterServiceVersion()
-		if err != nil {
-			return fmt.Errorf("extracting version info for bundle %q: %w", bundle.Name, err)
-		}
-		operatorVersionedNames = append(operatorVersionedNames, csv.GetName())
+		csv := bundle.ClusterServiceVersion
+
+		operatorVersionedNames = append(operatorVersionedNames, csv.Name)
 	}
 
 	fmt.Fprintln(os.Stdout, strings.Join(operatorVersionedNames, "\n"))

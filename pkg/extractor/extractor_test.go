@@ -3,7 +3,7 @@ package extractor
 import (
 	"testing"
 
-	"github.com/operator-framework/operator-registry/pkg/registry"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/stretchr/testify/require"
 )
 
@@ -45,7 +45,7 @@ func TestMainExtractorWithDefaultValues(t *testing.T) {
 		t.Run(tc.indexImage, func(t *testing.T) {
 			t.Parallel()
 
-			var bundles []*registry.Bundle
+			var bundles []operator.Bundle
 			var err error
 
 			if tc.pkgName == "" {
