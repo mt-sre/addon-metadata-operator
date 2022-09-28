@@ -7,7 +7,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/fatih/color v1.13.0
 	github.com/go-logr/logr v1.2.3
-	github.com/magefile/mage v1.13.0
+	github.com/magefile/mage v1.14.0
 	github.com/mt-sre/client v0.2.0
 	github.com/mt-sre/go-ci v0.3.3
 	github.com/novln/docker-parser v1.0.0
