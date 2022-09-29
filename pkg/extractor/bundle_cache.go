@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/operator-framework/operator-registry/pkg/registry"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 )
 
 // NewBundleCacheImpl returns an initialized BundleCacheImpl. A
@@ -27,13 +27,13 @@ type BundleCacheImpl struct {
 
 var ErrInvalidBundleData = errors.New("invalid bundle data")
 
-func (c *BundleCacheImpl) GetBundle(img string) (*registry.Bundle, error) {
+func (c *BundleCacheImpl) GetBundle(img string) (*operator.Bundle, error) {
 	data, ok := c.cfg.Store.Read(img)
 	if !ok {
 		return nil, nil
 	}
 
-	bundle, ok := data.(registry.Bundle)
+	bundle, ok := data.(operator.Bundle)
 	if !ok {
 		return nil, ErrInvalidBundleData
 	}
@@ -41,7 +41,7 @@ func (c *BundleCacheImpl) GetBundle(img string) (*registry.Bundle, error) {
 	return &bundle, nil
 }
 
-func (c *BundleCacheImpl) SetBundle(img string, bundle registry.Bundle) error {
+func (c *BundleCacheImpl) SetBundle(img string, bundle operator.Bundle) error {
 	if err := c.cfg.Store.Write(img, bundle); err != nil {
 		return fmt.Errorf("writing bundle data: %w", err)
 	}

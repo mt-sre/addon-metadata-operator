@@ -6,10 +6,9 @@ import (
 	"strings"
 
 	"github.com/blang/semver/v4"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
-	"github.com/mt-sre/addon-metadata-operator/pkg/utils"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
 const (
@@ -61,34 +60,22 @@ func (o *OperatorName) Run(ctx context.Context, mb types.MetaBundle) validator.R
 	return o.Success()
 }
 
-func validateBundle(bundle *registry.Bundle, operatorName string) ([]string, error) {
+func validateBundle(bundle operator.Bundle, operatorName string) ([]string, error) {
 	var msgs []string
 
-	nameVer, err := utils.GetBundleNameVersion(bundle)
-	if err != nil {
-		return nil, fmt.Errorf("retrieving bundle name and version: %w", err)
-	}
-
+	nameVer := bundle.GetNameVersion()
 	if bundle.Annotations.PackageName != operatorName {
 		msgs = append(msgs, fmt.Sprintf(
 			"bundle %q package annotation does not match operatorName %q", nameVer, operatorName,
 		))
 	}
 
-	csv, err := bundle.ClusterServiceVersion()
-	if err != nil {
-		return nil, fmt.Errorf("retrieving csv: %w", err)
-	}
-
+	csv := bundle.ClusterServiceVersion
 	if msg := validateBundleIdentifier(csv.Name, operatorName); msg != "" {
 		msgs = append(msgs, fmt.Sprintf("bundle %q failed validation on csv.Name: %s.", nameVer, msg))
 	}
 
-	replaces, err := csv.GetReplaces()
-	if err != nil {
-		return nil, fmt.Errorf("retrieving 'replaces' field from csv: %w", err)
-	}
-
+	replaces := csv.Spec.Replaces
 	if replaces != "" {
 		if msg := validateBundleIdentifier(replaces, operatorName); msg != "" {
 			msgs = append(msgs, fmt.Sprintf("bundle %q failed validation on csv.Replaces: %s.", nameVer, msg))

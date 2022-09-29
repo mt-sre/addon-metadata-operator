@@ -3,7 +3,7 @@ package extractor
 import (
 	"context"
 
-	"github.com/operator-framework/operator-registry/pkg/registry"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 )
 
 // Extractor - utilizes both the indexExtractor and bundleExtractor to first extract
@@ -11,9 +11,9 @@ import (
 // bundles from those underlying bundleImages.
 type Extractor interface {
 	// extract all bundles from indexImage matching pkgName
-	ExtractBundles(indexImage string, pkgName string) ([]*registry.Bundle, error)
+	ExtractBundles(indexImage string, pkgName string) ([]operator.Bundle, error)
 	// extract all bundles from indexImage, for all packages
-	ExtractAllBundles(indexImage string) ([]*registry.Bundle, error)
+	ExtractAllBundles(indexImage string) ([]operator.Bundle, error)
 }
 
 // Choosing to list explicitly that the indexExtractor works with BundleImages
@@ -34,5 +34,5 @@ type IndexExtractor interface {
 // format by OPM.
 // Bundle format: https://docs.openshift.com/container-platform/4.9/operators/understanding/olm-packaging-format.html#olm-bundle-format_olm-packaging-format
 type BundleExtractor interface {
-	Extract(ctx context.Context, bundleImage string) (*registry.Bundle, error)
+	Extract(ctx context.Context, bundleImage string) (operator.Bundle, error)
 }

@@ -1,13 +1,12 @@
 package csvutils
 
 import (
-	"encoding/json"
 	"strings"
 	"unicode"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	operatorv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 	rbac "k8s.io/api/rbac/v1"
 )
 
@@ -83,27 +82,20 @@ func WildCardResourcePresent(csvPermissions *types.CSVPermissions, ownedApis []s
 	return len(matchedRules) > 0
 }
 
-func GetApisOwned(csv *registry.ClusterServiceVersion) ([]string, error) {
-	ownedApis, _, err := csv.GetCustomResourceDefintions()
-	if err != nil {
-		return nil, err
+func GetApisOwned(csv operator.ClusterServiceVersion) ([]string, error) {
+	ownedAPIs := csv.OwnedCustomResourceDefinitions
+
+	result := make([]string, 0, len(ownedAPIs))
+	for _, api := range ownedAPIs {
+		result = append(result, trimWhiteSpace(api.Group))
 	}
-	result := make([]string, 0)
-	for _, api := range ownedApis {
-		if api != nil {
-			result = append(result, trimWhiteSpace(api.Group))
-		}
-	}
+
 	return result, nil
 }
 
-func GetPermissions(csv *registry.ClusterServiceVersion) (*types.CSVPermissions, error) {
-	var csvSpec operatorv1alpha1.ClusterServiceVersionSpec
-	if err := json.Unmarshal(csv.Spec, &csvSpec); err != nil {
-		return nil, err
-	}
-	clusterPermissions := csvSpec.InstallStrategy.StrategySpec.ClusterPermissions
-	permissions := csvSpec.InstallStrategy.StrategySpec.Permissions
+func GetPermissions(csv operator.ClusterServiceVersion) (*types.CSVPermissions, error) {
+	clusterPermissions := csv.Spec.InstallStrategy.StrategySpec.ClusterPermissions
+	permissions := csv.Spec.InstallStrategy.StrategySpec.Permissions
 
 	return &types.CSVPermissions{
 		ClusterPermissions: operatorPermissions2LocalPermissions(clusterPermissions),

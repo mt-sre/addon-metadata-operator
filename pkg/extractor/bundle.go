@@ -10,14 +10,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/operator-framework/operator-registry/pkg/image"
 	"github.com/operator-framework/operator-registry/pkg/image/containerdregistry"
 	opmbundle "github.com/operator-framework/operator-registry/pkg/lib/bundle"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	k8syaml "k8s.io/apimachinery/pkg/util/yaml"
 )
 
 // BundleCache provides a cache of OPM bundles which are referenced by
@@ -26,10 +23,10 @@ type BundleCache interface {
 	// GetBundle returns a bundle for the given image. An error is
 	// returned if the bundle cannot be retrieved or the data is
 	// corrupted.
-	GetBundle(img string) (*registry.Bundle, error)
+	GetBundle(img string) (*operator.Bundle, error)
 	// SetBundle caches a bundle for the given image. An error
 	// is returned if the bundle cannot be cached.
-	SetBundle(img string, bundle registry.Bundle) error
+	SetBundle(img string, bundle operator.Bundle) error
 }
 
 type DefaultBundleExtractor struct {
@@ -80,39 +77,40 @@ func WithBundleTimeout(timeout time.Duration) BundleExtractorOpt {
 	}
 }
 
-func (e *DefaultBundleExtractor) Extract(ctx context.Context, bundleImage string) (*registry.Bundle, error) {
-	bundle, err := e.Cache.GetBundle(bundleImage)
+func (e *DefaultBundleExtractor) Extract(ctx context.Context, bundleImage string) (operator.Bundle, error) {
+	cachedBundle, err := e.Cache.GetBundle(bundleImage)
 	if err != nil {
 		e.Log.Warnf("retrieving bundle %q from cache: %w", bundleImage, err)
 	}
 
-	if bundle != nil {
-		e.Log.Debugf("cache hit for '%s'", bundleImage)
-		return bundle, nil
+	if cachedBundle != nil {
+		e.Log.Debugf("cache hit for %q", bundleImage)
+		return *cachedBundle, nil
 	}
 
 	e.Log.Debugf("cache miss for '%s'", bundleImage)
 	tmpDirs, err := createTempDirs()
 	if err != nil {
-		return nil, err
+		return operator.Bundle{}, err
 	}
 	defer func() {
 		if err := tmpDirs.CleanUp(); err != nil {
-			e.Log.Errorf("failed to cleanup tmpDirs: %w", err)
+			e.Log.Errorf("cleaning up tmpDirs: %w", err)
 		}
 	}()
 
 	if err := e.unpackAndValidateBundle(ctx, bundleImage, tmpDirs); err != nil {
-		return nil, fmt.Errorf("failed to unpack and validate bundle: %w", err)
+		return operator.Bundle{}, fmt.Errorf("unpacking and validating bundle: %w", err)
 	}
 
-	bundle, err = e.loadBundle(tmpDirs["bundle"])
+	bundle, err := operator.NewBundleFromDirectory(tmpDirs["bundle"])
 	if err != nil {
-		return nil, err
+		return operator.Bundle{}, err
 	}
+
 	bundle.BundleImage = bundleImage // not set by OPM
 
-	if err := e.Cache.SetBundle(bundleImage, *bundle); err != nil {
+	if err := e.Cache.SetBundle(bundleImage, bundle); err != nil {
 		e.Log.Warnf("caching bundle %q: %w", bundleImage, err)
 	}
 
@@ -171,59 +169,6 @@ func (e *DefaultBundleExtractor) ValidateBundle(registry *containerdregistry.Reg
 	}
 
 	return nil
-}
-
-func (e *DefaultBundleExtractor) loadBundle(tmpDir string) (*registry.Bundle, error) {
-	e.Log.Debugf("loading the bundle from tmpDir: %s", tmpDir)
-	unstObjs, err := readAllManifests(filepath.Join(tmpDir, opmbundle.ManifestsDir))
-	if err != nil {
-		return nil, err
-	}
-	annotations, err := readAnnotations(filepath.Join(tmpDir, opmbundle.MetadataDir))
-	if err != nil {
-		return nil, err
-	}
-	return registry.NewBundle(annotations.PackageName, annotations, unstObjs...), nil
-}
-
-func readAllManifests(manifestsDir string) ([]*unstructured.Unstructured, error) {
-	unstObjs := []*unstructured.Unstructured{}
-	items, err := ioutil.ReadDir(manifestsDir)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, item := range items {
-		path := filepath.Join(manifestsDir, item.Name())
-		data, err := ioutil.ReadFile(path)
-		if err != nil {
-			return nil, fmt.Errorf("unable to read file %s, got %w", path, err)
-		}
-
-		dec := k8syaml.NewYAMLOrJSONDecoder(strings.NewReader(string(data)), 30)
-		k8sFile := &unstructured.Unstructured{}
-		if err = dec.Decode(k8sFile); err != nil {
-			return nil, fmt.Errorf("unable to decode file %s, got %w", path, err)
-		}
-
-		unstObjs = append(unstObjs, k8sFile)
-	}
-	return unstObjs, nil
-}
-
-func readAnnotations(metadataDir string) (*registry.Annotations, error) {
-	path := filepath.Join(metadataDir, opmbundle.AnnotationsFile)
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("unable to read file '%s': %w", path, err)
-	}
-
-	var annotationsFile registry.AnnotationsFile
-	if err = yaml.Unmarshal(content, &annotationsFile); err != nil {
-		return nil, fmt.Errorf("unable to unmarshal file '%s': %w", path, err)
-	}
-
-	return &annotationsFile.Annotations, nil
 }
 
 type tempDirs map[string]string

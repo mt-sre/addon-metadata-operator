@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	imageparser "github.com/novln/docker-parser"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -66,7 +66,7 @@ func WithLog(log logrus.FieldLogger) MainExtractorOpt {
 }
 
 // ExtractBundles - extract bundles from indexImage matching pkgName
-func (e *MainExtractor) ExtractBundles(indexImage string, pkgName string) ([]*registry.Bundle, error) {
+func (e *MainExtractor) ExtractBundles(indexImage string, pkgName string) ([]operator.Bundle, error) {
 	if err := validateIndexImage(indexImage); err != nil {
 		if errors.Is(err, ErrTaglessImage) {
 			e.Log.Info("skipping tagless image, nothing to extract")
@@ -92,7 +92,7 @@ func (e *MainExtractor) ExtractBundles(indexImage string, pkgName string) ([]*re
 }
 
 // ExtractAllBundles - extract bundles for all packages from indexImage
-func (e *MainExtractor) ExtractAllBundles(indexImage string) ([]*registry.Bundle, error) {
+func (e *MainExtractor) ExtractAllBundles(indexImage string) ([]operator.Bundle, error) {
 	if err := validateIndexImage(indexImage); err != nil {
 		if errors.Is(err, ErrTaglessImage) {
 			e.Log.Info("skipping tagless image, nothing to extract")
@@ -111,8 +111,8 @@ func (e *MainExtractor) ExtractAllBundles(indexImage string) ([]*registry.Bundle
 	return e.extractBundlesConcurrent(bundleImages)
 }
 
-func (e *MainExtractor) extractBundlesConcurrent(bundleImages []string) ([]*registry.Bundle, error) {
-	res := make([]*registry.Bundle, len(bundleImages))
+func (e *MainExtractor) extractBundlesConcurrent(bundleImages []string) ([]operator.Bundle, error) {
+	res := make([]operator.Bundle, len(bundleImages))
 	g := new(errgroup.Group)
 
 	// we need the global context to be able to cancel all goroutines

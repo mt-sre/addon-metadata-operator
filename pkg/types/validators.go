@@ -2,15 +2,15 @@ package types
 
 import (
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
-	"github.com/operator-framework/operator-registry/pkg/registry"
+	op "github.com/mt-sre/addon-metadata-operator/pkg/operator"
 )
 
 type MetaBundle struct {
 	AddonMeta *v1alpha1.AddonMetadataSpec
-	Bundles   []*registry.Bundle
+	Bundles   []op.Bundle
 }
 
-func NewMetaBundle(addonMeta *v1alpha1.AddonMetadataSpec, bundles []*registry.Bundle) *MetaBundle {
+func NewMetaBundle(addonMeta *v1alpha1.AddonMetadataSpec, bundles []op.Bundle) *MetaBundle {
 	return &MetaBundle{
 		AddonMeta: addonMeta,
 		Bundles:   bundles,

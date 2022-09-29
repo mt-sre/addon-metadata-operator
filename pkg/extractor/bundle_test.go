@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/operator-framework/operator-registry/pkg/registry"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -55,7 +55,7 @@ func TestDefaultBundleExtractor(t *testing.T) {
 			cachedBundle, err := cache.GetBundle(tc.BundleImage)
 			require.NoError(t, err)
 
-			tc.AssertExpectations(t, cachedBundle)
+			tc.AssertExpectations(t, *cachedBundle)
 		})
 	}
 }
@@ -67,7 +67,7 @@ type testCase struct {
 	ExpectedCSVVersion  string
 }
 
-func (tc testCase) AssertExpectations(t *testing.T, b *registry.Bundle) {
+func (tc testCase) AssertExpectations(t *testing.T, b operator.Bundle) {
 	t.Helper()
 
 	assert.Equal(t, b.Name, tc.ExpectedPackageName)
@@ -75,14 +75,7 @@ func (tc testCase) AssertExpectations(t *testing.T, b *registry.Bundle) {
 	assert.NotNil(t, b.Annotations)
 	assert.Equal(t, b.Annotations.PackageName, tc.ExpectedPackageName)
 
-	csv, err := b.ClusterServiceVersion()
-	require.NoError(t, err)
-	require.NotNil(t, csv)
+	assert.Equal(t, b.ClusterServiceVersion.Name, tc.ExpectedCSVName)
 
-	assert.Equal(t, csv.Name, tc.ExpectedCSVName)
-
-	version, err := csv.GetVersion()
-	require.NoError(t, err)
-
-	assert.Equal(t, version, tc.ExpectedCSVVersion)
+	assert.Equal(t, b.Version, tc.ExpectedCSVVersion)
 }

@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,7 +24,7 @@ func TestCSVInstallModeValid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "OwnNamespace",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
@@ -32,7 +32,7 @@ func TestCSVInstallModeValid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "AllNamespaces",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
@@ -55,7 +55,7 @@ func TestCSVInstallModeInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "something",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
@@ -63,7 +63,7 @@ func TestCSVInstallModeInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "SingleNamespace",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},
@@ -71,7 +71,7 @@ func TestCSVInstallModeInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				InstallMode: "MultiNamespace",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(filepath.Join("test_csvs", "csv.yaml")),
 			},
 		},

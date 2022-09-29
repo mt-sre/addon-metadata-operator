@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/api/v1alpha1"
+	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
-	"github.com/operator-framework/operator-registry/pkg/registry"
 )
 
 func TestCSVDeploymentValid(t *testing.T) {
@@ -21,7 +21,7 @@ func TestCSVDeploymentValid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_valid.yaml"),
 				),
@@ -41,7 +41,7 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_invalid_livenessprobe.yaml"),
 				),
@@ -51,7 +51,7 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_invalid_readinessprobe.yaml"),
 				),
@@ -61,7 +61,7 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_invalid_memory_requirement.yaml"),
 				),
@@ -71,7 +71,7 @@ func TestCSVDeploymentInvalid(t *testing.T) {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
 				OperatorName: "reference-addon",
 			},
-			Bundles: []*registry.Bundle{
+			Bundles: []operator.Bundle{
 				loader.LoadFromCSV(
 					filepath.Join("test_csvs", "csv_invalid_cpu_requirement.yaml"),
 				),
