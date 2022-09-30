@@ -154,9 +154,6 @@ type AddonMetadataSpec struct {
 	ManualInstallPlanApproval *bool `json:"manualInstallPlanApproval"`
 
 	// +optional
-	PullSecret string `json:"pullSecret"`
-
-	// +optional
 	// Labels to be applied to all objects created in the SelectorSyncSet.
 	CommonLabels *map[string]string `json:"commonLabels"`
 
