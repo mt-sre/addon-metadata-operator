@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/mt-sre/go-ci/command"
 	"github.com/mt-sre/go-ci/container"
 	"github.com/mt-sre/go-ci/file"
+	"github.com/mt-sre/go-ci/git"
 	"github.com/mt-sre/go-ci/web"
 	"go.uber.org/multierr"
 )
@@ -35,30 +35,26 @@ var _projectRoot = func() string {
 		return root
 	}
 
-	toplevel := git(
-		command.WithArgs{"rev-parse", "--show-toplevel"},
+	topLevel, err := git.RevParse(context.Background(),
+		git.WithRevParseFormat(git.RevParseFormatTopLevel),
 	)
-
-	if err := toplevel.Run(); err != nil || !toplevel.Success() {
-		panic("failed to get working directory")
+	if err != nil {
+		panic(err)
 	}
 
-	return strings.TrimSpace(toplevel.Stdout())
+	return topLevel
 }()
 
 var _tag = func() string {
-	shortRev := git(
-		command.WithArgs{"rev-parse", "--short", "HEAD"},
+	short, err := git.RevParse(context.Background(),
+		git.WithRevParseFormat(git.RevParseFormatShort),
 	)
-
-	if err := shortRev.Run(); err != nil || !shortRev.Success() {
-		panic("failed to get current tag")
+	if err != nil {
+		panic(err)
 	}
 
-	return strings.TrimSpace(shortRev.Stdout())
+	return short
 }()
-
-var git = command.NewCommandAlias("git")
 
 var Aliases = map[string]interface{}{
 	"check":     All.Check,
