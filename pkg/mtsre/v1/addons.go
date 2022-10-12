@@ -112,6 +112,9 @@ type TargetSecretRef struct {
 type SubscriptionConfig struct {
 	// +kubebuilder:validation:Required
 	Env *[]EnvItem `json:"env" validate:"required"`
+
+	// +kubebuilder:validation:Required
+	Secrets *[]Secret `json:"secrets" validate:"required"`
 }
 
 //+kubebuilder:object:generate=true
@@ -136,4 +139,15 @@ type Secret struct {
 
 	// +optional
 	DestinationSecretName *string `json:"destinationSecretName"`
+}
+
+//+kubebuilder:object:generate=true
+type AdditionalCatalogSource struct {
+	// Name of the additional catalog source
+	// +kubebuilder:validation:Pattern=`^[a-z]([-a-z0-9]*[a-z0-9])?$`
+	Name string `json:"name"`
+
+	// Image url of the additional catalog source
+	// +kubebuilder:validation:Required
+	Image string `json:"image"`
 }
