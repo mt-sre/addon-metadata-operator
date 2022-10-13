@@ -24,7 +24,6 @@ import (
 
 // AddonMetadataSpec defines the desired state of AddonMetadata
 // View markers: $ controller-gen -www crd
-// TODO add missing fields from schema, only required fields from jsonschema are present
 type AddonMetadataSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$`
@@ -184,24 +183,27 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// Configs to be passed to the subscription OLM object.
-	SubscriptionConfig *mtsrev1.SubscriptionConfig `json:"subscriptionConfig"`
-
-	// +optional
-	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
-	// Name of the service account created by the addon operator to authenticate to the API.
-	ServiceAccount *string `json:"serviceAccount"`
-
-	// +optional
-	// List of permissions in an IAM policy that are required by the addon operator.
-	PolicyPermissions *[]string `json:"policyPermissions"`
+	Config *mtsrev1.Config `json:"config"`
 
 	// +optional
 	// Name of the secret under secrets which is supposed to be used for pulling Catalog Image under CatalogSource.
 	PullSecretName string `json:"pullSecretName"`
 
 	// +optional
-	// List of secrets that are required by the addon.
-	Secrets *[]mtsrev1.Secret `json:"secrets"`
+	// List of additional catalog sources to be created.
+	AdditionalCatalogSources *[]mtsrev1.AdditionalCatalogSource `json:"additionalCatalogSources"`
+
+	// +optional
+	// List of credential requests to authenticate operators.
+	CredentialsRequests *[]mtsrev1.CredentialsRequest `json:"credentialsRequests"`
+
+	// +optional
+	// The step currently in consideration in the process of migrating the addon to SyncSet.
+	SyncsetMigration *string `json:"syncsetMigration"`
+
+	// +optional
+	// Indicates if the add-on will be used as a Managed Service.
+	ManagedService *bool `json:"managedService"`
 }
 
 // AddonMetadataStatus defines the observed state of AddonMetadata

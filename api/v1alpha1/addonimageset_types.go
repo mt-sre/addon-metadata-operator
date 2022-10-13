@@ -52,7 +52,15 @@ type AddonImageSetSpec struct {
 
 	// +optional
 	// Configs to be passed to the subscription OLM object.
-	SubscriptionConfig *mtsrev1.SubscriptionConfig `json:"subscriptionConfig"`
+	Config *mtsrev1.Config `json:"config"`
+
+	// +kubebuilder:validation:Pattern=`^[a-z0-9][a-z0-9-]{1,60}[a-z0-9]$`
+	// Name of the secret under `secrets` which is supposed to be used for pulling Catalog Image under CatalogSource.
+	PullSecretName string `json:"pullSecretName"`
+
+	// +optional
+	// List of additional catalog sources to be created.
+	AdditionalCatalogSources *[]mtsrev1.AdditionalCatalogSource `json:"additionalCatalogSources"`
 }
 
 // AddonImageSetStatus defines the observed state of AddonImageSet
