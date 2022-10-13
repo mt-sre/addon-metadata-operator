@@ -4,7 +4,7 @@ relatedImages: []
 addOnParameters: []
 addOnRequirements: []
 subOperators: []
-subscriptionConfig:
+config:
   env:
     - name: IN
       value: imageset_file

@@ -24,7 +24,6 @@ import (
 
 // AddonMetadataSpec defines the desired state of AddonMetadata
 // View markers: $ controller-gen -www crd
-// TODO add missing fields from schema, only required fields from jsonschema are present
 type AddonMetadataSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$`
@@ -184,7 +183,7 @@ type AddonMetadataSpec struct {
 
 	// +optional
 	// Configs to be passed to the subscription OLM object.
-	SubscriptionConfig *mtsrev1.SubscriptionConfig `json:"subscriptionConfig"`
+	Config *mtsrev1.Config `json:"config"`
 
 	// +optional
 	// Name of the secret under secrets which is supposed to be used for pulling Catalog Image under CatalogSource.

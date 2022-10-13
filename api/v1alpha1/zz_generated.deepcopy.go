@@ -125,9 +125,9 @@ func (in *AddonImageSetSpec) DeepCopyInto(out *AddonImageSetSpec) {
 			copy(*out, *in)
 		}
 	}
-	if in.SubscriptionConfig != nil {
-		in, out := &in.SubscriptionConfig, &out.SubscriptionConfig
-		*out = new(mtsrev1.SubscriptionConfig)
+	if in.Config != nil {
+		in, out := &in.Config, &out.Config
+		*out = new(mtsrev1.Config)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.AdditionalCatalogSources != nil {
@@ -372,9 +372,9 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 			copy(*out, *in)
 		}
 	}
-	if in.SubscriptionConfig != nil {
-		in, out := &in.SubscriptionConfig, &out.SubscriptionConfig
-		*out = new(mtsrev1.SubscriptionConfig)
+	if in.Config != nil {
+		in, out := &in.Config, &out.Config
+		*out = new(mtsrev1.Config)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.AdditionalCatalogSources != nil {

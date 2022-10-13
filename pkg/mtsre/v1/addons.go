@@ -109,7 +109,7 @@ type TargetSecretRef struct {
 }
 
 //+kubebuilder:object:generate=true
-type SubscriptionConfig struct {
+type Config struct {
 	// +kubebuilder:validation:Required
 	Env *[]EnvItem `json:"env" validate:"required"`
 
