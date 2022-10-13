@@ -299,7 +299,10 @@ var gocmd = command.NewCommandAlias(mg.GoCmd())
 type Generate mg.Namespace
 
 func (Generate) Boilerplate(ctx context.Context) error {
-	mg.CtxDeps(ctx, Deps.UpdateControllerGen)
+	mg.CtxDeps(ctx,
+		Deps.UpdateControllerGen,
+		Generate.Clean,
+	)
 
 	generate := controllergen(
 		command.WithArgs{
@@ -323,6 +326,26 @@ func (Generate) Boilerplate(ctx context.Context) error {
 }
 
 var controllergen = command.NewCommandAlias(filepath.Join(_depBin, "controller-gen"))
+
+func (Generate) Clean(ctx context.Context) error {
+	genFiles, err := file.Find(_projectRoot,
+		file.WithEntType(file.EntTypeFile),
+		file.WithName("zz_generated.deepcopy.go"),
+	)
+	if err != nil {
+		return fmt.Errorf("finding generated files: %w", err)
+	}
+
+	var finalErr error
+
+	for _, f := range genFiles {
+		if err := sh.Rm(f); err != nil {
+			multierr.AppendInto(&finalErr, fmt.Errorf("removing file %q: %w", f, err))
+		}
+	}
+
+	return finalErr
+}
 
 type Release mg.Namespace
 
