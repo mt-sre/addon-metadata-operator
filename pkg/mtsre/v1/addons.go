@@ -151,3 +151,22 @@ type AdditionalCatalogSource struct {
 	// +kubebuilder:validation:Required
 	Image string `json:"image"`
 }
+
+// +kubebuilder:object:generate=true
+type CredentialsRequest struct {
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	// Name of the credentials secret used to access cloud resources
+	Name string `json:"name"`
+
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	// Namespace where the credentials secret lives in the cluster
+	Namespace string `json:"namespace"`
+
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	// Service account name to use when authenticating
+	ServiceAccount string `json:"service_account"`
+
+	// +kubebuilder:validate:Pattern=`^[a-z0-9]{1,60}:[A-Za-z0-9]{1,60}$`
+	// List of policy permissions needed to access cloud resources
+	PolicyPermissions *[]string `json:"policy_permissions"`
+}
