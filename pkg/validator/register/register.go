@@ -16,4 +16,5 @@ import (
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0013"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0015"
 	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0016"
+	_ "github.com/mt-sre/addon-metadata-operator/pkg/validator/am0017"
 )
