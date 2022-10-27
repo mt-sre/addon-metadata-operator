@@ -9,10 +9,10 @@ import (
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator/testutils"
 )
 
-func TestAdditionalCatalogSourceValid(t *testing.T) {
+func TestUniqueResourceValid(t *testing.T) {
 	t.Parallel()
 
-	tester := testutils.NewValidatorTester(t, NewAdditionalCatalogSource)
+	tester := testutils.NewValidatorTester(t, NewUniqueResource)
 	tester.TestValidBundles(map[string]types.MetaBundle{
 		"no additional catalog sources": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
@@ -47,13 +47,53 @@ func TestAdditionalCatalogSourceValid(t *testing.T) {
 				},
 			},
 		},
+		"config is nil": {
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				Config: nil,
+			},
+		},
+		"no secret": {
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				Config: &mtsrev1.Config{
+					Secrets: nil,
+				},
+			},
+		},
+		"one secret": {
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				Config: &mtsrev1.Config{
+					Secrets: &[]mtsrev1.Secret{
+						{
+							Name: "test-secret",
+						},
+					},
+				},
+			},
+		},
+		"multiple secrets": {
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				Config: &mtsrev1.Config{
+					Secrets: &[]mtsrev1.Secret{
+						{
+							Name: "test-secret-1",
+						},
+						{
+							Name: "test-secret-2",
+						},
+						{
+							Name: "test-secret-3",
+						},
+					},
+				},
+			},
+		},
 	})
 }
 
-func TestAdditionalCatalogSourceInvalid(t *testing.T) {
+func TestUniqueResourcesInvalid(t *testing.T) {
 	t.Parallel()
 
-	tester := testutils.NewValidatorTester(t, NewAdditionalCatalogSource)
+	tester := testutils.NewValidatorTester(t, NewUniqueResource)
 	tester.TestInvalidBundles(map[string]types.MetaBundle{
 		"one additional catalog source repeating": {
 			AddonMeta: &v1alpha1.AddonMetadataSpec{
@@ -95,6 +135,46 @@ func TestAdditionalCatalogSourceInvalid(t *testing.T) {
 					{
 						Name:  "test-name-1",
 						Image: "test-image-5",
+					},
+				},
+			},
+		},
+		"one secret repeating": {
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				Config: &mtsrev1.Config{
+					Secrets: &[]mtsrev1.Secret{
+						{
+							Name: "test-secret-1",
+						},
+						{
+							Name: "test-secret-2",
+						},
+						{
+							Name: "test-secret-1",
+						},
+					},
+				},
+			},
+		},
+		"multiple secret repeating": {
+			AddonMeta: &v1alpha1.AddonMetadataSpec{
+				Config: &mtsrev1.Config{
+					Secrets: &[]mtsrev1.Secret{
+						{
+							Name: "test-secret-1",
+						},
+						{
+							Name: "test-secret-2",
+						},
+						{
+							Name: "test-secret-2",
+						},
+						{
+							Name: "test-secret-3",
+						},
+						{
+							Name: "test-secret-3",
+						},
 					},
 				},
 			},
