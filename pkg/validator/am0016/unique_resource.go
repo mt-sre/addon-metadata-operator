@@ -51,6 +51,11 @@ func (u *UniqueResource) Run(ctx context.Context, mb types.MetaBundle) validator
 		messages = append(messages, secretMessage...)
 	}
 
+	credentialRequestMessage := UniqueCredentialRequests(mb.AddonMeta)
+	if len(credentialRequestMessage) > 0 {
+		messages = append(messages, credentialRequestMessage...)
+	}
+
 	if len(messages) > 0 {
 		return u.Fail(messages...)
 	}
@@ -108,6 +113,33 @@ func UniqueSecrets(addonMetadataSpec *v1alpha1.AddonMetadataSpec) []string {
 			messages = append(messages, fmt.Sprintf("secrets: secret name %v is already present and not unique.", secretName))
 		} else {
 			secretNames[secretName] = true
+		}
+	}
+
+	return messages
+}
+
+func UniqueCredentialRequests(addonMetadataSpec *v1alpha1.AddonMetadataSpec) []string {
+	var messages []string
+
+	credentialRequests := addonMetadataSpec.CredentialsRequests
+	if credentialRequests == nil {
+		return messages
+	}
+	if len(*credentialRequests) == 1 {
+		return messages
+	}
+
+	credentialNames := make(map[string]bool)
+	for _, credential := range *credentialRequests {
+		crName := credential.Name
+
+		if credentialNames[crName] {
+			messages = append(messages,
+				fmt.Sprintf("credential requests: credentialRequest name %v is already present and not unique", crName),
+			)
+		} else {
+			credentialNames[crName] = true
 		}
 	}
 
