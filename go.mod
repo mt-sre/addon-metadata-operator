@@ -19,7 +19,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	go.uber.org/multierr v1.8.0
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
@@ -114,7 +114,7 @@ require (
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rivo/uniseg v0.1.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/contrib v0.20.0 // indirect
