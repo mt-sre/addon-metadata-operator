@@ -12,7 +12,7 @@ require (
 	github.com/mt-sre/go-ci v0.6.1
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.4.0
-	github.com/onsi/gomega v1.22.1
+	github.com/onsi/gomega v1.23.0
 	github.com/openshift-online/ocm-sdk-go v0.1.290
 	github.com/operator-framework/api v0.17.1
 	github.com/operator-framework/operator-registry v1.26.2
@@ -75,7 +75,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/cel-go v0.12.5 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
