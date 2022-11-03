@@ -12,7 +12,7 @@ require (
 	github.com/mt-sre/go-ci v0.6.1
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.4.0
-	github.com/onsi/gomega v1.23.0
+	github.com/onsi/gomega v1.24.0
 	github.com/openshift-online/ocm-sdk-go v0.1.291
 	github.com/operator-framework/api v0.17.1
 	github.com/operator-framework/operator-registry v1.26.2
