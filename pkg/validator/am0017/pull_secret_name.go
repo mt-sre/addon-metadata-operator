@@ -1,4 +1,4 @@
-package am0018
+package am0017
 
 import (
 	"context"
@@ -13,7 +13,7 @@ func init() {
 }
 
 const (
-	code = 18
+	code = 17
 	name = "pull_secret_name"
 	desc = "Ensure that pullSecretName if not nil is present in Secrets"
 )
