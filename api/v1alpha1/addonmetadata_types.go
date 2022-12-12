@@ -212,8 +212,8 @@ type AddonMetadataStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // AddonMetadata is the Schema for the AddonMetadata API
 type AddonMetadata struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -223,7 +223,7 @@ type AddonMetadata struct {
 	Status AddonMetadataStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 // AddonMetadataList contains a list of AddonMetadata
 type AddonMetadataList struct {
 	metav1.TypeMeta `json:",inline"`

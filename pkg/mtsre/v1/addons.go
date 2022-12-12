@@ -20,7 +20,7 @@ Update zz_generated.deepcopy.go with:
 // +kubebuilder:validation:Pattern=`^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$`
 type Notification string
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type Monitoring struct {
 	// +kubebuilder:validation:Required
 	Namespace string `json:"namespace" validate:"required"`
@@ -33,7 +33,7 @@ type Monitoring struct {
 }
 
 // Deprecated: Replaced by SubscriptionConfig.
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type BundleParameters struct {
 	// +optional
 	// +kubebuilder:validation:Pattern=`^(true|false|^$)$`
@@ -56,7 +56,7 @@ type BundleParameters struct {
 	AddonParamsSecretName *string `json:"addonParamsSecretName"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type PagerDuty struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9]+$`
@@ -79,7 +79,7 @@ type PagerDuty struct {
 	SecretNamespace string `json:"secretNamespace" validate:"required"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type DeadmansSnitch struct {
 	// +optional
 	ClusterDeploymentSelector *metav1.LabelSelector `json:"clusterDeploymentSelector"`
@@ -97,7 +97,7 @@ type DeadmansSnitch struct {
 // +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
 type Tag string
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type TargetSecretRef struct {
 	// +optional
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
@@ -108,7 +108,7 @@ type TargetSecretRef struct {
 	Namespace *string `json:"namespace"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type Config struct {
 	// +kubebuilder:validation:Required
 	Env *[]EnvItem `json:"env" validate:"required"`
@@ -117,7 +117,7 @@ type Config struct {
 	Secrets *[]Secret `json:"secrets" validate:"required"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type EnvItem struct {
 	// +kubebuilder:validation:Required
 	Name string `json:"name" validate:"required"`
@@ -126,7 +126,7 @@ type EnvItem struct {
 	Value string `json:"value" validate:"required"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type Secret struct {
 	// +kubebuilder:validation:Required
 	Name string `json:"name" validate:"required"`
@@ -141,7 +141,7 @@ type Secret struct {
 	DestinationSecretName *string `json:"destinationSecretName"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type AdditionalCatalogSource struct {
 	// Name of the additional catalog source
 	// +kubebuilder:validation:Pattern=`^[a-z]([-a-z0-9]*[a-z0-9])?$`

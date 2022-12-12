@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -177,7 +176,7 @@ func createTempDirs() (tempDirs, error) {
 	res := make(tempDirs)
 
 	for _, dirName := range []string{"bundle", "containerd"} {
-		tmpDir, err := ioutil.TempDir(os.TempDir(), dirName+"-")
+		tmpDir, err := os.MkdirTemp("", dirName+"-")
 		if err != nil {
 			return nil, fmt.Errorf("unable to create %s tmpDir: %w", dirName, err)
 		}

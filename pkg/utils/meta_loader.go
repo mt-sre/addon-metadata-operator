@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -66,7 +66,7 @@ func (l defaultMetaLoader) Load() (*addonsv1alpha1.AddonMetadataSpec, error) {
 }
 
 func (l defaultMetaLoader) readMeta() (*addonsv1alpha1.AddonMetadataSpec, error) {
-	data, err := ioutil.ReadFile(l.getMetadataPath())
+	data, err := os.ReadFile(l.getMetadataPath())
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (l defaultMetaLoader) readImageSet(defaultVersion string) (*addonsv1alpha1.
 	if err != nil {
 		return nil, err
 	}
-	data, err := ioutil.ReadFile(imageSetPath)
+	data, err := os.ReadFile(imageSetPath)
 	if err != nil {
 		return nil, err
 	}
@@ -119,12 +119,12 @@ func (l defaultMetaLoader) getImagesetPath(version string) (string, error) {
 }
 
 func GetLatestImageSetVersion(dir string) (string, error) {
-	sortDescending := func(files []os.FileInfo) {
+	sortDescending := func(files []fs.DirEntry) {
 		sort.Slice(files, func(i, j int) bool {
 			return files[i].Name() > files[j].Name()
 		})
 	}
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return "", err
 	}

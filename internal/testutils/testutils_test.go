@@ -1,14 +1,14 @@
 package testutils
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestValidateRootDirContainsGoMod(t *testing.T) {
-	files, err := ioutil.ReadDir(string(RootDir()))
+	files, err := os.ReadDir(string(RootDir()))
 	require.NoError(t, err)
 
 	foundGoMod := false

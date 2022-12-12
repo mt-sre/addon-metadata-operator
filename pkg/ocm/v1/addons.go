@@ -18,7 +18,7 @@ Update zz_generated.deepcopy.go with:
 	$ make generate
 */
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type AddOnParameter struct {
 	// +kubebuilder:validation:Required
 	ID string `json:"id" validate:"required"`
@@ -70,7 +70,7 @@ const (
 	AddOnParameterValueTypeResource AddOnParameterValueType = "resource"
 )
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type AddOnParameterOption struct {
 	// +kubebuilder:validation:Required
 	Name string `json:"name" validate:"required"`
@@ -79,7 +79,7 @@ type AddOnParameterOption struct {
 	Value string `json:"value" validate:"required"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type AddOnResourceRequirement struct {
 	// +kubebuilder:validation:Required
 	Resource AddOnRequirementResourceType `json:"resource" validate:"required"`
@@ -93,7 +93,7 @@ type AddOnResourceRequirement struct {
 
 type AddOnRequirementData map[string]apiextensionsv1.JSON
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type AddOnResourceRequirementStatus struct {
 	// +optional
 	Fulfilled *bool `json:"fulfilled"`
@@ -110,7 +110,7 @@ const (
 	AddOnRequirementResourceTypeMachinePool AddOnRequirementResourceType = "machine_pool"
 )
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type AddOnRequirement struct {
 	// +kubebuilder:validation:Required
 	ID string `json:"id" validate:"required"`
@@ -128,7 +128,7 @@ type AddOnRequirement struct {
 	Enabled bool `json:"enabled" validate:"required"`
 }
 
-//+kubebuilder:object:generate=true
+// +kubebuilder:object:generate=true
 type AddOnSubOperator struct {
 	// +kubebuilder:validation:Required
 	OperatorName string `json:"operator_name" validate:"required"`
