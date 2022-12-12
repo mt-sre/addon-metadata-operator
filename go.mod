@@ -14,14 +14,14 @@ require (
 	github.com/onsi/ginkgo/v2 v2.5.1
 	github.com/onsi/gomega v1.24.1
 	github.com/openshift-online/ocm-sdk-go v0.1.294
-	github.com/operator-framework/api v0.17.1
+	github.com/operator-framework/api v0.17.2
 	github.com/operator-framework/operator-registry v1.26.2
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/multierr v1.8.0
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
+	golang.org/x/mod v0.6.0
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.25.4
@@ -42,7 +42,6 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
