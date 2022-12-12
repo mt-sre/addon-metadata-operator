@@ -34,7 +34,7 @@ var _ = Describe("validate subcommand", func() {
 				exitCode = 1
 			}
 
-			Eventually(session, "10s").Should(Exit(exitCode))
+			Eventually(session, "15s").Should(Exit(exitCode))
 		},
 		Entry("reference-addon.v0.0.1-valid",
 			labelTestCase{
