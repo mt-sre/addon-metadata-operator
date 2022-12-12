@@ -69,8 +69,8 @@ type AddonImageSetStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // AddonImageSet is the Schema for the addonimagesets API
 type AddonImageSet struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -80,7 +80,7 @@ type AddonImageSet struct {
 	Status AddonImageSetStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 // AddonImageSetList contains a list of AddonImageSet
 type AddonImageSetList struct {
 	metav1.TypeMeta `json:",inline"`

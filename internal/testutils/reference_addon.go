@@ -2,7 +2,7 @@ package testutils
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -80,7 +80,7 @@ func (r *singleton) GetMetadata(useImageSet bool) (*addonsv1alpha1.AddonMetadata
 	} else {
 		metaPath = filepath.Join(r.IndexImageDir(), "metadata", r.Env, "addon.yaml")
 	}
-	data, err := ioutil.ReadFile(metaPath)
+	data, err := os.ReadFile(metaPath)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (r *singleton) GetImageSet(version string) (*addonsv1alpha1.AddonImageSetSp
 		target = fmt.Sprintf("reference-addon.v%v.yaml", *r.MetaImageSet.ImageSetVersion)
 	}
 	imageSetPath := filepath.Join(baseDir, target)
-	data, err := ioutil.ReadFile(imageSetPath)
+	data, err := os.ReadFile(imageSetPath)
 	if err != nil {
 		return nil, err
 	}

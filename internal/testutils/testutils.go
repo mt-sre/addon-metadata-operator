@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"io/ioutil"
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
@@ -25,10 +24,11 @@ func init() {
 }
 
 /*
-	Implement a chaining directory interface. Examples:
-		RootDir().TestData().MetadataV1().Legacy()
-		RootDir().TestData().MetadataV2()
-		RootDir().Bundles()
+Implement a chaining directory interface. Examples:
+
+	RootDir().TestData().MetadataV1().Legacy()
+	RootDir().TestData().MetadataV2()
+	RootDir().Bundles()
 */
 type Tree string
 type RootTree Tree
@@ -85,7 +85,7 @@ func YamlToDynamicObj(yamlPath string) (unstructured.Unstructured, error) {
 	if err != nil {
 		return unstructured.Unstructured{}, err
 	}
-	yamlBytes, err := ioutil.ReadFile(yamlAbsPath)
+	yamlBytes, err := os.ReadFile(yamlAbsPath)
 	if err != nil {
 		return unstructured.Unstructured{}, err
 	}
