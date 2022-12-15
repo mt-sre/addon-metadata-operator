@@ -518,8 +518,8 @@ github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c h1:nXxl5PrvVm2L/wCy8d
 github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c/go.mod h1:BbKIizmSmc5MMPqRYbxO4ZU0S0+P200+tUnFx7PXmsc=
 github.com/mt-sre/client v0.2.0 h1:nF6ei3aZ2BHyi+EB/rQBuCIlR0z1QvaYNjZ7RVNsSak=
 github.com/mt-sre/client v0.2.0/go.mod h1:wiYCEamk92vOM1eKkgQDaxYj7ON+m1R/aceSZ+1UDTI=
-github.com/mt-sre/go-ci v0.6.1 h1:9yas9JkSO7r8sRLvXqahpdPUe9fT3ASJPJDVInQCT/0=
-github.com/mt-sre/go-ci v0.6.1/go.mod h1:Rhc+vQ+8uOiIhFJ6Pnyas4UB29BJsxmLKGmLCmzEi5s=
+github.com/mt-sre/go-ci v0.6.2 h1:lrXnqt2AkUCyYt4hkLtPiUCSLJqKVeW08L1P1lP51PE=
+github.com/mt-sre/go-ci v0.6.2/go.mod h1:9hdq2Gbj2s1hknF1V6hiWsqZWzpgm9t7UaiIKGlHofI=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
