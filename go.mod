@@ -11,8 +11,8 @@ require (
 	github.com/mt-sre/client v0.2.1
 	github.com/mt-sre/go-ci v0.6.2
 	github.com/novln/docker-parser v1.0.0
-	github.com/onsi/ginkgo/v2 v2.6.0
-	github.com/onsi/gomega v1.24.1
+	github.com/onsi/ginkgo/v2 v2.6.1
+	github.com/onsi/gomega v1.24.2
 	github.com/openshift-online/ocm-sdk-go v0.1.301
 	github.com/operator-framework/api v0.17.3
 	github.com/operator-framework/operator-registry v1.26.2
@@ -127,7 +127,7 @@ require (
 	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.7.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/net v0.3.1-0.20221206200815-1e63c2f08a10 // indirect
+	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
