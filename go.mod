@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/go-logr/logr v1.2.3
 	github.com/magefile/mage v1.14.0
-	github.com/mt-sre/client v0.2.0
+	github.com/mt-sre/client v0.2.1
 	github.com/mt-sre/go-ci v0.6.2
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.6.0
@@ -43,7 +43,7 @@ require (
 	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
-	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
+	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/containerd/cgroups v1.0.3 // indirect
 	github.com/containerd/containerd v1.5.13 // indirect
