@@ -1,6 +1,6 @@
 module github.com/mt-sre/addon-metadata-operator
 
-go 1.18
+go 1.19
 
 require (
 	github.com/alexeyco/simpletable v1.0.0
