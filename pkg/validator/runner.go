@@ -36,10 +36,7 @@ func NewRunner(opts ...RunnerOption) (*Runner, error) {
 	var cfg RunnerConfig
 
 	cfg.Option(opts...)
-
-	if err := cfg.Default(); err != nil {
-		return nil, err
-	}
+	cfg.Default()
 
 	deps := Dependencies{
 		Logger:     cfg.Logger,
@@ -135,10 +132,6 @@ func (r *Runner) applyMiddleware(run RunFunc) RunFunc {
 	return res
 }
 
-func (r *Runner) CleanUp() error {
-	return r.cfg.OCMClient.CloseConnection()
-}
-
 type RunnerConfig struct {
 	Initializers []Initializer
 	Logger       logr.Logger
@@ -153,7 +146,7 @@ func (c *RunnerConfig) Option(opts ...RunnerOption) {
 	}
 }
 
-func (c *RunnerConfig) Default() error {
+func (c *RunnerConfig) Default() {
 	if len(c.Initializers) == 0 {
 		c.Initializers = initializers
 	}
@@ -163,23 +156,12 @@ func (c *RunnerConfig) Default() error {
 	}
 
 	if c.OCMClient == nil {
-		o, err := NewDefaultOCMClient()
-		if err != nil {
-			if !IsOCMClientAuthError(err) {
-				return err
-			}
-
-			c.Logger.Error(err, "setting default configs:")
-		}
-
-		c.OCMClient = o
+		c.OCMClient = NewDisconnectedOCMClient()
 	}
 
 	if c.QuayClient == nil {
 		c.QuayClient = NewQuayClient()
 	}
-
-	return nil
 }
 
 type RunnerOption interface {
