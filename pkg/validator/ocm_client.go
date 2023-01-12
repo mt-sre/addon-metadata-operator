@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 
 	sdk "github.com/openshift-online/ocm-sdk-go"
 )
@@ -26,32 +25,19 @@ func IsOCMServerSideError(err error) bool {
 	return ok && ocmErr.ServerSide()
 }
 
-type OCMClientError interface {
-	IsAuthRelated() bool
-}
-
-func IsOCMClientAuthError(err error) bool {
-	clientErr, ok := err.(OCMClientError)
-
-	return ok && clientErr.IsAuthRelated()
-}
-
 // OCMClient abstracts behavior required for validators which request data
 // from OCM to be implemented by OCM API clients.
 type OCMClient interface {
 	QuotaRuleGetter
-	// Stuck here until OCM Client can be injected via Params...
-	CloseConnection() error
 }
 
 type QuotaRuleGetter interface {
+	// QuotaRuleExists takes a given quota rule name and returns a tuple
+	// of ('ok', error) which returns 'true' if the quota rule exists
+	// and false otherwise. An optional error is returned if any issues
+	// occurred.
 	QuotaRuleExists(context.Context, string) (bool, error)
 }
-
-const (
-	apiURLStage    = "https://api.stage.openshift.com"
-	ocmTokenEnvVar = "OCM_TOKEN"
-)
 
 // OCMResponseError is used to wrap HTTP error (400 - 599) response codes
 // which are returned from a request to OCM.
@@ -67,78 +53,35 @@ func (e OCMResponseError) ServerSide() bool {
 	return code >= 500 && code < 600
 }
 
-func NewOCMClientAuthError(err error) ocmClientError {
-	return ocmClientError{
-		error:       err,
-		authRelated: true,
-	}
-}
-
-type ocmClientError struct {
-	authRelated bool
-	error
-}
-
-func (e ocmClientError) Unwrap() error { return e.error }
-func (e ocmClientError) Error() string {
-	return fmt.Sprintf("unable to setup OCM authentication: %v", e.error)
-}
-
-func (e ocmClientError) IsAuthRelated() bool { return e.authRelated }
-
-// NewDefaultOCMClient takes a variadic slice of options to configure a default
+// NewOCMClient takes a variadic slice of options to configure a default
 // OCM client and applies defaults if no appropriate option is given. An error
 // may be returned if an unusable OCM token is provided or a connection cannot
 // be initialized otherwise the default client is returned.
-func NewDefaultOCMClient(opts ...DefaultOCMClientOption) (*DefaultOCMClient, error) {
-	var client DefaultOCMClient
+func NewOCMClient(opts ...OCMClientOption) (*OCMClientImpl, error) {
+	var cfg OCMClientConfig
 
-	for _, opt := range opts {
-		client.Option(opt)
-	}
+	cfg.Option(opts...)
+	cfg.Default()
 
-	if client.apiURL == "" {
-		client.apiURL = apiURLStage
-	}
-
-	if client.tp == nil {
-		client.tp = NewEnvOCMTokenProvider(ocmTokenEnvVar)
-	}
-
-	if err := client.initConnection(); err != nil {
-		return nil, err
-	}
-
-	return &client, nil
-}
-
-// DefaultOCMClient implements the 'types.OCMClient' interface and
-// exposes methods by which validators can communicate with OCM.
-type DefaultOCMClient struct {
-	apiURL string
-	conn   *sdk.Connection
-	tp     OCMTokenProvider
-}
-
-func (c *DefaultOCMClient) initConnection() error {
-	token, err := c.tp.ProvideToken()
+	conn, err := cfg.Connector.Connect(cfg.ConnectOptions...)
 	if err != nil {
-		return NewOCMClientAuthError(err)
+		return nil, fmt.Errorf("connecting to OCM: %w", err)
 	}
 
-	c.conn, err = sdk.NewConnectionBuilder().
-		URL(c.apiURL).
-		Tokens(token).
-		Build()
-
-	return err
+	return &OCMClientImpl{
+		cfg:  cfg,
+		conn: conn,
+	}, nil
 }
 
-func (c *DefaultOCMClient) QuotaRuleExists(ctx context.Context, quotaName string) (bool, error) {
-	if c == nil || c.conn == nil {
-		return false, errors.New("no active OCM connection")
-	}
+// OCMClientImpl implements the 'types.OCMClient' interface and
+// exposes methods by which validators can communicate with OCM.
+type OCMClientImpl struct {
+	cfg  OCMClientConfig
+	conn *sdk.Connection
+}
 
+func (c *OCMClientImpl) QuotaRuleExists(ctx context.Context, quotaName string) (bool, error) {
 	req := c.conn.
 		Get().
 		Path("/api/accounts_mgmt/v1/quota_rules").
@@ -162,66 +105,103 @@ func (c *DefaultOCMClient) QuotaRuleExists(ctx context.Context, quotaName string
 	return list.Size > 0, nil
 }
 
-func (c *DefaultOCMClient) CloseConnection() error {
-	if c == nil || c.conn == nil {
-		return nil
-	}
-
-	return c.conn.Close()
-}
-
 func isHTTPError(code int) bool {
 	return code >= 400 && code < 600
 }
 
-// Option applies the given option to an instance of the DefaultOCMClient.
-func (c *DefaultOCMClient) Option(opt DefaultOCMClientOption) {
-	opt(c)
+// CloseConnection releases any resources held by the connection to
+// OCM.
+func (c *OCMClientImpl) CloseConnection() error { return c.conn.Close() }
+
+type OCMClientConfig struct {
+	Connector      OCMConnector
+	ConnectOptions []OCMConnectOption
 }
 
-// DefaultOCMClientOption describes a function which configures a DefaultOCMClient instance.
-type DefaultOCMClientOption func(c *DefaultOCMClient)
-
-// DefaultOCMClientAPIURL updates the URL used to connect to OCM.
-// This option only takes effect if applied prior to connection initialization.
-func DefaultOCMClientAPIURL(url string) DefaultOCMClientOption {
-	return func(c *DefaultOCMClient) {
-		c.apiURL = url
+func (c *OCMClientConfig) Option(opts ...OCMClientOption) {
+	for _, opt := range opts {
+		opt.ConfigureOCMClient(c)
 	}
 }
 
-// DefaultOCMClientAPIURL updates the URL used to connect to OCM.
-// This option only takes effect if applied prior to connection initialization.
-func DefaultOCMClientTokenProvider(tp OCMTokenProvider) DefaultOCMClientOption {
-	return func(c *DefaultOCMClient) {
-		c.tp = tp
+func (c *OCMClientConfig) Default() {
+	if c.Connector == nil {
+		c.Connector = NewOCMConnector()
 	}
 }
 
-// OCMTokenProvider provides OCM tokens to clients.
-type OCMTokenProvider interface {
-	// ProvideToken returns either an access token as an encoded JWT token
-	// or an error if a token could not be provided.
-	ProvideToken() (string, error)
+type OCMClientOption interface {
+	ConfigureOCMClient(*OCMClientConfig)
 }
 
-// NewEnvOCMTokenProvider returns an instance of EnvOCMTokenProvider
-// which retrieves OCM tokens from the environment by the given envVar name.
-func NewEnvOCMTokenProvider(envVar string) EnvOCMTokenProvider {
-	return EnvOCMTokenProvider{
-		envVar: envVar,
+// OCMConnector establishes and returns a connection to OCM.
+type OCMConnector interface {
+	// Connect takes a variadic slice of OCMConnectOptions
+	// to configure and return an open connection to OCM.
+	// Returns an error if connection fails.
+	Connect(opts ...OCMConnectOption) (*sdk.Connection, error)
+}
+
+type OCMConnectionConfig struct {
+	APIURL       string
+	AccessToken  string
+	ClientID     string
+	ClientSecret string
+}
+
+func (c *OCMConnectionConfig) Option(opts ...OCMConnectOption) {
+	for _, opt := range opts {
+		opt.ConfigureOCMConnection(c)
 	}
 }
 
-// EnvOCMTokenProvider provides OCM tokens from the current environment.
-type EnvOCMTokenProvider struct {
-	envVar string
+const (
+	apiURLStage = "https://api.stage.openshift.com"
+)
+
+func (c *OCMConnectionConfig) Default() {
+	if c.APIURL == "" {
+		c.APIURL = apiURLStage
+	}
 }
 
-func (tp EnvOCMTokenProvider) ProvideToken() (string, error) {
-	if token, ok := os.LookupEnv(tp.envVar); ok {
-		return token, nil
+type OCMConnectOption interface {
+	ConfigureOCMConnection(*OCMConnectionConfig)
+}
+
+// NewOCMConnector returns an initialized OCMConnector instance.
+func NewOCMConnector() *OCMConnectorImpl {
+	return &OCMConnectorImpl{}
+}
+
+type OCMConnectorImpl struct{}
+
+func (c *OCMConnectorImpl) Connect(opts ...OCMConnectOption) (*sdk.Connection, error) {
+	var cfg OCMConnectionConfig
+
+	cfg.Option(opts...)
+	cfg.Default()
+
+	builder := sdk.NewConnectionBuilder().URL(cfg.APIURL)
+
+	if cfg.ClientID != "" && cfg.ClientSecret != "" {
+		builder = builder.Client(cfg.ClientID, cfg.ClientSecret)
+	} else {
+		builder = builder.Tokens(cfg.AccessToken)
 	}
 
-	return "", fmt.Errorf("utils: ocm token environment variable '%s' not set", tp.envVar)
+	return builder.Build()
+}
+
+// NewDisconnectedOCMClient returns an OCM Client which fails
+// on any operations which call OCM. Helpful to trigger failure
+// only for validators which depend on OCM.
+func NewDisconnectedOCMClient() DisconnectedOCMClient { return DisconnectedOCMClient{} }
+
+type DisconnectedOCMClient struct{}
+
+var ErrDisconnectedOCMClient = errors.New("OCM client disconnected")
+
+func (c DisconnectedOCMClient) QuotaRuleExists(_ context.Context, _ string) (bool, error) {
+	return false, ErrDisconnectedOCMClient
 }

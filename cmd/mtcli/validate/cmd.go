@@ -62,6 +62,12 @@ func Cmd() *cobra.Command {
 	return cmd
 }
 
+const (
+	ocmTokenEnvVar        = "OCM_TOKEN"
+	ocmClientIDEnvVar     = "OCM_CLIENT_ID"
+	ocmClientSecretEnvVar = "OCM_CLIENT_SECRET"
+)
+
 var (
 	ErrValidationFailed  = errors.New("validation failed")
 	ErrValidationErrored = errors.New("validators encountered errors")
@@ -98,12 +104,19 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("generating validator filter: %w", err)
 		}
 
-		ocm, err := validator.NewDefaultOCMClient(
-			validator.DefaultOCMClientAPIURL(envToOCMURL(opts.Env)),
+		ocm, err := validator.NewOCMClient(
+			validator.WithConnectOptions{
+				validator.WithAPIURL(envToOCMURL(opts.Env)),
+				validator.WithAccessToken(os.Getenv(ocmTokenEnvVar)),
+				validator.WithClientID(os.Getenv(ocmClientIDEnvVar)),
+				validator.WithClientSecret(os.Getenv(ocmClientSecretEnvVar)),
+			},
 		)
 		if err != nil {
 			return fmt.Errorf("initializing ocm client: %w", err)
 		}
+
+		defer func() { _ = ocm.CloseConnection() }()
 
 		runner, err := validator.NewRunner(
 			validator.WithMiddleware{
@@ -144,10 +157,6 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 		fmt.Fprintln(os.Stdout, table.String())
 		fmt.Fprintln(os.Stdout)
 		fmt.Fprintln(os.Stdout, "Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
-
-		if err := runner.CleanUp(); err != nil {
-			return fmt.Errorf("cleaning up validators: %w", err)
-		}
 
 		if errs := results.Errors(); len(errs) > 0 {
 			cli.PrintValidationErrors(errs)

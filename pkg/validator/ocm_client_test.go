@@ -2,19 +2,18 @@ package validator
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestDefaultOCMClientInterface(t *testing.T) {
+func TestOCMClientImplInterface(t *testing.T) {
 	t.Parallel()
 
 	require.Implements(t,
-		new(OCMClient), new(DefaultOCMClient),
-		"utils.DefaultOCMClient must implement the types.OCMClient interface",
+		new(OCMClient), new(OCMClientImpl),
+		"utils.OCMClientImpl must implement the types.OCMClient interface",
 	)
 }
 
@@ -72,65 +71,20 @@ func TestOCMResponseErrorServerSide(t *testing.T) {
 	}
 }
 
-func TestEnvOCMTokenProviderInterface(t *testing.T) {
+func TestDisconnectedOCMClientInterface(t *testing.T) {
 	t.Parallel()
 
-	require.Implements(t, new(OCMTokenProvider), EnvOCMTokenProvider{})
-}
-
-func TestEnvOCMTokenProviderProvideToken(t *testing.T) {
-	t.Parallel()
-
-	const (
-		goodEnvVar = "TEST_VAR"
-		goodToken  = "supersecrettoken"
+	require.Implements(t,
+		new(OCMClient), new(DisconnectedOCMClient),
+		"utils.DisconnectedOCMClient must implement the types.OCMClient interface",
 	)
-
-	err := os.Setenv(goodEnvVar, goodToken)
-	require.NoError(t, err)
-
-	for name, tc := range map[string]struct {
-		envVar        string
-		expectedToken string
-		assertFunc    func(assert.TestingT, error, ...interface{}) bool
-	}{
-		"correctly set environment variable": {
-			envVar:        goodEnvVar,
-			expectedToken: goodToken,
-			assertFunc:    assert.NoError,
-		},
-		"unset environment variable": {
-			envVar:        "DNE",
-			expectedToken: "",
-			assertFunc:    assert.Error,
-		},
-	} {
-		tc := tc
-
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			token, err := NewEnvOCMTokenProvider(tc.envVar).ProvideToken()
-			tc.assertFunc(t, err)
-			require.Equal(t, tc.expectedToken, token)
-		})
-	}
 }
 
-func TestDefaultOCMClientQuotaRuleExists(t *testing.T) {
+func TestDisconnectedOCMClientQuotaRuleExists(t *testing.T) {
 	t.Parallel()
 
-	var client DefaultOCMClient
+	var client DisconnectedOCMClient
 
 	_, err := client.QuotaRuleExists(context.Background(), "")
 	require.Error(t, err)
-}
-
-func TestDefaultOCMClientCloseConnection(t *testing.T) {
-	t.Parallel()
-
-	var client DefaultOCMClient
-
-	err := client.CloseConnection()
-	require.NoError(t, err)
 }
