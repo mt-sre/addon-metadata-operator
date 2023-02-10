@@ -31,7 +31,7 @@ func run(cmd *cobra.Command, args []string) error {
 	path := args[0]
 	bundleExtractor := extractor.NewBundleExtractor()
 
-	if err := bundleExtractor.ValidateBundle(nil, path); err != nil {
+	if err := bundleExtractor.ValidateBundle(cmd.Context(), nil, path); err != nil {
 		return fmt.Errorf("validating bundle %s: %w", path, err)
 	}
 

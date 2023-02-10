@@ -67,20 +67,20 @@ func WithIndexLog(log logrus.FieldLogger) IndexExtractorOpt {
 }
 
 // ExtractBundleImages - returns a sorted list of bundles for a given pkg
-func (e *DefaultIndexExtractor) ExtractBundleImages(indexImage string, pkgName string) ([]string, error) {
+func (e *DefaultIndexExtractor) ExtractBundleImages(ctx context.Context, indexImage string, pkgName string) ([]string, error) {
 	e.Log.Debugf("extracting bundles for '%s', matching pkgName '%s'", indexImage, pkgName)
-	return e.extractBundleImages(indexImage, pkgName)
+	return e.extractBundleImages(ctx, indexImage, pkgName)
 }
 
 // ExtractAllBundleImages - returns a sorted list of all bundles for all pkgs
-func (e *DefaultIndexExtractor) ExtractAllBundleImages(indexImage string) ([]string, error) {
+func (e *DefaultIndexExtractor) ExtractAllBundleImages(ctx context.Context, indexImage string) ([]string, error) {
 	e.Log.Debugf("extracting all bundles for '%s'", indexImage)
-	return e.extractBundleImages(indexImage, allBundlesKey)
+	return e.extractBundleImages(ctx, indexImage, allBundlesKey)
 }
 
 // listBundles - return a list of all bundleImages. Need to sort bundleImages
 // everytime as order might not be preserved in the cache.
-func (e *DefaultIndexExtractor) extractBundleImages(indexImage string, cacheKey string) ([]string, error) {
+func (e *DefaultIndexExtractor) extractBundleImages(ctx context.Context, indexImage string, cacheKey string) ([]string, error) {
 	bundleImages, err := e.Cache.GetBundleImages(indexImage, cacheKey)
 	if err != nil {
 		e.Log.Warnf("getting bundle images from cache: %w", err)
@@ -93,7 +93,7 @@ func (e *DefaultIndexExtractor) extractBundleImages(indexImage string, cacheKey 
 
 	e.Log.Debugf("cache miss for '%s'", indexImage)
 	lb := action.ListBundles{IndexReference: indexImage, PackageName: pkgNameFromCacheKey(cacheKey)}
-	data, err := lb.Run(context.Background())
+	data, err := lb.Run(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list bundles with opm: %w", err)
 	}

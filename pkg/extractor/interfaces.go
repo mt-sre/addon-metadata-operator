@@ -11,9 +11,9 @@ import (
 // bundles from those underlying bundleImages.
 type Extractor interface {
 	// extract all bundles from indexImage matching pkgName
-	ExtractBundles(indexImage string, pkgName string) ([]operator.Bundle, error)
+	ExtractBundles(ctx context.Context, indexImage string, pkgName string) ([]operator.Bundle, error)
 	// extract all bundles from indexImage, for all packages
-	ExtractAllBundles(indexImage string) ([]operator.Bundle, error)
+	ExtractAllBundles(ctx context.Context, indexImage string) ([]operator.Bundle, error)
 }
 
 // Choosing to list explicitly that the indexExtractor works with BundleImages
@@ -25,9 +25,9 @@ type Extractor interface {
 // Catalog format: https://docs.openshift.com/container-platform/4.9/operators/admin/olm-managing-custom-catalogs.html#olm-managing-custom-catalogs-fb
 type IndexExtractor interface {
 	// extract all bundleImages contained in indexImage, matching pkgName
-	ExtractBundleImages(indexImage string, pkgName string) ([]string, error)
+	ExtractBundleImages(ctx context.Context, indexImage string, pkgName string) ([]string, error)
 	// extract all bundleImages contained in the indexImage, for all packages.
-	ExtractAllBundleImages(indexImage string) ([]string, error)
+	ExtractAllBundleImages(ctx context.Context, indexImage string) ([]string, error)
 }
 
 // BundleExtractor - extracts a single bundle from it's bundleImage, using the bundle

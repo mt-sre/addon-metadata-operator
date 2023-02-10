@@ -2,7 +2,6 @@ package validators
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/internal/cli"
@@ -48,8 +47,10 @@ func run(cmd *cobra.Command, args []string) error {
 		})
 	}
 
-	fmt.Fprintln(os.Stdout, table.String())
-	fmt.Fprintln(os.Stdout)
+	out := cmd.OutOrStdout()
+
+	fmt.Fprintln(out, table.String())
+	fmt.Fprintln(out)
 
 	return nil
 }
