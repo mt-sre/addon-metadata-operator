@@ -1,6 +1,7 @@
 package extractor
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,7 +50,7 @@ func TestExtractorFileBasedAndSQLCatalogs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			bundleImages, err := extractor.ExtractBundleImages(tc.IndexImage, tc.PkgName)
+			bundleImages, err := extractor.ExtractBundleImages(context.Background(), tc.IndexImage, tc.PkgName)
 			require.NoError(t, err)
 
 			assert.ElementsMatch(t, bundleImages, tc.ExpectedBundleImages)
@@ -102,8 +103,10 @@ func TestIndexExtractorListAllBundles(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
+			ctx := context.Background()
+
 			// test bundleImages for all packages are listed
-			bundleImages, err := extractor.ExtractAllBundleImages(tc.IndexImage)
+			bundleImages, err := extractor.ExtractAllBundleImages(ctx, tc.IndexImage)
 			require.NoError(t, err)
 
 			assert.ElementsMatch(t, bundleImages, tc.ExpectedBundleImages)
@@ -115,7 +118,7 @@ func TestIndexExtractorListAllBundles(t *testing.T) {
 
 			// test bundles have been cached per pkgName
 			for pkgName, expectedBundleImages := range tc.PackageToBundle {
-				bundleImages, err := extractor.ExtractBundleImages(tc.IndexImage, pkgName)
+				bundleImages, err := extractor.ExtractBundleImages(ctx, tc.IndexImage, pkgName)
 				require.NoError(t, err)
 
 				assert.ElementsMatch(t, bundleImages, expectedBundleImages)

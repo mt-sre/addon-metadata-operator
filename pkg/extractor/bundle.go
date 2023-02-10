@@ -152,22 +152,33 @@ func (e *DefaultBundleExtractor) unpackAndValidateBundle(ctx context.Context, bu
 		return err
 	}
 
-	return e.ValidateBundle(registry, tmpDirs["bundle"])
+	return e.ValidateBundle(ctx, registry, tmpDirs["bundle"])
 }
 
-func (e *DefaultBundleExtractor) ValidateBundle(registry *containerdregistry.Registry, tmpDir string) error {
-	e.Log.Debugf("validating the unpacked bundle from %s", tmpDir)
+func (e *DefaultBundleExtractor) ValidateBundle(ctx context.Context, registry *containerdregistry.Registry, tmpDir string) error {
+	errCh := make(chan error)
 
-	validator := opmbundle.NewImageValidator(registry, e.Log.(*logrus.Entry))
-	if err := validator.ValidateBundleFormat(tmpDir); err != nil {
-		return fmt.Errorf("bundle format validation failed: %w", err)
+	go func() {
+		e.Log.Debugf("validating the unpacked bundle from %s", tmpDir)
+
+		validator := opmbundle.NewImageValidator(registry, e.Log.(*logrus.Entry))
+		if err := validator.ValidateBundleFormat(tmpDir); err != nil {
+			errCh <- fmt.Errorf("bundle format validation failed: %w", err)
+		}
+
+		if err := validator.ValidateBundleContent(filepath.Join(tmpDir, opmbundle.ManifestsDir)); err != nil {
+			errCh <- fmt.Errorf("bundle content validation failed: %w", err)
+		}
+
+		errCh <- nil
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-errCh:
+		return err
 	}
-
-	if err := validator.ValidateBundleContent(filepath.Join(tmpDir, opmbundle.ManifestsDir)); err != nil {
-		return fmt.Errorf("bundle content validation failed: %w", err)
-	}
-
-	return nil
 }
 
 type tempDirs map[string]string

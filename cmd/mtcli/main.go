@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
 
 	"github.com/mt-sre/addon-metadata-operator/cmd/mtcli/bundle"
 	"github.com/mt-sre/addon-metadata-operator/cmd/mtcli/completion"
@@ -16,11 +18,21 @@ import (
 var verbose bool
 
 func main() {
+	code := 0
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
+	defer func() {
+		stop()
+
+		os.Exit(code)
+	}()
+
 	rootCmd := generateRootCmd()
 
-	if err := rootCmd.Execute(); err != nil {
+	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		fmt.Fprintln(os.Stdout, err)
-		os.Exit(1)
+
+		code = 1
 	}
 }
 

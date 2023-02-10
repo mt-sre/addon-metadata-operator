@@ -66,7 +66,7 @@ func WithLog(log logrus.FieldLogger) MainExtractorOpt {
 }
 
 // ExtractBundles - extract bundles from indexImage matching pkgName
-func (e *MainExtractor) ExtractBundles(indexImage string, pkgName string) ([]operator.Bundle, error) {
+func (e *MainExtractor) ExtractBundles(ctx context.Context, indexImage string, pkgName string) ([]operator.Bundle, error) {
 	if err := validateIndexImage(indexImage); err != nil {
 		if errors.Is(err, ErrTaglessImage) {
 			e.Log.Info("skipping tagless image, nothing to extract")
@@ -82,17 +82,17 @@ func (e *MainExtractor) ExtractBundles(indexImage string, pkgName string) ([]ope
 		return nil, err
 	}
 
-	bundleImages, err := e.Index.ExtractBundleImages(indexImage, pkgName)
+	bundleImages, err := e.Index.ExtractBundleImages(ctx, indexImage, pkgName)
 	if err != nil {
 		e.Log.Errorf("failed to extract bundles: %w", err)
 		return nil, err
 	}
 
-	return e.extractBundlesConcurrent(bundleImages)
+	return e.extractBundlesConcurrent(ctx, bundleImages)
 }
 
 // ExtractAllBundles - extract bundles for all packages from indexImage
-func (e *MainExtractor) ExtractAllBundles(indexImage string) ([]operator.Bundle, error) {
+func (e *MainExtractor) ExtractAllBundles(ctx context.Context, indexImage string) ([]operator.Bundle, error) {
 	if err := validateIndexImage(indexImage); err != nil {
 		if errors.Is(err, ErrTaglessImage) {
 			e.Log.Info("skipping tagless image, nothing to extract")
@@ -102,16 +102,16 @@ func (e *MainExtractor) ExtractAllBundles(indexImage string) ([]operator.Bundle,
 		return nil, err
 	}
 
-	bundleImages, err := e.Index.ExtractAllBundleImages(indexImage)
+	bundleImages, err := e.Index.ExtractAllBundleImages(ctx, indexImage)
 	if err != nil {
 		e.Log.Errorf("failed to extract all bundles: %w", err)
 		return nil, err
 	}
 
-	return e.extractBundlesConcurrent(bundleImages)
+	return e.extractBundlesConcurrent(ctx, bundleImages)
 }
 
-func (e *MainExtractor) extractBundlesConcurrent(bundleImages []string) ([]operator.Bundle, error) {
+func (e *MainExtractor) extractBundlesConcurrent(ctx context.Context, bundleImages []string) ([]operator.Bundle, error) {
 	res := make([]operator.Bundle, len(bundleImages))
 	g := new(errgroup.Group)
 

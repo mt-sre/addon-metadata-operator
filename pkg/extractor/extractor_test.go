@@ -1,6 +1,7 @@
 package extractor
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/operator"
@@ -45,13 +46,15 @@ func TestMainExtractorWithDefaultValues(t *testing.T) {
 		t.Run(tc.indexImage, func(t *testing.T) {
 			t.Parallel()
 
+			ctx := context.Background()
+
 			var bundles []operator.Bundle
 			var err error
 
 			if tc.pkgName == "" {
-				bundles, err = extractor.ExtractAllBundles(tc.indexImage)
+				bundles, err = extractor.ExtractAllBundles(ctx, tc.indexImage)
 			} else {
-				bundles, err = extractor.ExtractBundles(tc.indexImage, tc.pkgName)
+				bundles, err = extractor.ExtractBundles(ctx, tc.indexImage, tc.pkgName)
 			}
 			require.NoError(t, err)
 

@@ -75,6 +75,9 @@ var (
 
 func run(opts *options) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		ctx, cancel := context.WithCancel(cmd.Context())
+		defer cancel()
+
 		if err := opts.VerifyFlags(); err != nil {
 			return fmt.Errorf("verifying flags: %w", err)
 		}
@@ -94,7 +97,7 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 		}
 
 		extractor := extractor.New()
-		bundles, err := extractor.ExtractBundles(*meta.IndexImage, meta.OperatorName)
+		bundles, err := extractor.ExtractBundles(ctx, *meta.IndexImage, meta.OperatorName)
 		if err != nil {
 			return fmt.Errorf("extracting and parsing addon bundles: %w", err)
 		}
@@ -128,9 +131,6 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("initializing validators: %w", err)
 		}
 
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
 		mb := types.MetaBundle{
 			AddonMeta: meta,
 			Bundles:   bundles,
@@ -154,9 +154,11 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 			writeResult(table, res)
 		}
 
-		fmt.Fprintln(os.Stdout, table.String())
-		fmt.Fprintln(os.Stdout)
-		fmt.Fprintln(os.Stdout, "Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
+		out := cmd.OutOrStdout()
+
+		fmt.Fprintln(out, table.String())
+		fmt.Fprintln(out)
+		fmt.Fprintln(out, "Please consult corresponding validator wikis: https://github.com/mt-sre/addon-metadata-operator/wiki/<code>.")
 
 		if errs := results.Errors(); len(errs) > 0 {
 			cli.PrintValidationErrors(errs)

@@ -1,6 +1,7 @@
 package testutils
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -117,7 +118,7 @@ func (r *singleton) GetMetaBundle(version string) (*types.MetaBundle, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Could not get reference-addon imageset got %v.", err)
 	}
-	bundles, err := r.Extractor.ExtractBundles(imageSet.IndexImage, "reference-addon")
+	bundles, err := r.Extractor.ExtractBundles(context.Background(), imageSet.IndexImage, "reference-addon")
 	if err != nil {
 		return nil, fmt.Errorf("Could not extract reference-addon bundles, got %v.", err)
 	}

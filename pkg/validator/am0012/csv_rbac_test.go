@@ -1,6 +1,7 @@
 package am0012
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
@@ -18,8 +19,11 @@ func TestCSVRBAC(t *testing.T) {
 }
 
 func TestCSVRBACInvalid(t *testing.T) {
+	ctx := context.Background()
+
 	extractor := extractor.New()
 	invalidBundles, err := extractor.ExtractBundles(
+		ctx,
 		"quay.io/osd-addons/rhods-index@sha256:cd579e328ecce9141793c8df4dcb6675fac93a61035003a2f0820e37db616f74",
 		"rhods-operator",
 	)

@@ -2,7 +2,6 @@ package bundles
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/extractor"
@@ -31,7 +30,7 @@ func run(cmd *cobra.Command, args []string) error {
 	indexImageURL := args[0]
 
 	extractor := extractor.New()
-	allBundles, err := extractor.ExtractAllBundles(indexImageURL)
+	allBundles, err := extractor.ExtractAllBundles(cmd.Context(), indexImageURL)
 	if err != nil {
 		return fmt.Errorf("extracting and parsing bundles from index image %q: %w", indexImageURL, err)
 	}
@@ -43,7 +42,7 @@ func run(cmd *cobra.Command, args []string) error {
 		operatorVersionedNames = append(operatorVersionedNames, csv.Name)
 	}
 
-	fmt.Fprintln(os.Stdout, strings.Join(operatorVersionedNames, "\n"))
+	fmt.Fprintln(cmd.OutOrStdout(), strings.Join(operatorVersionedNames, "\n"))
 
 	return nil
 }
