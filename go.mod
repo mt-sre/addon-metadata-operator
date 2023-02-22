@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.27.1
 	github.com/openshift-online/ocm-sdk-go v0.1.318
 	github.com/operator-framework/api v0.17.3
-	github.com/operator-framework/operator-registry v1.26.3
+	github.com/operator-framework/operator-registry v1.26.4
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
