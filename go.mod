@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.14.1
 	github.com/go-logr/logr v1.2.3
 	github.com/magefile/mage v1.14.0
-	github.com/mt-sre/client v0.2.2
+	github.com/mt-sre/client v0.2.3
 	github.com/mt-sre/go-ci v0.6.4
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.9.0
@@ -127,11 +127,11 @@ require (
 	go.opentelemetry.io/otel/sdk v1.10.0 // indirect
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
-	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/term v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/oauth2 v0.6.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/term v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
