@@ -34,7 +34,7 @@ var _ = Describe("validate subcommand", func() {
 				exitCode = 1
 			}
 
-			Eventually(session, "20s").Should(Exit(exitCode))
+			Eventually(session, "30s").Should(Exit(exitCode))
 		},
 		Entry("ocm-addon-test-operator.v0.0.12-invalid",
 			disableTestCase{

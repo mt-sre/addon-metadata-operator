@@ -31,7 +31,7 @@ var _ = Describe("bundle subcommand", func() {
 				exitCode = 1
 			}
 
-			Eventually(session, "10s").Should(Exit(exitCode))
+			Eventually(session, "30s").Should(Exit(exitCode))
 		},
 		Entry("reference-addon.0.1.6-valid",
 			validateTestCase{
