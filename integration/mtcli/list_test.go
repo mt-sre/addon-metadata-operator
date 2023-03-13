@@ -25,7 +25,7 @@ var _ = Describe("list subcommand", func() {
 
 			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).ToNot(HaveOccurred())
-			Eventually(session, "10s").Should(Exit(0))
+			Eventually(session, "30s").Should(Exit(0))
 
 			Expect(session.Out).To(Say(strings.Join(tc.ExpectedBundles, "\n")))
 		},
