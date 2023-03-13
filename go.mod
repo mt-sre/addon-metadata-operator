@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/blang/semver/v4 v4.0.0
-	github.com/fatih/color v1.14.1
+	github.com/fatih/color v1.15.0
 	github.com/go-logr/logr v1.2.3
 	github.com/magefile/mage v1.14.0
 	github.com/mt-sre/client v0.2.3
