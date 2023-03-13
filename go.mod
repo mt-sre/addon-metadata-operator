@@ -12,7 +12,7 @@ require (
 	github.com/mt-sre/go-ci v0.6.4
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.9.0
-	github.com/onsi/gomega v1.27.2
+	github.com/onsi/gomega v1.27.3
 	github.com/openshift-online/ocm-sdk-go v0.1.323
 	github.com/operator-framework/api v0.17.3
 	github.com/operator-framework/operator-registry v1.26.4
@@ -70,7 +70,7 @@ require (
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/cel-go v0.12.6 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
