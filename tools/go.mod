@@ -3,7 +3,7 @@ module tools
 go 1.19
 
 require (
-	github.com/golangci/golangci-lint v1.52.0
+	github.com/golangci/golangci-lint v1.52.1
 	github.com/onsi/ginkgo/v2 v2.9.1
 	sigs.k8s.io/controller-tools v0.11.3
 )
