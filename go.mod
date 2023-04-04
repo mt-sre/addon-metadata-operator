@@ -17,7 +17,7 @@ require (
 	github.com/operator-framework/api v0.17.4-0.20230223191600-0131a6301e42
 	github.com/operator-framework/operator-registry v1.26.5
 	github.com/sirupsen/logrus v1.9.0
-	github.com/spf13/cobra v1.6.1
+	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.2
 	go.uber.org/multierr v1.11.0
@@ -84,7 +84,7 @@ require (
 	github.com/h2non/filetype v1.1.1 // indirect
 	github.com/h2non/go-is-svg v0.0.0-20160927212452-35e8c4b0612c // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
-	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/joelanford/ignore v0.0.0-20210607151042-0d25dc18b62d // indirect
 	github.com/josharian/intern v1.0.0 // indirect
