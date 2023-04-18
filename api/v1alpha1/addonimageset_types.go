@@ -33,6 +33,11 @@ type AddonImageSetSpec struct {
 	// The url for the index image
 	IndexImage string `json:"indexImage" validate:"required"`
 
+	// +optional
+	// +kubebuilder:validation:Pattern=`^quay\.io/osd-addons/[a-z-]+`
+	// The url for the package image
+	PackageImage string `json:"packageImage"`
+
 	// +kubebuilder:validation:Required
 	// A list of image urls of related operators
 	RelatedImages []string `json:"relatedImages" validate:"required"`
