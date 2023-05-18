@@ -20,6 +20,7 @@ Update zz_generated.deepcopy.go with:
 // +kubebuilder:validation:Pattern=`^([A-Za-z -]+ <[0-9A-Za-z_.-]+@redhat\.com>,?)+$`
 type Notification string
 
+// Deprecated: Replaced by MetricsFederation
 // +kubebuilder:object:generate=true
 type Monitoring struct {
 	// +kubebuilder:validation:Required
@@ -30,6 +31,49 @@ type Monitoring struct {
 
 	// +kubebuilder:validation:Required
 	MatchLabels map[string]string `json:"matchLabels" validate:"required"`
+}
+
+// +kubebuilder:object:generate=true
+type MetricsFederation struct {
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	Namespace string `json:"namespace" validate:"required"`
+
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9][A-Za-z0-9-]{0,60}[A-Za-z0-9]$`
+	PortName string `json:"portName" validate:"required"`
+
+	// +kubebuilder:validation:Pattern=`^[a-zA-Z_:][a-zA-Z0-9_:]*$`
+	MatchNames []string `json:"matchNames" validate:"required"`
+
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9-_./]+$`
+	MatchLabels map[string]string `json:"matchLabels" validate:"required"`
+}
+
+// +kubebuilder:object:generate=true
+type MonitoringStack struct {
+	// +optional
+	// This denotes whether the addon requires the MonitoringStack CR to be created in runtime or not. Validation fails if it is provided as 'false' and at the same time other parameters are specified
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// +optional
+	// Represents the resource quotas (requests/limits) to be allocated to the Prometheus instances which will be spun up consequently by the respective MonitoringStack CR in runtime. If not provided, the default values would be used: '{requests: {cpu: '100m', memory: '256M'}, limits:{memory: '512M', cpu: '500m'}}'
+	Resources *MonitoringStackResources `json:"resources,omitempty"`
+}
+
+type MonitoringStackResources struct {
+	// Represents the cpu/memory resources which would be requested by the Prometheus instances spun up consequently by the MonitoringStack CR in runtime
+	Request *MonitoringStackResource `json:"requests,omitempty"`
+
+	// Represents the max. amount of cpu/memory resources which would be accessible by the Prometheus instances spun up consequently by the MonitoringStack CR in runtime
+	Limits *MonitoringStackResource `json:"limits,omitempty"`
+}
+
+type MonitoringStackResource struct {
+	// Ref: https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L147
+	// +kubebuilder:validation:Pattern=`^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$`
+	Cpu *string `json:"cpu,omitempty"`
+
+	// +kubebuilder:validation:Pattern=`^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$`
+	Memory *string `json:"memory,omitempty"`
 }
 
 // Deprecated: Replaced by SubscriptionConfig.

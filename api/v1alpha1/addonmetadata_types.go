@@ -160,8 +160,17 @@ type AddonMetadataSpec struct {
 	CommonAnnotations *map[string]string `json:"commonAnnotations"`
 
 	// +optional
+	// Deprecated: Replaced by MetricsFederation
 	// Configuration parameters to be injected in the ServiceMonitor used for federation. The target prometheus server found by matchLabels needs to serve service-ca signed TLS traffic (https://docs.openshift.com/container-platform/4.6/security/certificate_types_descriptions/service-ca-certificates.html), and it needs to be runing inside the monitoring.namespace, with the service name 'prometheus'.
-	Monitoring *mtsrev1.Monitoring `json:"monitoring"`
+	Monitoring *mtsrev1.Monitoring `json:"monitoring"` //nolint: staticcheck // ignoring self-deprecation SA1019
+
+	// +optional
+	// Configuration parameters to be injected in the ServiceMonitor used for federation. The target prometheus server found by matchLabels needs to serve service-ca signed TLS traffic (https://docs.openshift.com/container-platform/4.6/security/certificate_types_descriptions/service-ca-certificates.html), and it needs to be runing inside the monitoring.namespace, with the service name 'prometheus'.
+	MetricsFederation *mtsrev1.MetricsFederation `json:"metricsFederation"`
+
+	// +optional
+	// Configuration parameters which will determine the underlying configuration of the MonitoringStack CR which will be created in runtime whenever the respective addon would be installed.
+	MonitoringStack *mtsrev1.MonitoringStack `json:"monitoringStack"`
 
 	// +optional
 	// Deprecated: Replaced by SubscriptionConfig.
