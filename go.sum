@@ -572,8 +572,8 @@ github.com/openshift-online/ocm-sdk-go v0.1.341/go.mod h1:KYOw8kAKAHyPrJcQoVR82C
 github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJc5AZX7/PBEpw=
 github.com/operator-framework/api v0.17.5 h1:9d0pc6m1Vp4QeS8i5dhl/B0nifhKQdtw+iFsNx0An0Q=
 github.com/operator-framework/api v0.17.5/go.mod h1:l/cuwtPxkVUY7fzYgdust2m9tlmb8I4pOvbsUufRb24=
-github.com/operator-framework/operator-registry v1.27.0 h1:jpphbQ4CKxZ/KPxBOmjEPr6BChlr3JMUeQcUK5KlFkM=
-github.com/operator-framework/operator-registry v1.27.0/go.mod h1:zVsP+QdutDReiSpASIYqbrixjoNEHZKAyBOgLz1jaXk=
+github.com/operator-framework/operator-registry v1.27.1 h1:yU4atKR69XKH/GHlhgTdKTOAv4qRZUIFVHgrJE4FyiE=
+github.com/operator-framework/operator-registry v1.27.1/go.mod h1:zVsP+QdutDReiSpASIYqbrixjoNEHZKAyBOgLz1jaXk=
 github.com/otiai10/copy v1.2.0 h1:HvG945u96iNadPoG2/Ja2+AUJeW5YuFQMixq9yirC+k=
 github.com/otiai10/copy v1.2.0/go.mod h1:rrF5dJ5F0t/EWSYODDu4j9/vEeYHMkc8jt0zJChqQWw=
 github.com/otiai10/curr v0.0.0-20150429015615-9b4961190c95/go.mod h1:9qAhocn7zKJG+0mI8eUu6xqkFDYS2kb2saOteoSB3cE=
