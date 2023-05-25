@@ -566,8 +566,8 @@ github.com/opencontainers/image-spec v1.0.2/go.mod h1:BtxoFyWECRxE4U/7sNtV5W15zM
 github.com/opencontainers/runtime-spec v1.0.2/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/runtime-spec v1.0.3-0.20200929063507-e6143ca7d51d/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417 h1:3snG66yBm59tKhhSPQrQ/0bCrv1LQbKt40LnUPiUxdc=
-github.com/openshift-online/ocm-sdk-go v0.1.341 h1:hSEHR1le+jGOMoKqVC7/KKXPc3aFu3m5f16u6s7l7iw=
-github.com/openshift-online/ocm-sdk-go v0.1.341/go.mod h1:KYOw8kAKAHyPrJcQoVR82CneQ4ofC02Na4cXXaTq4Nw=
+github.com/openshift-online/ocm-sdk-go v0.1.342 h1:Op1IzedflseIZNleuPe1/9nvQZspv7W0FHv7a+w8Erk=
+github.com/openshift-online/ocm-sdk-go v0.1.342/go.mod h1:KYOw8kAKAHyPrJcQoVR82CneQ4ofC02Na4cXXaTq4Nw=
 github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJc5AZX7/PBEpw=
 github.com/operator-framework/api v0.17.5 h1:9d0pc6m1Vp4QeS8i5dhl/B0nifhKQdtw+iFsNx0An0Q=
 github.com/operator-framework/api v0.17.5/go.mod h1:l/cuwtPxkVUY7fzYgdust2m9tlmb8I4pOvbsUufRb24=
