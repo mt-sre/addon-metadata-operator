@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/golangci/golangci-lint v1.53.2
-	github.com/onsi/ginkgo/v2 v2.9.7
+	github.com/onsi/ginkgo/v2 v2.10.0
 	sigs.k8s.io/controller-tools v0.12.0
 )
 
