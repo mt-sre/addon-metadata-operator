@@ -2,8 +2,8 @@
 
 set -exvo pipefail -o nounset
 
-GO_1_19="/opt/go/1.19.3/bin"
+GO_1_20="/opt/go/1.20.6/bin"
 
-if [ -d  "${GO_1_19}" ]; then
-     PATH="${GO_1_19}:${PATH}"
+if [ -d  "${GO_1_20}" ]; then
+     PATH="${GO_1_20}:${PATH}"
 fi
