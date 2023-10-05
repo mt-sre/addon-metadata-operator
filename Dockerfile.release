@@ -1,4 +1,4 @@
-FROM ghcr.io/goreleaser/goreleaser-cross:v1.19.3
+FROM ghcr.io/goreleaser/goreleaser-cross:v1.20.6
 
 COPY . /go/src/github.com/mt-sre/addon-metadata-operator
 
