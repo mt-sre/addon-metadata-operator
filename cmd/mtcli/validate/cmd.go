@@ -58,6 +58,7 @@ func Cmd() *cobra.Command {
 	opts.AddVersionFlag(flags)
 	opts.AddDisabledFlag(flags)
 	opts.AddEnabledFlag(flags)
+	opts.AddExcludedNamespacesFlag(flags)
 
 	return cmd
 }
@@ -126,6 +127,9 @@ func run(opts *options) func(cmd *cobra.Command, args []string) error {
 				validator.NewRetryMiddleware(),
 			},
 			validator.WithOCMClient{OCMClient: ocm},
+			validator.WithValidatorOptions{
+				validator.WithExcludedNamespaces(opts.ExcludedNamespaces),
+			},
 		)
 		if err != nil {
 			return fmt.Errorf("initializing validators: %w", err)

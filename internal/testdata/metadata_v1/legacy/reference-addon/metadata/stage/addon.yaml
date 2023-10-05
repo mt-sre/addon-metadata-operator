@@ -9,9 +9,9 @@ addonOwner: MT-SRE Team <sd-mt-sre@redhat.com>
 quayRepo: quay.io/osd-addons/reference-addon
 testHarness: quay.io/miwilson/addon-samples
 installMode: OwnNamespace
-targetNamespace: redhat-reference-addon
+targetNamespace: reference-addon
 namespaces:
-- redhat-reference-addon
+- reference-addon
 ocmQuotaName: addon-reference-addon
 ocmQuotaCost: 1
 operatorName: reference-addon

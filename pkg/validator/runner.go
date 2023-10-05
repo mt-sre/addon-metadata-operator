@@ -25,9 +25,30 @@ type Initializer func(Dependencies) (Validator, error)
 
 // Dependencies abstracts common dependencies for Validators.
 type Dependencies struct {
-	Logger     logr.Logger
-	OCMClient  OCMClient
-	QuayClient QuayClient
+	Logger          logr.Logger
+	OCMClient       OCMClient
+	QuayClient      QuayClient
+	ValidatorConfig ValidatorConfig
+}
+
+type ValidatorConfig struct {
+	ExcludedNamespaces []string
+}
+
+func (c *ValidatorConfig) Option(opts ...ValidatorOption) {
+	for _, opt := range opts {
+		opt.ConfigureValidator(c)
+	}
+}
+
+type ValidatorOption interface {
+	ConfigureValidator(c *ValidatorConfig)
+}
+
+type WithExcludedNamespaces []string
+
+func (w WithExcludedNamespaces) ConfigureValidator(c *ValidatorConfig) {
+	c.ExcludedNamespaces = append(c.ExcludedNamespaces, w...)
 }
 
 // NewRunner returns a Runner configured with a variadic
@@ -38,10 +59,15 @@ func NewRunner(opts ...RunnerOption) (*Runner, error) {
 	cfg.Option(opts...)
 	cfg.Default()
 
+	var valCfg ValidatorConfig
+
+	valCfg.Option(cfg.ValidatorOptions...)
+
 	deps := Dependencies{
-		Logger:     cfg.Logger,
-		OCMClient:  cfg.OCMClient,
-		QuayClient: cfg.QuayClient,
+		Logger:          cfg.Logger,
+		OCMClient:       cfg.OCMClient,
+		QuayClient:      cfg.QuayClient,
+		ValidatorConfig: valCfg,
 	}
 
 	entries := make(map[Code]validatorEntry)
@@ -133,11 +159,12 @@ func (r *Runner) applyMiddleware(run RunFunc) RunFunc {
 }
 
 type RunnerConfig struct {
-	Initializers []Initializer
-	Logger       logr.Logger
-	Middleware   []Middleware
-	OCMClient    OCMClient
-	QuayClient   QuayClient
+	Initializers     []Initializer
+	Logger           logr.Logger
+	Middleware       []Middleware
+	OCMClient        OCMClient
+	QuayClient       QuayClient
+	ValidatorOptions []ValidatorOption
 }
 
 func (c *RunnerConfig) Option(opts ...RunnerOption) {
@@ -187,6 +214,12 @@ func (o WithOCMClient) ApplyToRunnerConfig(c *RunnerConfig) { c.OCMClient = o }
 type WithQuayClient struct{ QuayClient }
 
 func (q WithQuayClient) ApplyToRunnerConfig(c *RunnerConfig) { c.QuayClient = q }
+
+type WithValidatorOptions []ValidatorOption
+
+func (w WithValidatorOptions) ApplyToRunnerConfig(c *RunnerConfig) {
+	c.ValidatorOptions = append(c.ValidatorOptions, w...)
+}
 
 type validatorEntry struct {
 	Validator

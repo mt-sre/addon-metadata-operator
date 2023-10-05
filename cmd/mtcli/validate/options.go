@@ -9,10 +9,11 @@ import (
 )
 
 type options struct {
-	Env      string
-	Version  string
-	Disabled string
-	Enabled  string
+	Env                string
+	Version            string
+	Disabled           string
+	Enabled            string
+	ExcludedNamespaces []string
 }
 
 func (o *options) AddEnvFlag(flags *pflag.FlagSet) {
@@ -48,6 +49,15 @@ func (o *options) AddEnabledFlag(flags *pflag.FlagSet) {
 		"enabled",
 		o.Enabled,
 		"Enable specific validators, separated by ','. Can't be combined with --disabled.",
+	)
+}
+
+func (o *options) AddExcludedNamespacesFlag(flags *pflag.FlagSet) {
+	flags.StringArrayVar(
+		&o.ExcludedNamespaces,
+		"excluded-namespaces",
+		o.ExcludedNamespaces,
+		"Excludes the given namespaces from validation.",
 	)
 }
 
