@@ -7,6 +7,7 @@ import (
 
 	"github.com/mt-sre/addon-metadata-operator/pkg/types"
 	"github.com/mt-sre/addon-metadata-operator/pkg/validator"
+	"golang.org/x/exp/slices"
 )
 
 func init() {
@@ -30,29 +31,14 @@ func NewNamespace(deps validator.Dependencies) (validator.Validator, error) {
 	}
 
 	return &Namespace{
-		Base: base,
+		Base:               base,
+		ExcludedNamespaces: deps.ValidatorConfig.ExcludedNamespaces,
 	}, nil
 }
 
 type Namespace struct {
 	*validator.Base
-}
-
-func namespaceRegexExceptions() []string {
-	return []string{
-		"acm",
-		"codeready-workspaces-operator",
-		"codeready-workspaces-operator-qe",
-		"addon-dba-operator",
-		"openshift-storage",
-		"prow",
-	}
-}
-
-func namespacePresenceExceptions() []string {
-	return []string{
-		"openshift-logging",
-	}
+	ExcludedNamespaces []string
 }
 
 func (n *Namespace) Run(ctx context.Context, mb types.MetaBundle) validator.Result {
@@ -63,11 +49,23 @@ func (n *Namespace) Run(ctx context.Context, mb types.MetaBundle) validator.Resu
 		return n.Fail("Target namespace is not in the list of supplied namespaces")
 	}
 
-	allValid, failedNamespaces := validateNamespaceRegex(namespaceList, namespaceRegexExceptions())
+	allValid, failedNamespaces := validateNamespaceRegex(namespaceList, n.ExcludedNamespaces)
 	if !allValid {
 		return n.Fail(fmt.Sprintf("Some namespaces doesn't start with 'redhat-*' %v", failedNamespaces))
 	}
 	return n.Success()
+}
+
+func validateNamespacePresence(targetNamespace string, namespaceList []string, exceptionList []string) bool {
+	// Return true if targetNamespace is in the exceptionList or
+	// Return true if targetNamespace is in the namespaceList
+	return slices.Contains(exceptionList, targetNamespace) || slices.Contains(namespaceList, targetNamespace)
+}
+
+func namespacePresenceExceptions() []string {
+	return []string{
+		"openshift-logging",
+	}
 }
 
 func validateNamespaceRegex(namespaceList []string, exceptionList []string) (bool, []string) {
@@ -76,7 +74,7 @@ func validateNamespaceRegex(namespaceList []string, exceptionList []string) (boo
 	var failedNamespaces []string
 
 	for _, namespace := range namespaceList {
-		if includes(namespace, exceptionList) {
+		if slices.Contains(exceptionList, namespace) {
 			continue
 		}
 
@@ -88,19 +86,4 @@ func validateNamespaceRegex(namespaceList []string, exceptionList []string) (boo
 	}
 
 	return len(failedNamespaces) == 0, failedNamespaces
-}
-
-func validateNamespacePresence(targetNamespace string, namespaceList []string, exceptionList []string) bool {
-	// Return true if targetNamespace is in the exceptionList or
-	// Return true if targetNamespace is in the namespaceList
-	return includes(targetNamespace, exceptionList) || includes(targetNamespace, namespaceList)
-}
-
-func includes(item string, itemList []string) bool {
-	for _, elem := range itemList {
-		if elem == item {
-			return true
-		}
-	}
-	return false
 }
