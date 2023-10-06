@@ -53,7 +53,7 @@ func (o *options) AddEnabledFlag(flags *pflag.FlagSet) {
 }
 
 func (o *options) AddExcludedNamespacesFlag(flags *pflag.FlagSet) {
-	flags.StringArrayVar(
+	flags.StringSliceVar(
 		&o.ExcludedNamespaces,
 		"excluded-namespaces",
 		o.ExcludedNamespaces,
