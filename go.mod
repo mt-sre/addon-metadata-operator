@@ -11,7 +11,7 @@ require (
 	github.com/mt-sre/client v0.2.4
 	github.com/mt-sre/go-ci v0.6.6
 	github.com/novln/docker-parser v1.0.0
-	github.com/onsi/ginkgo/v2 v2.12.1
+	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.28.0
 	github.com/openshift-online/ocm-sdk-go v0.1.373
 	github.com/operator-framework/api v0.17.7
