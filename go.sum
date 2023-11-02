@@ -706,8 +706,8 @@ github.com/opencontainers/runtime-tools v0.0.0-20181011054405-1d69bd0f9c39/go.mo
 github.com/opencontainers/selinux v1.6.0/go.mod h1:VVGKuOLlE7v4PJyT6h7mNWvq1rzqiriPsEqVhc+svHE=
 github.com/opencontainers/selinux v1.8.0/go.mod h1:RScLhm78qiWa2gbVCcGkC7tCGdgk3ogry1nUQF8Evvo=
 github.com/opencontainers/selinux v1.8.2/go.mod h1:MUIHuUEvKB1wtJjQdOyYRgOnLD2xAPP8dBsCoU0KuF8=
-github.com/openshift-online/ocm-sdk-go v0.1.380 h1:rYjSSh+h61OPvUN9gClz6w0xfQqwg1g8hiOBpyz+jd0=
-github.com/openshift-online/ocm-sdk-go v0.1.380/go.mod h1:/+VFIw1iW2H0jEkFH4GnbL/liWareyzsL0w7mDIudB4=
+github.com/openshift-online/ocm-sdk-go v0.1.381 h1:MRmMyqs4jSWUrDwSzslq22GjB2Ly/9pz1B1+v72npCs=
+github.com/openshift-online/ocm-sdk-go v0.1.381/go.mod h1:/+VFIw1iW2H0jEkFH4GnbL/liWareyzsL0w7mDIudB4=
 github.com/operator-framework/api v0.18.0 h1:6EdSNeAjin4LRu2YQnQWMJMc6HXS0AQDG+CfaEvFrAo=
 github.com/operator-framework/api v0.18.0/go.mod h1:SCCslqke6AVOJ5JM+NqNE1CHuAgJLScsL66pnPaSMXs=
 github.com/operator-framework/operator-registry v1.30.1 h1:7XvISZrwi+j9z4MIiApRRU+K7v3qMXIcgBs88eQ724Q=
