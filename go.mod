@@ -23,7 +23,7 @@ require (
 	go.uber.org/multierr v1.11.0
 	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0
 	golang.org/x/mod v0.13.0
-	golang.org/x/sync v0.4.0
+	golang.org/x/sync v0.5.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.28.3
 	k8s.io/apiextensions-apiserver v0.28.3
