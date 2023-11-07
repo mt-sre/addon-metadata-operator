@@ -17,7 +17,7 @@ require (
 	github.com/operator-framework/api v0.19.0
 	github.com/operator-framework/operator-registry v1.31.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/multierr v1.11.0
