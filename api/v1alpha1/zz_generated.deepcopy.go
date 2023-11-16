@@ -311,11 +311,6 @@ func (in *AddonMetadataSpec) DeepCopyInto(out *AddonMetadataSpec) {
 			copy(*out, *in)
 		}
 	}
-	if in.ManualInstallPlanApproval != nil {
-		in, out := &in.ManualInstallPlanApproval, &out.ManualInstallPlanApproval
-		*out = new(bool)
-		**out = **in
-	}
 	if in.CommonLabels != nil {
 		in, out := &in.CommonLabels, &out.CommonLabels
 		*out = new(map[string]string)
