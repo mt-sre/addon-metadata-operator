@@ -149,9 +149,6 @@ type AddonMetadataSpec struct {
 	AddonNotifications *[]mtsrev1.Notification `json:"addonNotifications"`
 
 	// +optional
-	ManualInstallPlanApproval *bool `json:"manualInstallPlanApproval"`
-
-	// +optional
 	// Labels to be applied to all objects created in the SelectorSyncSet.
 	CommonLabels *map[string]string `json:"commonLabels"`
 
