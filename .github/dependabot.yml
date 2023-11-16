@@ -6,6 +6,7 @@ updates:
     interval: daily
   labels:
   - kind/deps
+  - ok-to-test
   commit-message:
     prefix: fix
     include: scope
@@ -15,6 +16,7 @@ updates:
     interval: daily
   labels:
   - kind/deps
+  - ok-to-test
   commit-message:
     prefix: fix
     include: scope
