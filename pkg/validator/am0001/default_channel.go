@@ -65,6 +65,7 @@ func (d *DefaultChannel) isPartOfEnum(defaultChannel string) validator.Result {
 		"stable": {},
 		"edge":   {},
 		"rc":     {},
+		"fast":   {},
 	}
 	if _, ok := enum[defaultChannel]; !ok {
 		msg := fmt.Sprintf("The defaultChannel '%v' is not part of the accepted values: alpha, beta, stable, edge or rc.", defaultChannel)
