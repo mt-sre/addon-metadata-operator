@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.30.0
 	github.com/openshift-online/ocm-sdk-go v0.1.391
 	github.com/operator-framework/api v0.20.0
-	github.com/operator-framework/operator-registry v1.33.0
+	github.com/operator-framework/operator-registry v1.34.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
@@ -64,7 +64,6 @@ require (
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
 	github.com/go-git/go-git/v5 v5.11.0 // indirect
