@@ -11,11 +11,11 @@ require (
 	github.com/mt-sre/client v0.2.6
 	github.com/mt-sre/go-ci v0.6.8
 	github.com/novln/docker-parser v1.0.0
-	github.com/onsi/ginkgo/v2 v2.17.0
+	github.com/onsi/ginkgo/v2 v2.17.1
 	github.com/onsi/gomega v1.32.0
 	github.com/openshift-online/ocm-sdk-go v0.1.413
 	github.com/operator-framework/api v0.22.0
-	github.com/operator-framework/operator-registry v1.37.0
+	github.com/operator-framework/operator-registry v1.38.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
@@ -56,9 +56,9 @@ require (
 	github.com/containers/storage v1.51.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/reference v0.5.0 // indirect
-	github.com/docker/cli v24.0.7+incompatible // indirect
+	github.com/docker/cli v25.0.5+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v24.0.9+incompatible // indirect
+	github.com/docker/docker v25.0.5+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
