@@ -13,7 +13,7 @@ require (
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.17.1
 	github.com/onsi/gomega v1.32.0
-	github.com/openshift-online/ocm-sdk-go v0.1.413
+	github.com/openshift-online/ocm-sdk-go v0.1.414
 	github.com/operator-framework/api v0.23.0
 	github.com/operator-framework/operator-registry v1.39.0
 	github.com/sirupsen/logrus v1.9.3
