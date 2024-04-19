@@ -9,7 +9,7 @@ require (
 	github.com/go-logr/logr v1.4.1
 	github.com/magefile/mage v1.15.0
 	github.com/mt-sre/client v0.2.6
-	github.com/mt-sre/go-ci v0.6.8
+	github.com/mt-sre/go-ci v0.6.9
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.17.1
 	github.com/onsi/gomega v1.33.0
