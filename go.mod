@@ -6,7 +6,7 @@ require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/fatih/color v1.17.0
-	github.com/go-logr/logr v1.4.1
+	github.com/go-logr/logr v1.4.2
 	github.com/magefile/mage v1.15.0
 	github.com/mt-sre/client v0.2.6
 	github.com/mt-sre/go-ci v0.6.9
