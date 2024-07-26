@@ -11,8 +11,8 @@ require (
 	github.com/mt-sre/client v0.2.6
 	github.com/mt-sre/go-ci v0.6.9
 	github.com/novln/docker-parser v1.0.0
-	github.com/onsi/ginkgo/v2 v2.19.0
-	github.com/onsi/gomega v1.33.1
+	github.com/onsi/ginkgo/v2 v2.19.1
+	github.com/onsi/gomega v1.34.0
 	github.com/openshift-online/ocm-sdk-go v0.1.432
 	github.com/operator-framework/api v0.23.0
 	github.com/operator-framework/operator-registry v1.41.0
@@ -143,7 +143,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
