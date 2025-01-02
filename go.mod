@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/blang/semver/v4 v4.0.0
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.18.0
 	github.com/go-logr/logr v1.4.2
 	github.com/magefile/mage v1.15.0
 	github.com/mt-sre/client v0.2.7
