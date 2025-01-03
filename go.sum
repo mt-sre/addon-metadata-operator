@@ -290,8 +290,8 @@ github.com/opencontainers/image-spec v1.1.0 h1:8SG7/vwALn54lVB/0yZ/MMwhFrPYtpEHQ
 github.com/opencontainers/image-spec v1.1.0/go.mod h1:W4s4sFTMaBeK1BQLXbG4AdM2szdn85PY75RI83NrTrM=
 github.com/opencontainers/runtime-spec v1.2.0 h1:z97+pHb3uELt/yiAWD691HNHQIF07bE7dzrbT927iTk=
 github.com/opencontainers/runtime-spec v1.2.0/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
-github.com/openshift-online/ocm-sdk-go v0.1.413 h1:+zIRjcmYFgx4InSptZZqYENxCf9yFVZXE8CfjtWuxOM=
-github.com/openshift-online/ocm-sdk-go v0.1.413/go.mod h1:CiAu2jwl3ITKOxkeV0Qnhzv4gs35AmpIzVABQLtcI2Y=
+github.com/openshift-online/ocm-sdk-go v0.1.453 h1:iYA4dVa+sgNH4QnBL0XLBmPcBHyyrD+R1IQvNgSl1Ko=
+github.com/openshift-online/ocm-sdk-go v0.1.453/go.mod h1:CiAu2jwl3ITKOxkeV0Qnhzv4gs35AmpIzVABQLtcI2Y=
 github.com/operator-framework/api v0.27.0 h1:OrVaGKZJvbZo58HTv2guz7aURkhVKYhFqZ/6VpifiXI=
 github.com/operator-framework/api v0.27.0/go.mod h1:lg2Xx+S8NQWGYlEOvFwQvH46E5EK5IrAIL7HWfAhciM=
 github.com/operator-framework/operator-registry v1.49.0 h1:7oasuzReEBt3Fh6g5DTE5nzY6wO8bFp5F/LSmYnNWD0=
