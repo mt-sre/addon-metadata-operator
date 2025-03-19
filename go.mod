@@ -22,7 +22,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/multierr v1.11.0
 	golang.org/x/exp v0.0.0-20250103183323-7d7fa50e5329
-	golang.org/x/mod v0.23.0
+	golang.org/x/mod v0.24.0
 	golang.org/x/sync v0.11.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.32.2
