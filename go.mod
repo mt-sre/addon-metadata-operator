@@ -11,9 +11,9 @@ require (
 	github.com/mt-sre/client v0.2.7
 	github.com/mt-sre/go-ci v0.6.10
 	github.com/novln/docker-parser v1.0.0
-	github.com/onsi/ginkgo/v2 v2.22.2
+	github.com/onsi/ginkgo/v2 v2.23.2
 	github.com/onsi/gomega v1.36.2
-	github.com/openshift-online/ocm-sdk-go v0.1.461
+	github.com/openshift-online/ocm-sdk-go v0.1.462
 	github.com/operator-framework/api v0.30.0
 	github.com/operator-framework/operator-registry v1.51.0
 	github.com/sirupsen/logrus v1.9.3
@@ -147,7 +147,7 @@ require (
 	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
-	golang.org/x/tools v0.29.0 // indirect
+	golang.org/x/tools v0.30.0 // indirect
 	google.golang.org/genproto v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250227231956-55c901821b1e // indirect
