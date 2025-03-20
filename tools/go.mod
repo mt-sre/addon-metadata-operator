@@ -5,7 +5,7 @@ toolchain go1.24.1
 
 require (
 	github.com/golangci/golangci-lint v1.64.8
-	github.com/onsi/ginkgo/v2 v2.22.2
+	github.com/onsi/ginkgo/v2 v2.23.2
 	sigs.k8s.io/controller-tools v0.17.2
 )
 
