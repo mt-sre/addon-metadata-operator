@@ -2,6 +2,8 @@ module github.com/mt-sre/addon-metadata-operator
 
 go 1.23.0
 
+toolchain go1.24.1
+
 require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/blang/semver/v4 v4.0.0
@@ -13,7 +15,7 @@ require (
 	github.com/novln/docker-parser v1.0.0
 	github.com/onsi/ginkgo/v2 v2.23.3
 	github.com/onsi/gomega v1.36.3
-	github.com/openshift-online/ocm-sdk-go v0.1.463
+	github.com/openshift-online/ocm-sdk-go v0.1.464
 	github.com/operator-framework/api v0.30.0
 	github.com/operator-framework/operator-registry v1.51.0
 	github.com/sirupsen/logrus v1.9.3
